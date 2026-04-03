@@ -3,6 +3,7 @@
 - Chạy thử chương trình sử dụng OpenCV và YOLO để kiểm thử Camera
 - Tìm hiểu Calibration sa bàn cho Cam với OpenCV
 - Tìm các giá gắn cam, Tripod trên thị trường
+
 **Mục lục:**
 - [A. Công việc đã làm](#a-công-việc-đã-làm)
   - [1. Tìm các giá gắn cam, tripod trên thị trường](#1-tìm-các-giá-gắn-cam-tripod-trên-thị-trường)

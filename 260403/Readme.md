@@ -72,7 +72,9 @@ y = f × (Yc / Zc)
 ```
 
 Trong đó **f** là tiêu cự (focal length) — khoảng cách từ tâm quang học đến mặt phẳng sensor, **Zc** là khoảng cách từ điểm P đến camera.
+
 <p align="center"><img src="images/pinhole-camera.png" alt="Mô hình Pinhole Camera"></p>
+
 Tuy nhiên, camera thực tế không lý tưởng. Pixel trên sensor có thể không vuông (tiêu cự khác nhau theo 2 trục: fx ≠ fy), và tâm quang học (cx, cy) thường không trùng chính xác tâm ảnh. Các tham số này được gộp vào **Ma trận nội tham số (Intrinsic Matrix K)**:
 
 ```

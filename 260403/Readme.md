@@ -165,3 +165,6 @@ Sau khi có kết quả calibration là file calibration_result.npz là ma trậ
 ![YOLO Pose Keypoints](images/image.png)
 
 Hiện tại Yolo_pose mặc định sẽ nhận biết các keypoit của người, như trên hình ta có thể phân tích được góc giữa các vector cánh tay và thân. 
+
+## C. Công việc tiếp theo
+- Triển khai Calibration khử méo cho Cam và Calibration tọa độ sa bàn.

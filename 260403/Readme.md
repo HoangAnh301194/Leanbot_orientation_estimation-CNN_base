@@ -16,11 +16,15 @@
       - [b. Mục tiêu của Camera Calibration](#b-mục-tiêu-của-camera-calibration)
       - [c. Phương pháp Checkerboard](#c-phương-pháp-calibration-bằng-bàn-cờ-checkerboard-pattern)
       - [d. Ứng dụng kết quả Calibration](#d-ứng-dụng-kết-quả-calibration)
+
 ### 1. Kiểm thử Camera
+
 - Trước đó em đã triển khai và huấn luận model Yolo_object_detection để nhận biết Leanbot và OpenCV để vẽ đường bao xuang quanh Leanbot trên khung hình trong bài báo cáo trước đó tại Lab, tuy nhiên trước đó em sử dụng Cam máy tính. Hiện tại em đã kiểm thử trên Cam mới và cho kết quả như sau: 
 
 <p align="center"><img src="images/leanbot.png" alt="Kiểm thử Camera"></p>
+
 - Link Code test : [Leanbot_detection](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/tree/master/260403/Leanbot_detection)
+
 
 ### 2. Calibration Sa bàn cho Camera bằng OpenCV
 #### 2.1. Cơ sở lý thuyết 

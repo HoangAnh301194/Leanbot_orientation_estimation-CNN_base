@@ -184,7 +184,7 @@ Sau khi có kết quả calibration là file calibration_result.npz là ma trậ
   Em đã lấy ảnh bàn cờ Caro trên mạng và mở ở máy tính cho Camera quét, zoom đúng kích thước 30mm/ô và làm theo code hướng dẫn trong tài liệu. Các bước thực hiện và kết quả thu được như sau:
   **a. Chụp ảnh bàn cờ**
   - **Công cụ:** Chạy script đã viết `capture_calibration_images.py`.
-  - **Quá trình:** Thiết lập kích thước bàn cờ mục tiêu (4x4 inner corners). Chĩa camera vào ảnh Caro trên màn hình máy tính. Sử dụng hàm`cv2.findChessboardCorners` để liên tục dò tìm các góc lân cận, sinh ra lưới overlay màu xanh khi khóa mục tiêu thành công.
+  - **Quá trình:** Thiết lập kích thước bàn cờ mục tiêu (4x4 inner corners). Hướng camera vào ảnh Caro trên màn hình máy tính. Sử dụng hàm`cv2.findChessboardCorners` để liên tục dò tìm các góc lân cận, sinh ra lưới overlay màu xanh khi khóa mục tiêu thành công.
   - **Tính năng:** Khi chạy script thì cửa sổ Cam hiện lên, chỉ cần cầm bàn cờ di chuyển nhiều góc độ khác nhau trước camera, khi nào thấy lưới màu xanh hiện lên thì nhấn C để chụp, X để xóa ảnh cũ, Q để thoát.
 
   ![alt text](image-4.png)
@@ -200,6 +200,7 @@ Sau khi có kết quả calibration là file calibration_result.npz là ma trậ
   - Kết quả sau khi chạy bao gồm ma trận nội tham số, ngoại tham số và hệ số méo ảnh như sau: 
 
     ![alt text](image.png)
+
   - Ảnh so sảnh trước, sau khi khử méo nhưu sau ( trái là ảnh trước, phải là ảnh sau khi khử méo ):
 
     ![alt text](image-1.png)
@@ -208,11 +209,11 @@ Sau khi có kết quả calibration là file calibration_result.npz là ma trậ
   **c. Calibrate tọa độ sa bàn**
   - **Công cụ:** Chạy script `undistort_and_transform.py`.
   - **Làm thẳng Frame ảnh:** Load các tham số Nội vừa lưu, sử dụng `cv2.initUndistortRectifyMap` và `cv2.remap` để "kéo dãn" ảnh đầu vào realtime của Webcam.
-  - **Tạo hệ mặt phẳng chuẩn (Ma trận Ngoại tham số với Sa bàn):** Cắm tọa độ ảo 1200x1200mm vào máy tính. Dùng chuột click lần lượt vào 4 góc vật lý thực tế của sàn thi đấu (Sa bàn) trên màn hình máy tính.
+  - **Tạo hệ mặt phẳng chuẩn (Ma trận Ngoại tham số với Sa bàn):** Gắn tọa độ ảo 1200x1200mm vào máy tính. Dùng chuột click lần lượt vào 4 góc vật lý thực tế của sàn thi đấu (Sa bàn) trên màn hình máy tính, lần lượt tại các góc : Trái trên -> phải trên -> phải dưới -> trái dưới.
 
     ![alt text](image-2.png)
 
-  - **Perspective Transform:** Kích hoạt thuật toán `cv2.getPerspectiveTransform()` ép sinh ra Ma trận biến đổi phối cảnh tương đối giữa 4 mốc Pixel và 4 gốc kích thước Vật Lý và thu được tọa độ thực của 4 góc sa bàn như sau:
+  - **Perspective Transform:**  chạy hàm thuật toán `cv2.getPerspectiveTransform()` output trả về ma trận biến đổi phối cảnh tương đối giữa 4 mốc Pixel và 4 gốc kích thước Vật Lý và thu được tọa độ thực của 4 góc sa bàn như sau:
 
     ![alt text](image-3.png)
 

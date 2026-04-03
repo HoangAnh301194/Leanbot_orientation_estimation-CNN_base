@@ -21,7 +21,7 @@
 
 - Trước đó em đã triển khai và huấn luận model Yolo_object_detection để nhận biết Leanbot và OpenCV để vẽ đường bao xuang quanh Leanbot trên khung hình trong bài báo cáo trước đó tại Lab, tuy nhiên trước đó em sử dụng Cam máy tính. Hiện tại em đã kiểm thử trên Cam mới và cho kết quả như sau: 
 
-<p align="center"><img src="images/leanbot.png" alt="Kiểm thử Camera"></p>
+![Kiểm thử Camera](images/leanbot.png)
 
 - Link Code test : [Leanbot_detection](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/tree/master/260403/Leanbot_detection)
 
@@ -73,7 +73,7 @@ y = f × (Yc / Zc)
 
 Trong đó **f** là tiêu cự (focal length) — khoảng cách từ tâm quang học đến mặt phẳng sensor, **Zc** là khoảng cách từ điểm P đến camera.
 
-<p align="center"><img src="images/pinhole-camera.png" alt="Mô hình Pinhole Camera"></p>
+![Mô hình Pinhole Camera](images/pinhole-camera.png)
 
 Tuy nhiên, camera thực tế không lý tưởng. Pixel trên sensor có thể không vuông (tiêu cự khác nhau theo 2 trục: fx ≠ fy), và tâm quang học (cx, cy) thường không trùng chính xác tâm ảnh. Các tham số này được gộp vào **Ma trận nội tham số (Intrinsic Matrix K)**:
 
@@ -117,7 +117,7 @@ Trong thực tế, ống kính camera không hoàn hảo như mô hình Pinhole.
 
 - **Méo xuyên tâm (Radial Distortion):** Gây ra bởi hình dạng ống kính. Ảnh bị méo dạng hình thùng (barrel — phình ra ngoài) hoặc hình gối (pincushion — co vào trong), đặc biệt rõ ở vùng rìa ảnh. Được mô tả bởi hệ số **k1, k2, k3**.
 
-<p align="center"><img src="images/lens-distortion.png" alt="Méo ống kính"></p>
+![Méo ống kính](images/lens-distortion.png)
 
 - **Méo tiếp tuyến (Tangential Distortion):** Xảy ra khi ống kính không song song hoàn toàn với mặt phẳng sensor, khiến ảnh bị lệch nhẹ. Được mô tả bởi hệ số **p1, p2**.
 
@@ -129,7 +129,7 @@ Mục tiêu của Calibration là tìm ra ma trận K và 5 hệ số méo từ 
 
 - **Đầu vào:** Nhiều ảnh chụp một mẫu hình có kích thước đã biết (thường là checkerboard) từ nhiều góc nhìn khác nhau. Với mỗi ảnh, ta biết tọa độ 3D thực của các điểm trên mẫu và tìm được tọa độ pixel 2D tương ứng.
 
-<p align="center"><img src="images/calibration-patterns.gif" alt="Calibration Patterns"></p>
+![Calibration Patterns](images/calibration-patterns.gif)
 
 - **Đầu ra:**
   - **Camera Matrix K** (3×3): chứa fx, fy, cx, cy
@@ -146,7 +146,7 @@ Checkerboard (bàn cờ đen-trắng) là mẫu hình phổ biến nhất cho ca
 2. **Chụp nhiều ảnh:** Chụp 15-25 ảnh checkerboard từ nhiều góc, vị trí, khoảng cách khác nhau.
 3. **Tìm corners 2D:** Dùng `cv2.findChessboardCorners()` để tìm corners thô, sau đó tinh chỉnh đến độ chính xác sub-pixel bằng `cv2.cornerSubPix()`.
 
-<p align="center"><img src="images/corner.png" alt="Tìm corners 2D"></p>
+![Tìm corners 2D](images/corner.png)
 
 4. **Calibrate:** Truyền danh sách tọa độ 3D và 2D vào `cv2.calibrateCamera()` để tính K, hệ số méo, và rvecs/tvecs.
 
@@ -162,6 +162,6 @@ Sau khi có kết quả calibration là file calibration_result.npz là ma trậ
 - Hiện tại em có tìm hiểu được phương pháp nhận diện Leanbot mới : Yolo_pose fine tuning . Về tư tưởng thì sẽ huấn luyện model nhận biết được các điểm đặc trưng trên Leanbot nhưu 2 cánh tay servo, 2 bánh xe, 2 góc đuôi,... từ đó khi phát hiện được leanbot có thể dựa vào chiều của các vector nối các điểm để biết hướng xuay của leanbot trải dài trên 0 - 360 độ. So với phương pháp trước đó em chỉ fine tuning lại Yolo_object_detection thì chi nhận diện được leanbot nằm ở đâu trên frame ảnh như em đã chạy kiểm thử ở mục A trong báo cáo.
 - Hình ảnh minh họa mô tả cho phương pháp Yolo_pose :
 
-<p align="center"><img src="images/image.png" alt="YOLO Pose Keypoints"></p>
+![YOLO Pose Keypoints](images/image.png)
 
 Hiện tại Yolo_pose mặc định sẽ nhận biết các keypoit của người, như trên hình ta có thể phân tích được góc giữa các vector cánh tay và thân. 

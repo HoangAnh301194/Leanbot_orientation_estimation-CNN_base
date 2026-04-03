@@ -1,5 +1,5 @@
 # Báo cáo công việc ngày 2/4/2026
-## Công việc đã làm
+## A. Công việc đã làm
 - Nhận tài khoản PyGit từ anh Hữu và setup để viết báo cáo.
 - Khảo sát và đưa ra chiều cao của camera so với sa bàn trong các trường hợp ( giá trị tương đối) để thỏa mãn các yêu cầu sau :
     - Độ cao camera tương đối thấp, không quá cao so với sa bàn
@@ -45,3 +45,5 @@
 #### 1.4. Nhận xét chung
 - Nếu đặt camera càng xa sa bàn mà không thay đổi góc chiếu thì cần tăng chiều cao đặt camera để lấy được góc rộng đủ bao quát toàn bộ sa bàn.
 - Nếu không tăng chiều cao mà kéo góc chiếu của camera lên để lấy đủ góc rộng, ảnh thu về sẽ bị nghiêng hơn, dẫn tới việc xử lý ảnh có thể khó khăn hơn.
+
+## B. Khó khăn 

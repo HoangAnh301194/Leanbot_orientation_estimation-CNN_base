@@ -20,6 +20,7 @@
 - Trước đó em đã triển khai và huấn luận model Yolo_object_detection để nhận biết Leanbot và OpenCV để vẽ đường bao xuang quanh Leanbot trên khung hình trong bài báo cáo trước đó tại Lab, tuy nhiên trước đó em sử dụng Cam máy tính. Hiện tại em đã kiểm thử trên Cam mới và cho kết quả như sau: 
 
 <p align="center"><img src="images/leanbot.png" alt="Kiểm thử Camera"></p>
+- Link Code test : [Leanbot_detection](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/tree/master/260403/Leanbot_detection)
 
 ### 2. Calibration Sa bàn cho Camera bằng OpenCV
 #### 2.1. Cơ sở lý thuyết 
@@ -145,7 +146,7 @@ Checkerboard (bàn cờ đen-trắng) là mẫu hình phổ biến nhất cho ca
 
 ###### d. Ứng dụng kết quả Calibration
 
-Sau khi có kết quả calibration, ta áp dụng vào 2 việc chính:
+Sau khi có kết quả calibration là file calibration_result.npz là ma trận chứa các nội tham số và hệ số méo của camera, ta áp dụng vào 2 việc chính:
 
 - **Khử méo ảnh (Undistort):** Dùng `cv2.undistort()` với Camera Matrix và Distortion Coefficients để sửa méo — các đường thẳng trong thực tế sẽ hiển thị thẳng trên ảnh.
 - **Phép biến đổi phối cảnh (Perspective Transform):** Sau khi ảnh đã khử méo, chọn 4 góc sa bàn trên ảnh và ánh xạ về tọa độ thực (mm) bằng `cv2.getPerspectiveTransform()`, cho phép chuyển đổi bất kỳ điểm pixel nào thành tọa độ thực trên sa bàn.

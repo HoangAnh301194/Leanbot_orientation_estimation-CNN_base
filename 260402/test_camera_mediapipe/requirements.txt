@@ -1,2 +1,0 @@
-opencv-python>=4.10,<5
-ultralytics

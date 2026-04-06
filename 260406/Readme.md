@@ -132,7 +132,5 @@ Tuy ảnh sau khi xử lý đã được kéo về góc phẳng khá chuẩn xá
 2. **Ảnh phần góc xa (phía trên) bị mờ hơn phần dưới:**
    - *Nguyên nhân Quang học:* Theo nguyên lý thị giác xa/gần, mép phía trên của sa bàn nằm rất xa nên thu lại rất nhỏ và chiếm rất ít điểm ảnh trên cảm biến camera. Trong khi mép chiếu gần chiếm nhiều pixel nên rất nét.
    - *Thực tế thử nghiệm:* Khi thuật toán Warping nắn lại tỉ lệ 1:1, nó phải ép một lượng pixel nhỏ ở viền trên để nội suy, zoom to và kéo giãn ra cho khớp kích cỡ với viền dưới. Thao tác zoom kỹ thuật số này làm giảm độ chi tiết, tạo cảm giác mờ ảnh. Mặc dù em đã đẩy độ phân giải tối đa lên 2k nhưng vẫn không khắc phục được nhược điểm này.
-    
-
 ## B. Khó khăn
 - Em chưa tìm được từ khóa hay phương pháp nào để giải quyết vấn đề vật thể 3D bị dẹt và kéo dài ra ạ. 

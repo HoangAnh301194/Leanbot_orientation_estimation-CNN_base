@@ -84,6 +84,7 @@
     - Từ đó em thu được **Các thông số có thể Configure :** 
         - FRAME_HEIGHT
         - FPS
+
 ### 3. Kéo ảnh Sa bàn về góc phẳng khi Cam đặt chéo 
 #### 3.1. Bài toán đặt ra và cơ sở lý thuyết
 - **Bài toán:** Khi đặt camera ở góc chéo (không thể đặt top-down thẳng đứng), mặt phẳng sa bàn (hình chữ nhật) khi chiếu lên cụm cảm biến của camera sẽ biến dạng thành một hình thang. Mục tiêu là nắn phẳng (Warping / Bird's Eye View) toàn bộ bức ảnh hình thang đó trở về dạng hình chữ nhật vuông vức như khi nhìn thẳng đứng từ trên xuống.
@@ -129,5 +130,6 @@ warped_image = cv2.warpPerspective(frame, matrix, (width, height))
    - *Nguyên nhân Quang học:* Theo nguyên lý thị giác xa/gần, mép phía trên của sa bàn nằm rất xa nên thu lại rất nhỏ và chiếm rất ít điểm ảnh trên cảm biến camera. Trong khi mép chiếu gần chiếm nhiều pixel nên rất nét.
    - *Thực tế thử nghiệm:* Khi thuật toán Warping nắn lại tỉ lệ 1:1, nó phải ép một lượng pixel nhỏ ở viền trên để nội suy, zoom to và kéo giãn ra cho khớp kích cỡ với viền dưới. Thao tác zoom kỹ thuật số này làm giảm độ chi tiết, tạo cảm giác mờ ảnh. Mặc dù em đã đẩy độ phân giải tối đa lên 2k nhưng vẫn không khắc phục được nhược điểm này.
     
+
 ## B. Khó khăn
 - Em chưa tìm được từ khóa hay phương pháp nào để giải quyết vấn đề vật thể 3D bị dẹt và kéo dài ra ạ. 

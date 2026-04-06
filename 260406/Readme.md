@@ -81,7 +81,7 @@
     BACKLIGHT       | before=4.000 | target=0.000 | after=4.000 | ok=True
     ZOOM            | before=100.000 | target=120.000 | after=100.000 | ok=True
     ```
-    - **Các thông số có thể Configure :**
+    - Từ đó em thu được **Các thông số có thể Configure :** 
         - FRAME_HEIGHT
         - FPS
 ### 3. Kéo ảnh Sa bàn về góc phẳng khi Cam đặt chéo 

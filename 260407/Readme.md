@@ -3,10 +3,11 @@
 - Tìm hiểu các hướng tối ưu Resolution.
 - Cách bố trí Cam so với sa bàn hiện tại.
 - Undistort và thử nghiệm với camera hiện tại so sánh trước sau.
+- Gắn đường dẫn tới code vào các báo cáo trước đó
 ### 1. Resolution và điều kiện ảnh hưởng tới Resolution
 - Resolution cao nhất mà Camera Hikvision DS-U04 có thể đạt được là 2560x1440 (2K). Và hiện tại em cũng đang dùng toàn bộ là 2560x1440 cho dự án ạ. FPS đạt được là 30, không có hiện tượng giật lag hay chậm ạ.
 - **Thử đổi Backend sang DSHOW**: 
-  Để đổi backend xử lí Cam sang DSHOW em đã cấu hình thêm trong hàm **cv2.VideoCapture(cam_id, cv2.CAP_DSHOW)**. DSHOW hỗ trợ tốt hơn cho việc OpenCV có thể đọc ảnh từ Cam qua hệ thống máy tính, góp phần ổn định hơn trong việc xử lí ảnh và giảm thiểu độ trễ khi ảnh có Resolution cao.
+  Để đổi backend xử lí Cam sang DSHOW em đã cấu hình thêm trong hàm **cv2.VideoCapture(cam_id, cv2.CAP_DSHOW)** . DSHOW hỗ trợ tốt hơn cho việc OpenCV có thể đọc ảnh từ Cam qua hệ thống máy tính, góp phần ổn định hơn trong việc xử lí ảnh và giảm thiểu độ trễ khi ảnh có Resolution cao.
 - **Định dạng MJPG** : MJPG là dạng nén ảnh JPEG theo từng frame, việc nén ảnh này giúp giảm băng thông trên USB, từ đó những Camera tốc độ chậm có thể đạt được FPS cao hơn khi chạy ở Resolution cao. Cách set định dạng này như sau :
   ```python
     import cv2
@@ -23,7 +24,7 @@
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
   ```
   - Kết quả: 
-    Sau khi chạy BenchMark và đánh giá so với setup mặc định là MSMF và format mặc định và độ phân giải tối đa 2K bằng file code benchMark_fps_resolution.py thì em thu được kết quả:
+    Sau khi chạy BenchMark và đánh giá so với setup mặc định là MSMF và format mặc định và độ phân giải tối đa 2K bằng file code [benchMark_fps_resolution.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260407/Scripts/Camera_configurator/benchMark_fps_resolution.py) thì em thu được kết quả:
       ```
       
         --- TESTING: Backend=DEFAULT (MSMF), Format=DEFAULT, Res=2560x1440 ---

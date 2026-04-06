@@ -1,7 +1,7 @@
 import cv2
 
 cam_id = 1
-cap = cv2.VideoCapture(cam_id, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(cam_id)
 
 
 if not cap.isOpened():
@@ -11,8 +11,8 @@ def is_close(a, b, tol=1e-6):
     return abs(a - b) <= tol
 
 tests = [
-    ("FRAME_WIDTH",  cv2.CAP_PROP_FRAME_WIDTH,  [320, 1280]),
-    ("FRAME_HEIGHT", cv2.CAP_PROP_FRAME_HEIGHT, [240, 720]),
+    ("FRAME_WIDTH",  cv2.CAP_PROP_FRAME_WIDTH,  [1280, 2560]),
+    ("FRAME_HEIGHT", cv2.CAP_PROP_FRAME_HEIGHT, [720, 1440]),
     ("FPS",          cv2.CAP_PROP_FPS,          [15, 60]),
 
     ("BRIGHTNESS",   cv2.CAP_PROP_BRIGHTNESS,   [64, 192]),

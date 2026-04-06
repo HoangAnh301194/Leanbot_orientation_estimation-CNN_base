@@ -23,7 +23,7 @@
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
   ```
-  - Kết quả: 
+  - Kết quả:
     Sau khi chạy BenchMark và đánh giá so với setup mặc định là MSMF và format mặc định và độ phân giải tối đa 2K bằng file code [benchMark_fps_resolution.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260407/Scripts/Camera_configurator/benchMark_fps_resolution.py) thì em thu được kết quả:
       ```
       
@@ -58,7 +58,7 @@
     ![alt text](image-4.png)
 
   - Sau khi Undistort:
-    ![alt text](image-5.png)
+    ![alt text](image-6.png)
 
 ## B. Khó khăn
 - Hiện tại model nhận diện Leanbot em chưa thu tập Dataset trên nền của Sa bàn trên công ty nên chưa nhận diện được ạ. Trước đó em thu data ở xưởng trên mặt bàn gỗ, dataset chỉ có 50 ảnh nên chưa sử dụng được trên sa bàn ở công ty ạ. Em có cần thu thêm data và tiếp tục thử nghiệm với model không ạ? Hay đi theo hướng mà em đề xuất với Thầy trước đó luôn ạ ? 

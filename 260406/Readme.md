@@ -21,7 +21,7 @@
     ![tripod](images/image.png)
 
 ### 2. Cách lấy thông tin Cam và Configure Cam bằng OpenCV
-- Theo tài liệu của OpenCV thì có thể lấy được nhiều thông tin của Cam như FPS, chiều dài, rộng của Frame ảnh,... tuy nhiên việc lấy thông tin này được thực hiện bằng hàm **cv::VideoCapture.get()** và đọc dữ liệu Cam thông qua hệ điều hành, driver camera, kết nối USB, ... nên dữ liệu trả về có thể không đúng chính xác hoàn toàn so với thông số của nhà sản xuất công bố. Ngoài ra OpenCV có thể quét rất nhiều thông tin, tuy nhiên sẽ tùy loại Cam mà thông tin đó có được lấy ra hay không, do đó em đã viết chương trình test, và in ra những thông tin nào có trả về dữ liệu bằng **infor_print.py** và sau đó thử chỉnh sửa các thông số đó bằng **config_check.py** xem có thể tùy chỉnh các thông số đó không. 
+- Theo tài liệu của OpenCV thì có thể lấy được nhiều thông tin của Cam như FPS, chiều dài, rộng của Frame ảnh,... tuy nhiên việc lấy thông tin này được thực hiện bằng hàm **cv::VideoCapture.get()** và đọc dữ liệu Cam thông qua hệ điều hành, driver camera, kết nối USB, ... nên dữ liệu trả về có thể không đúng chính xác hoàn toàn so với thông số của nhà sản xuất công bố. Ngoài ra OpenCV có thể quét rất nhiều thông tin, tuy nhiên sẽ tùy loại Cam mà thông tin đó có được lấy ra hay không, do đó em đã viết chương trình test, và in ra những thông tin nào có trả về dữ liệu bằng [**infor_print.py**](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Camera_configurator/infor_print.py) và sau đó thử chỉnh sửa các thông số đó bằng [**config_check.py**](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Camera_configurator/config_check.py) xem có thể tùy chỉnh các thông số đó không. 
 - Các thông tin có thể in ra được như sau:
     - **Nhóm thông tin stream / format**:
         - **CAP_PROP_FRAME_WIDTH = 640**: Độ rộng của khung hình camera, ở đây là 640 pixel.
@@ -95,7 +95,7 @@
 - Trước khi áp dụng Homography, ảnh bắt buộc phải trải qua bước khử cong thấu kính (Camera Calibration - Undistort) để xử lý hiện tượng méo ảnh làm cong đường thẳng của camera góc rộng.
 
 #### 3.2. Code tham khảo tích hợp Khử méo (Undistort) và Nắn phẳng (Warping)
-Code em tham khảo từ trang chủ OpenCV và kết hợp thêm việc sửa lỗi thấu kính gây méo ảnh của camera ở báo cáo trước sau đó mới áp dụng thuật toán `warpPerspective()`:
+Code em tham khảo từ trang chủ OpenCV và kết hợp thêm việc sửa lỗi thấu kính gây méo ảnh của camera ở báo cáo trước sau đó mới áp dụng thuật toán `warpPerspective()` tại file code [image_warping_birdseye.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Perspective_Transform/image_warping_birdseye.py)
 ```python
 # --- BƯỚC 1: KHỬ MÉO THẤU KÍNH (Lens Undistortion) ---
 # Nạp ma trận Calibration đã tính toán trước đó

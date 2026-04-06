@@ -4,11 +4,11 @@ import os
 
 # ======================== CẤU HÌNH ========================
 CAMERA_INDEX = 1
-CAMERA_WIDTH = 1920
-CAMERA_HEIGHT = 1080
+CAMERA_WIDTH = 2560
+CAMERA_HEIGHT = 1440
 
-# Đường dẫn trỏ tới file kết quả calibration đã làm ở bước trước
-CALIB_FILE = r"D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260403\Camera_Calibration\calibration_result.npz"
+# Đường dẫn trỏ tới file kết quả calibration vừa mới tạo
+CALIB_FILE = "calibration_result.npz"
 
 # THAM SỐ KHỬ MÉO (ALPHA)
 # ALPHA = 0: Xén ảnh hoàn toàn để xóa viền đen (mất một chút góc nhìn ở cạnh)
@@ -78,7 +78,7 @@ def main():
 
         # Resize nhẹ để hiển thị song song trên màn hình nếu cần
         # Ở đây ta hiển thị 2 cửa sổ riêng biệt với kích thước nhỏ hơn
-        scale = 0.4
+        scale = 0.3
         display_w = int(actual_w * scale)
         display_h = int(actual_h * scale)
 

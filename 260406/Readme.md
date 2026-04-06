@@ -1,8 +1,5 @@
 # Báo cáo công việc ngày 06/04/2026
-## A. Công việc đã làm
-- Nhận Tripod từ anh Hữu.
-- Tìm hiểu cách lấy thông tin của Cam và configure Cam bằng OpenCV.
-- Tìm hiểu cách kéo ảnh sa bàn từ hướng chéo về thẳng bằng OpenCV.
+
 ## Mục lục
 - [A. Công việc đã làm](#a-công-việc-đã-làm)
   - [1. Chi tiết thông tin Tripod khi sử dụng](#1-chi-tiết-thông-tin-tripod-khi-sử-dụng)
@@ -12,6 +9,12 @@
     - [3.2. Code tham khảo tích hợp Khử méo (Undistort) và Nắn phẳng (Warping)](#32-code-tham-khảo-tích-hợp-khử-méo-undistort-và-nắn-phẳng-warping)
     - [3.3. Kết quả thực tế và Đánh giá nhược điểm](#33-kết-quả-thực-tế-và-đánh-giá-nhược-điểm)
 - [B. Khó khăn](#b-khó-khăn)
+
+## A. Công việc đã làm
+- Nhận Tripod từ anh Hữu.
+- Tìm hiểu cách lấy thông tin của Cam và configure Cam bằng OpenCV.
+- Tìm hiểu cách kéo ảnh sa bàn từ hướng chéo về thẳng bằng OpenCV.
+
 ### 1. Chi tiết thông tin Tripod khi sử dụng 
 - Tripod có chiều cao tối đa 1.7m, khi sử dụng thì chiều sao vị trí đặt Cam so với mặt phẳng sa bàn là 0.9m. Hình ảnh chụp từ Cam ở vị trí cách Sa bàn 0,5m, cao 0.9m và góc chiếu của Cam so với mặt phẳng sa bàn khoảng 45 độ như sau : 
 
@@ -120,7 +123,7 @@ warped_image = cv2.warpPerspective(frame, matrix, (width, height))
     - Ảnh sau khi xử lý:
         ![sau](images/image-4.png)
 
-    Tuy ảnh sau khi xử lý đã được kéo về góc phẳng khá chuẩn xác (các đường line của sa bàn song song), nhưng giải pháp Image Warping thuần túy qua camera góc chéo gặp phải nhược điểm (không thể khắc phục triệt để bằng phần mềm):
+Tuy ảnh sau khi xử lý đã được kéo về góc phẳng khá chuẩn xác (các đường line của sa bàn song song), nhưng giải pháp Image Warping thuần túy qua camera góc chéo gặp phải nhược điểm (không thể khắc phục triệt để bằng phần mềm):
 
 1. **Vật thể 3D ( chiều cao z > 0) bị dẹt và kéo dài ra:**
    - *Nguyên nhân Toán học:* Thuật toán Homography 2D mặc định tiên đề toàn bộ các khối màu trên bề mặt ảnh chiếu đang nằm bẹp mặt đất (mặt phẳng Z = 0).

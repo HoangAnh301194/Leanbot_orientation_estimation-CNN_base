@@ -56,9 +56,11 @@
 ### 2. Undistort
 - Undistort để nắn ảnh bị méo do thấu kính của camera. Đây là kết quả so sánh trước và sau khi Undistort:
   - Trước khi Undistort:
+
     ![undistort_truoc](images/undistort_truoc.png)
- 
+
   - Sau khi Undistort:
+
     ![undistort_sau](images/undistort_sau.png)
 
 ### 3. Giải thích chi tiết về Resolution
@@ -74,22 +76,34 @@ Khác với thông tin tìm kiếm về việc dùng MJPG hay DSHOW để tối 
 ### 4. Căn chỉnh lại Cam và Sa bàn
 - Em đã hạ độ cao Cam xuống 0,8m so với mặt phẳng sa bàn ( em ko giảm xuống thêm nữa vì ảnh thu về sẽ chéo hơn), và đưa lại gần 0.35m so với mép sa bàn và căn chỉnh góc cam sao cho mép dưới Frame ảnh trùng với mép trắng sa bàn, mép trên trùng với cạnh trên của hộp Leanbot và đã đánh dấu trên sàn nhà rồi ạ. Ảnh thu được như sau : 
   ![can_chinh_1](images/can_chinh_cam_sa_ban_1.png)
+
   ![can_chinh_2](images/can_chinh_cam_sa_ban_2.png)
+
   ![can_chinh_3](images/can_chinh_cam_sa_ban_3.png)
+
   ![can_chinh_4](images/can_chinh_cam_sa_ban_4.png)
 
 ### 5. Dữ liệu Data đã thu thập
 - Hiện tại em đã lấy được rất nhiều mẫu data theo đề xuất của Thầy, và có cả nhiều mẫu em tự lấy thêm như : bật đèn, đóng mở tay Gripper, đi tự do ngẫu nhiên trên sa bàn, mỗi vị trí đều xoay 360 độ và chụp khoảng 10 ảnh trở lên. Tổng tất cả khoảng **300 tấm ảnh** ạ. **Chưa tính** ảnh của Leanbot IoT và 2 Leanbot trở lên chụp cùng 1 lúc và các loại màu Led khác nhau ạ.
 - Ảnh BackGroud trắng
-![bg_trang](images/data_mau_bg_trang.png)
+
+  ![bg_trang](images/data_mau_bg_trang.png)
+
 - Ảnh chỉ có các khối gỗ ngẫu nhiên
-![khoi_go](images/data_mau_khoi_go.png)
+
+  ![khoi_go](images/data_mau_khoi_go.png)
+
 - Ảnh Leanbot ở các vị trí ngẫu nhiên ( các vạch đen, ngã 4, các ô A,B,D,... góc sa bàn,...)
-![leanbot_ngau_nhien](images/data_mau_leanbot_ngau_nhien.png)
+
+  ![leanbot_ngau_nhien](images/data_mau_leanbot_ngau_nhien.png)
+
 - Ảnh 2 Leanbot ở vị trí ngẫu nhiên
-![2_leanbot](images/data_mau_2_leanbot.png)
+
+  ![2_leanbot](images/data_mau_2_leanbot.png)
+
 - Ảnh Leanbot với các Khối gỗ ngẫu nhiên
-![leanbot_khoi_go](images/data_mau_leanbot_khoi_go.png)
+
+  ![leanbot_khoi_go](images/data_mau_leanbot_khoi_go.png)
 
 ## B. Khó khăn
 - Về vấn đề ma trận nội tham số, ngoại tham số để Undistort Perspective Transform em sẽ về tìm hiểu thêm và báo cáo lại với Thầy ạ.

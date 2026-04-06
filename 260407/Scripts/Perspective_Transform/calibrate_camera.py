@@ -26,9 +26,6 @@ CHECKERBOARD = (4, 4)     # Số inner corners (phải giống file capture)
 SQUARE_SIZE = 30.0        # Kích thước mỗi ô vuông (mm). ĐO LẠI bằng thước!
 IMAGE_DIR = "./calibration_images"   # Thư mục chứa ảnh đã chụp
 OUTPUT_FILE = "calibration_result.npz"  # File lưu kết quả
-CAMERA_INDEX = 1          # Index camera để demo realtime
-CAMERA_WIDTH = 1920       # Độ phân giải ngang (Phải khớp với lúc chụp ảnh)
-CAMERA_HEIGHT = 1080      # Độ phân giải dọc (Phải khớp với lúc chụp ảnh)
 # ===========================================================
 
 
@@ -161,66 +158,51 @@ def main():
 
     print(f"\n Đã lưu kết quả vào: {OUTPUT_FILE}")
 
-    # -------- BƯỚC 6: LIVE DEMO UNDISTORT --------
-    print(f"\n[INFO] Bắt đầu Live Demo khử méo (undistort) từ Camera {CAMERA_INDEX}...")
-    print("  Nháy vào cửa sổ video và nhấn 'q' để thoát demo.")
+    # -------- BƯỚC 6: DEMO UNDISTORT --------
+    print(f"\n Demo khử méo ảnh (undistort)...")
 
-    cap = cv2.VideoCapture(CAMERA_INDEX)
-    if not cap.isOpened():
-        print(f"[ERROR] Không thể mở camera index {CAMERA_INDEX}")
-    else:
-        # THIẾT LẬP ĐỘ PHÂN GIẢI (CỰC KỲ QUAN TRỌNG: Phải khớp với lúc chụp ảnh calib)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
+    # Lấy ảnh đầu tiên để demo
+    sample_img = cv2.imread(images[3])
+    h, w = sample_img.shape[:2]
 
-        # Lấy độ phân giải thực tế của camera
-        actual_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        actual_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        
-        print(f"[INFO] Camera Live Resolution: {actual_w}x{actual_h}")
-        if actual_w != img_shape[0] or actual_h != img_shape[1]:
-            print(f"[WARNING] Độ phân giải demo ({actual_w}x{actual_h}) KHÔNG KHỚP với ảnh Calib ({img_shape[0]}x{img_shape[1]})!")
-            print(" -> Kết quả khử méo sẽ bị sai/méo hơn!")
-        
-        # Tính toán ma trận camera mới và bản đồ (map) để khử méo nhanh
-        # alpha=0: Zoom vào để xóa viền đen
-        # alpha=1: Giữ nguyên toàn bộ ảnh (có viền đen)
-        new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
-            camera_matrix, dist_coeffs, (actual_w, actual_h), 0, (actual_w, actual_h)
-        )
-        map1, map2 = cv2.initUndistortRectifyMap(
-            camera_matrix, dist_coeffs, None, new_camera_matrix,
-            (actual_w, actual_h), cv2.CV_16SC2
-        )
+    # Tính ma trận camera tối ưu
+    new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+        camera_matrix, dist_coeffs, (w, h), 1, (w, h)
+    )
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            # Khử méo bằng remap (nhanh hơn undistort)
-            undist_frame = cv2.remap(frame, map1, map2, cv2.INTER_LINEAR)
-            
-            # Hiển thị
-            # Resize để hiển thị nếu quá to so với màn hình
-            h_disp, w_disp = frame.shape[:2]
-            if w_disp > 800:
-                scale = 800 / w_disp
-                frame_disp = cv2.resize(frame, (int(w_disp * scale), int(h_disp * scale)))
-                undist_disp = cv2.resize(undist_frame, (int(undist_frame.shape[1] * scale), int(undist_frame.shape[0] * scale)))
-            else:
-                frame_disp = frame
-                undist_disp = undist_frame
+    # Undistort
+    undistorted = cv2.undistort(sample_img, camera_matrix, dist_coeffs,
+                                None, new_camera_matrix)
 
-            cv2.imshow("LIVE: Original (Before)", frame_disp)
-            cv2.imshow("LIVE: Undistorted (After)", undist_disp)
+    # Crop theo ROI
+    x, y, roi_w, roi_h = roi
+    if roi_w > 0 and roi_h > 0:
+        undistorted = undistorted[y:y + roi_h, x:x + roi_w]
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+    # Lưu ảnh demo vào folder
+    comp_dir = "comparison_results"
+    os.makedirs(comp_dir, exist_ok=True)
+    
+    orig_path = os.path.join(comp_dir, "1_original_sample.jpg")
+    undist_path = os.path.join(comp_dir, "2_undistorted_sample.jpg")
+    
+    cv2.imwrite(orig_path, sample_img)
+    cv2.imwrite(undist_path, undistorted)
+    print(f" Đã lưu 2 ảnh so sánh (gốc và khử méo) vào thư mục: {comp_dir}/")
 
-        cap.release()
-        cv2.destroyAllWindows()
-        print("[INFO] Đã đóng Live Demo.")
+    # Hiển thị so sánh
+    # Resize cả 2 cho dễ nhìn
+    scale = min(640 / w, 480 / h)
+    orig_small = cv2.resize(sample_img, (int(w * scale), int(h * scale)))
+    undist_small = cv2.resize(undistorted,
+                               (int(undistorted.shape[1] * scale),
+                                int(undistorted.shape[0] * scale)))
+
+    cv2.imshow("Original", orig_small)
+    cv2.imshow("Undistorted", undist_small)
+    print("\n[INFO] Nhấn phím bất kỳ để đóng...")
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     # -------- TÍNH RE-PROJECTION ERROR CHI TIẾT --------
     print("\n" + "=" * 60)

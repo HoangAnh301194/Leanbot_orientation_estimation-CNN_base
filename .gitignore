@@ -4,3 +4,4 @@ __pycache__/
 *.pt
 *.pth
 *calibration_images/
+260409/Leanbot_detection/datasets.zip

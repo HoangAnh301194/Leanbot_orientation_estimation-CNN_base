@@ -121,7 +121,7 @@
         }
         }
     ```
-    - file **classes.txt** : chứa các đối tượng được gắn nhãn
+    - file **classes.txt** : chứa các đối tượng được gắn nhãn ( hiện tại chỉ có mỗi Leanbot)
     ```
     Leanbot
     ```

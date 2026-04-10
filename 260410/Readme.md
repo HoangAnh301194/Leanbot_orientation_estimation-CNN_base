@@ -115,3 +115,4 @@
 - Em có tìm được thêm một vài công cụ khác như : CVAT, VGG Image, ... rất nhiều công cụ hiện có trên thế giới. Tuy nhiên, em vẫn chưa thử công cụ khác ngoài Label Studio.
 - Về thời gian để gắn nhãn ảnh bằng Lable studio thì theo em nghĩ thì sẽ mất khoảng 15 phút cho 30 bức ảnh ạ. Hôm qua em chỉ chụp có 50 bức nhưng độ chính xác cũng tương đối ổn, chỉ cần chụp thêm đến khoảng 500 bức ảnh là đủ tốt để nhận diện Leanbot trong mọi trường hợp trong Sa bàn ạ.
 ## B. Khó khăn
+- Em muốn Thầy đưa ra hướng đi tiếp theo ạ. Em có cần bắt đầu chụp thêm dữ liệu ảnh và gắn nhãn không ạ ?

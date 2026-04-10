@@ -95,4 +95,35 @@
         print(f"Saved frame: frame_{width}x{height}.jpg")
 ```
 - Kết quả kiểm tra cho thấy FPS ở chế độ Default thì ổn định ở 30 frame/s còn ở chế độ DSHOW thì FPS ko ổn định. 
+
+### 3. Chi tiết tập Datasets mà Label-studio trả về
+- Vì tập datasets nặng nên em ko thể upload lên git được. Link tải datasets : [https://drive.google.com/file/d/1dTYFQGfYl1c8RRx3Qcur2HRSKe_ZzCAZ/view](https://drive.google.com/file/d/1dTYFQGfYl1c8RRx3Qcur2HRSKe_ZzCAZ/view)
+- Cấu trúc datasets hiện tại : 
+    - images : chứa các ảnh Leanbot
+    - labels : chứa các file .txt đánh nhãn Leanbot (theo định dạng số thì là 0) và tọa độ 4 điểm của Bouding box tương tứng với ảnh ở images : 
+
+        ```
+        0 0.1295689655172414 0.8048275862068965 0.12879310344827588 0.1613793103448276
+        ```
+    - file **notes.json**: chứa thông tin cơ bản về đối tượng được gắn nhãn và thông tin của version Label studio đã tạo datasets.
+    ```json
+        {
+        "categories": [
+            {
+            "id": 0,
+            "name": "Leanbot"
+            }
+        ],
+        "info": {
+            "year": 2026,
+            "version": "1.0",
+            "contributor": "Label Studio"
+        }
+        }
+    ```
+    - file **classes.txt** : chứa các đối tượng được gắn nhãn
+    ```
+    Leanbot
+    ```
+
 ## B. Khó khăn

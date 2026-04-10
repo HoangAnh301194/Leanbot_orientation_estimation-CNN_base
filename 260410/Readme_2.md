@@ -18,16 +18,16 @@
 
 - Bảng tổng hợp ảnh kết quả :
 
-    | DEFAULT Backend | DSHOW Backend |
-    | :--- | :--- |
-    | [640x360_actual_640x360.jpg](scripts/default_format/640x360_actual_640x360.jpg) | [640x360_actual_640x360.jpg](scripts/dshow_format/640x360_actual_640x360.jpg) |
-    | [640x480_actual_640x480.jpg](scripts/default_format/640x480_actual_640x480.jpg) | [640x480_actual_640x480.jpg](scripts/dshow_format/640x480_actual_640x480.jpg) |
-    | [680x480_actual_640x480.jpg](scripts/default_format/680x480_actual_640x480.jpg) | [680x480_actual_640x480.jpg](scripts/dshow_format/680x480_actual_640x480.jpg) |
-    | [1280x720_actual_1280x720.jpg](scripts/default_format/1280x720_actual_1280x720.jpg) | [1280x720_actual_1280x720.jpg](scripts/dshow_format/1280x720_actual_1280x720.jpg) |
-    | [1280x960_actual_1280x960.jpg](scripts/default_format/1280x960_actual_1280x960.jpg) | [1280x960_actual_1280x960.jpg](scripts/dshow_format/1280x960_actual_1280x960.jpg) |
-    | [1920x1080_actual_1920x1080.jpg](scripts/default_format/1920x1080_actual_1920x1080.jpg) | [1920x1080_actual_1920x1080.jpg](scripts/dshow_format/1920x1080_actual_1920x1080.jpg) |
-    | [2048x1536_actual_1920x1080.jpg](scripts/default_format/2048x1536_actual_1920x1080.jpg) | [2048x1536_actual_1920x1080.jpg](scripts/dshow_format/2048x1536_actual_1920x1080.jpg) |
-    | [2560x1440_actual_2560x1440.jpg](scripts/default_format/2560x1440_actual_2560x1440.jpg) | [2560x1440_actual_2560x1440.jpg](scripts/dshow_format/2560x1440_actual_2560x1440.jpg) |
+| DEFAULT Backend | DSHOW Backend |
+| :--- | :--- |
+| [640x360_actual_640x360.jpg](scripts/default_format/640x360_actual_640x360.jpg) | [640x360_actual_640x360.jpg](scripts/dshow_format/640x360_actual_640x360.jpg) |
+| [640x480_actual_640x480.jpg](scripts/default_format/640x480_actual_640x480.jpg) | [640x480_actual_640x480.jpg](scripts/dshow_format/640x480_actual_640x480.jpg) |
+| [680x480_actual_640x480.jpg](scripts/default_format/680x480_actual_640x480.jpg) | [680x480_actual_640x480.jpg](scripts/dshow_format/680x480_actual_640x480.jpg) |
+| [1280x720_actual_1280x720.jpg](scripts/default_format/1280x720_actual_1280x720.jpg) | [1280x720_actual_1280x720.jpg](scripts/dshow_format/1280x720_actual_1280x720.jpg) |
+| [1280x960_actual_1280x960.jpg](scripts/default_format/1280x960_actual_1280x960.jpg) | [1280x960_actual_1280x960.jpg](scripts/dshow_format/1280x960_actual_1280x960.jpg) |
+| [1920x1080_actual_1920x1080.jpg](scripts/default_format/1920x1080_actual_1920x1080.jpg) | [1920x1080_actual_1920x1080.jpg](scripts/dshow_format/1920x1080_actual_1920x1080.jpg) |
+| [2048x1536_actual_1920x1080.jpg](scripts/default_format/2048x1536_actual_1920x1080.jpg) | [2048x1536_actual_1920x1080.jpg](scripts/dshow_format/2048x1536_actual_1920x1080.jpg) |
+| [2560x1440_actual_2560x1440.jpg](scripts/default_format/2560x1440_actual_2560x1440.jpg) | [2560x1440_actual_2560x1440.jpg](scripts/dshow_format/2560x1440_actual_2560x1440.jpg) |
 
 - Kết quả print ra :
 

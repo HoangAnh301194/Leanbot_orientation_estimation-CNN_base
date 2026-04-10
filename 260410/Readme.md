@@ -19,7 +19,7 @@
 
 ![openCV document](openCV_infor.png)
 
-- Ở báo cáo trước đó ngày 06/04 em có báo cáo về việc độ phân giải không thể Configure được, và tới ngày 07/04 thì đã có thể sử dụng độ phân giải 2K (2560x1440) với backend Default. Lý do cho sự nhẫm lẫn, sau sót này là khi em chạy code kiểm tra configure em đã lấy thông số thay đổi độ phân giải từ 680x680 về 320x320 nhưng thực tế Cam ko hỗ trợ độ phân giải này, em đã sửa và chạy lại code kiểm tra configure - **[config_check.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Camera_configurator/config_check.py)** và lấy thông số thay đổi các mức độ phân giải từ 680x480 tới 2560x1440 thì cho kết quả có thể Configure được như sau : 
+- Ở báo cáo trước đó ngày 06/04 em có báo cáo về việc độ phân giải không thể Configure được, và tới ngày 07/04 thì đã có thể sử dụng độ phân giải 2K (2560x1440) với backend Default. Lý do cho sự nhẫm lẫn, sau sót này là khi em chạy code kiểm tra configure em đã lấy thông số thay đổi độ phân giải từ 680x480 về 320x320 nhưng thực tế Cam ko hỗ trợ độ phân giải này, em đã sửa và chạy lại code kiểm tra configure - **[config_check.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Camera_configurator/config_check.py)** và lấy thông số thay đổi các mức độ phân giải từ 680x480 tới 2560x1440 thì cho kết quả có thể Configure được như sau : 
 
     ```
         RES 1280x720    | before= 640x480 | target=1280x720 | after=1280x720 | CONFIG DUOC

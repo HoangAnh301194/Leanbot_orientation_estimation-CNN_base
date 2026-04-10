@@ -127,3 +127,7 @@
     ```
 
 ## B. Khó khăn
+## C. Công việc tiếp theo 
+- Tìm hiểu hướng tự đánh nhãn Label thông qua việc phát hiện subtract bằng OpenCV :
+    - OpenCV subtract images
+    - OpenCV subtract images with alignment

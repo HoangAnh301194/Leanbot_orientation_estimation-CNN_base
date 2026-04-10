@@ -10,7 +10,7 @@
 #### 1.1. Chế độ DSHOW và độ phân giải tối đa mà Cam có thể đạt được. 
 - Trước tiên format **Default** không phải là một format/backend cố định. Trong OpenCV, nếu mở camera bằng cv2.VideoCapture(0) thì đó là CAP_ANY, nghĩa là OpenCV tự chọn backend khả dụng đầu tiên trên máy. Vì vậy, format **Default** trên máy chạy ccode có thể là MSMF, DSHOW, hoặc backend khác tùy build OpenCV và hệ thống. Em đã đọc được thông tin này trong tài liệu của OpenCV
     ![openCV document](openCV_infor.png)
-- Ở báo cáo trước đó ngày 06/04 em có báo cáo về việc độ phân giải không thể Configure được, và tới ngày 07/04 thì đã có thể sử dụng độ phân giải 2K (2560x1440) với backend Default. Lý do cho sự nhẫm lẫn, sau sót này là khi em chạy code kiểm tra configure em đã lấy thông số thay đổi độ phân giải từ 680x680 về 320x320 nhưng thực tế Cam ko hỗ trợ độ phân giải này, em đã sửa và chạy lại code kiểm tra configure và lấy thông số thay đổi độ phân giải từ 680x480 về 2560x1440 thì cho kết quả có thể Configure được như sau : 
+- Ở báo cáo trước đó ngày 06/04 em có báo cáo về việc độ phân giải không thể Configure được, và tới ngày 07/04 thì đã có thể sử dụng độ phân giải 2K (2560x1440) với backend Default. Lý do cho sự nhẫm lẫn, sau sót này là khi em chạy code kiểm tra configure em đã lấy thông số thay đổi độ phân giải từ 680x680 về 320x320 nhưng thực tế Cam ko hỗ trợ độ phân giải này, em đã sửa và chạy lại code kiểm tra configure - **[config_check.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260406/Scripts/Camera_configurator/config_check.py)** và lấy thông số thay đổi các mức độ phân giải từ 680x480 tới 2560x1440 thì cho kết quả có thể Configure được như sau : 
     ```
         RES 1280x720    | before= 640x480 | target=1280x720 | after=1280x720 | CONFIG DUOC
         RES 1920x1080   | before= 640x480 | target=1920x1080 | after=1920x1080 | CONFIG DUOC
@@ -47,7 +47,7 @@
         ![1920x1080_actual_1920x1080](scripts/dshow_format/1920x1080_actual_1920x1080.jpg)
     - 2560x1440 (tối đa)
         ![2560x1440_actual_2560x1440](scripts/dshow_format/2560x1440_actual_2560x1440.jpg)
-- So sánh kết quả cho thấy chất lượng ảnh ở 2 Format ko khác nhau là mấy, tuy nhiên đối với DSHOW Format thì FPS không ổn định và không tốt bằng format mặc định. Khi chạy code **[resolution_test.py](scripts/resolution_test.py)** thì cho kết quả như sau:
+- So sánh kết quả cho thấy chất lượng ảnh ở 2 Format ko khác nhau là mấy, tuy nhiên đối với DSHOW Format thì FPS không ổn định và không tốt bằng format mặc định. Khi chạy code **[resolution_test.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260410/scripts/resolution_test.py)** thì cho kết quả như sau:
     ```
         [DEFAULT] Summary
         ------------------------------------------------------------

@@ -12,7 +12,7 @@
 - Tìm hiểu lại về Configure Resolution của Cam và FPS.
 - Báo cáo về việc tạo tập dữ liệu Datasets để train model nhận diện Leanbot
 - Một số khó khăn khi sử dụng Label Studio
-
+- Trong báo cáo em đã có chèn đường link code ở tên các file code python em nhắc đến trong báo cáo ạ. Thầy chỉ cần bấm vào tên file code em in đậm trên báo cáo là có thể xem được code ạ.
 ### 1. Tìm hiểu lại về Configure Resolution của Cam và FPS.
 #### 1.1. Chế độ DSHOW và độ phân giải tối đa mà Cam có thể đạt được. 
 - Trước tiên format **Default** không phải là một format/backend cố định. Trong OpenCV, nếu mở camera bằng cv2.VideoCapture(0) thì đó là CAP_ANY, nghĩa là OpenCV tự chọn backend khả dụng đầu tiên trên máy. Vì vậy, format **Default** trên máy chạy ccode có thể là MSMF, DSHOW, hoặc backend khác tùy build OpenCV và hệ thống. Em đã đọc được thông tin này trong tài liệu của OpenCV

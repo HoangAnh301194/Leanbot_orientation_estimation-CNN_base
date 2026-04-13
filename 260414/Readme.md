@@ -2,7 +2,7 @@
 
 ## A. Công việc đã làm
 - Tìm hiểu subtract images with alignemnt trong OpenCV
-- Triển khai thực thế và gắn nhãn tự động cho Leanbot
+- Triển khai thực thế vẽ Bouding Box tự động cho Leanbot
 
 ### 1. Subtract images with alignemnt - OpenCV
 #### 1.1. Phép trừ ảnh trong OpenCV
@@ -102,9 +102,10 @@
 | | **Ảnh cắt ra**<br>![crop](scripts/output/leanbot/largest_changed_crop.jpg) |
 
 #### 1.2. Code subtract images OpenCV
-- Link code : https://github.com/anhnguyenhuu/yolov8_Leanbot_detection/blob/main/tools/auto_label_tool/auto_label_tool.py
+- Link code : [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260414/scripts/extraction.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260414/scripts/extraction.py)
 
 ## B. Khó khăn
 - Phương pháp trừ ảnh sẽ có nhược điểm là khi ánh sáng thay đổi một chút thì khi trừ ảnh thì sẽ có một vùng thay đổi lớn, và với phương pháp chọn Countor lớn nhất để gán cho Leanbot thì sẽ không chính xác nữa ạ.
+
 ## C. Công việc tiếp theo
 - Đóng gói code thành Tools để có thể thao tác với nhiều ảnh dễ dàng hơn

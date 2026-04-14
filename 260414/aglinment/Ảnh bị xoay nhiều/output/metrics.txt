@@ -1,0 +1,9 @@
+Ref: back.jpg
+Test: aglin.jpg
+
+Before ECC: nonzero=2432673, mean_diff=65.479438
+After ECC : nonzero=2269232, mean_diff=58.512189
+ECC cc    : 0.31845795
+Warp matrix:
+[[ 1.0742097e+00 -4.0974043e-02 -6.4148254e+00]
+ [ 6.9722712e-02  9.4800246e-01 -6.7253540e+01]]

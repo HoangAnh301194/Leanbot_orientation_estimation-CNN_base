@@ -1,0 +1,9 @@
+Ref: back.jpg
+Test: ledOff.jpg
+
+Before ECC: nonzero=1207495, mean_diff=21.461235
+After ECC : nonzero=1209071, mean_diff=21.470409
+ECC cc    : 0.94496407
+Warp matrix:
+[[ 1.0001876e+00 -6.0593748e-06 -2.5456598e-01]
+ [-4.8733223e-06  1.0000657e+00 -1.8149097e-01]]

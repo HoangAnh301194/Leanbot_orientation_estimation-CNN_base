@@ -15,7 +15,7 @@ def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
 def imread_utf8(path: Path):
-    """Đọc ảnh từ đường dẫn Unicode"""
+    
     try:
         data = np.fromfile(str(path), dtype=np.uint8)
         return cv2.imdecode(data, cv2.IMREAD_GRAYSCALE)
@@ -24,7 +24,7 @@ def imread_utf8(path: Path):
         return None
 
 def imwrite_utf8(path: Path, img: np.ndarray):
-    """Lưu ảnh vào đường dẫn Unicode"""
+    
     try:
         ext = path.suffix
         res, buf = cv2.imencode(ext, img)
@@ -36,6 +36,11 @@ def imwrite_utf8(path: Path, img: np.ndarray):
     return False
 
 def preprocess(gray: np.ndarray) -> np.ndarray:
+    # Cân bằng tương phản cục bộ bằng CLAHE
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    gray = clahe.apply(gray)
+    
+    # Làm mượt ảnh
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
     return gray
 
@@ -189,4 +194,4 @@ def main():
         print(f"\n--- Finished processing {processed_count} folders ---")
 
 if __name__ == "__main__":
-    main()
+    main()

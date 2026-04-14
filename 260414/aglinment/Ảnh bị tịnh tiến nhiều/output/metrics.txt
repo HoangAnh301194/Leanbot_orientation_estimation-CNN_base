@@ -1,9 +1,9 @@
 Ref: background.jpg
 Test: trans2.jpg
 
-Before ECC: nonzero=2434024, mean_diff=65.373341
-After ECC : nonzero=2259021, mean_diff=59.015432
-ECC cc    : 0.36796175
+Before ECC: nonzero=2676475, mean_diff=69.007254
+After ECC : nonzero=2485908, mean_diff=62.138252
+ECC cc    : 0.27747999
 Warp matrix:
-[[ 9.8045850e-01 -3.2003768e-02  6.7337296e+01]
- [ 4.1307448e-03  9.6744019e-01 -1.6143003e+01]]
+[[ 9.7931087e-01 -3.2488994e-02  6.9515472e+01]
+ [ 6.0452358e-03  9.7422796e-01 -2.3496643e+01]]

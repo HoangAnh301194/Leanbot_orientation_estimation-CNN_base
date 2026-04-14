@@ -196,7 +196,7 @@ Một số hướng alignment ảnh em đã tìm hiểu gồm:
     - `criteria`: điều kiện dừng của thuật toán, gồm:
         - `100`: số vòng lặp tối đa
         - `1e-5`: ngưỡng sai số để coi là hội tụ
-        Về lựa chọn số vòng lặp và ngưỡng hội tụ em chưa tìm hiểu chi tiết thuật toán nên em để tạm theo hướng dẫn của tài liệu OpenCV cung cấp ví dụ ạ.
+        - Về lựa chọn số vòng lặp và ngưỡng hội tụ em chưa tìm hiểu chi tiết thuật toán nên em để tạm theo hướng dẫn của tài liệu OpenCV cung cấp ví dụ ạ.
     - `cc`: chỉ số tương quan sau khi căn chỉnh, giá trị càng gần `1` thì hai ảnh càng khớp tốt
 
     Sau khi tìm được `warp`, sử dụng `cv2.warpAffine()` để biến đổi ảnh hiện tại về gần ảnh background trước khi thực hiện phép trừ ảnh.

@@ -106,6 +106,16 @@
 
 ## B. Khó khăn
 - Phương pháp trừ ảnh sẽ có nhược điểm là khi ánh sáng thay đổi một chút thì khi trừ ảnh thì sẽ có một vùng thay đổi lớn, và với phương pháp chọn Countor lớn nhất để gán cho Leanbot thì sẽ không chính xác nữa ạ.
+- Khi thay đổi điều kiện sáng ( tắt bớt đèn) thì kết quả trả về như sau :
+
+| Input (Images) | Output (Results) |
+| :---: | :---: |
+| **Background**<br>![background](scripts/images/background.jpg) | **Ảnh sai khác(Trừ ảnh)**<br>![diff](scripts/output/ledOff/01_diff.jpg) |
+| **Ảnh ledOff**<br>![ledOff](scripts/images/ledOff.jpg) | **Ảnh nhị phân hóa**<br>![mask](scripts/output/ledOff/02_mask.jpg) |
+| | **Bounding Box**<br>![bbox](scripts/output/ledOff/04_preview_bbox.jpg) |
+| | **Ảnh cắt ra**<br>![crop](scripts/output/ledOff/largest_changed_crop.jpg) |
+
+=> Sau khi thay đổi ảnh sáng phương pháp trừ ảnh để tìm ra BBox của Leanbot không còn chính xác. 
 
 ## C. Công việc tiếp theo
 - Đóng gói code thành Tools để có thể thao tác với nhiều ảnh dễ dàng hơn

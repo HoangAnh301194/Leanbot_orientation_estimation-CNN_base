@@ -167,6 +167,7 @@ cv.destroyAllWindows()
 
 ## B. Khó khăn
 - Em nghĩ ko cần thiết phải ứng dụng thêm phương pháp non-rectangular ROI vì ta có thể dùng chuột để click các tọa độ điểm ảnh của Sa bàn rồi dùng phương pháp ROI thông thường để xử lý được ạ 
+- Ngoài ra nếu dùng ROI thì là tham chiếu trên 1 bức ảnh, còn trong thực tế thì sẽ là 1 video ( chuỗi liên tục frame ảnh) nên em chưa hình dung được cách áp dụng ROI vào video thế nào ạ. ( ví dụ tạo thời điểm t ROI được cố định trên 4 góc sa bàn, và nếu tại thời điểm t2 camera bị rung lắc nhẹ thì ROI sẽ bị lệch đi thì làm sao để biết và điều chỉnh lại ROI cho đúng ạ? ) . Phương pháp Alignment dùng ECC cũng chỉ là phép biến đổi ma trận ảnh tại thời điểm t2 sao cho gần nhất với thời điểm t, nó không thể tự động điều chỉnh ROI cho đúng được ạ.
 ## C. Tài liệu tham khảo
 1. **OpenCV Official** – [Cropping an Image Using OpenCV](https://opencv.org/cropping-an-image-using-opencv/)
 2. **OpenCV Official** – [Pixel Level Image Manipulation](https://opencv.org/blog/pixel-level-image-manipulation-using-opencv/)

@@ -8,6 +8,7 @@
         - [1.3. Cú pháp trích xuất ROI](#13-cú-pháp-trích-xuất-roi)
         - [1.4. Cắt ảnh từ ROI (Cropping)](#14-cắt-ảnh-từ-roi-cropping)
         - [1.5. Chọn ROI tương tác (User Selective ROI)](#15-chọn-roi-tương-tác-user-selective-roi)
+        - [1.6. Bitwise Operations và ROI không chữ nhật](#16-bitwise-operations-và-roi-không-chữ-nhật)
 - [B. Khó khăn](#b-khó-khăn)
 - [C. Tài liệu tham khảo](#c-tài-liệu-tham-khảo)
 - [D. Công việc tiếp theo](#d-công-việc-tiếp-theo)
@@ -108,8 +109,62 @@ cv2.destroyAllWindows()
 
 ![selectRoi](Region_of_Interesting/output.gif)
 
-## B. Khó khăn
+#### 1.6. Bitwise Operations và ROI non-rectangular
+- ROI thông thường chỉ thao tác trên **vùng hình chữ nhật** vì được tạo bằng slicing như `img[y1:y2, x1:x2]`. Tuy nhiên trong thực tế có nhiều đối tượng không có dạng chữ nhật, vật thể tách nền hoặc vùng cần xử lý theo biên bất kỳ. Khi đó cần kết hợp ROI với **mask** để mô tả chính xác hình dạng của vùng quan tâm.
+- Trong ví dụ minh họa ở tài liệu OpenCV là chèn logo OpenCV lên ảnh nền, nếu cộng trực tiếp hai ảnh thì màu sắc sẽ bị thay đổi; nếu dùng `cv.addWeighted()` thì logo bị trong suốt. Để logo hiển thị rõ và giữ đúng biên dạng, ta tạo mask của logo và dùng các phép `bitwise` để tách nền và foreground trước khi ghép lại.
 
+- Ví dụ minh họa em lấy trên OpenCV Documents : 
+
+```python
+import cv2 as cv
+
+# Đọc ảnh nền và ảnh logo
+img1 = cv.imread("messi5.jpg")
+img2 = cv.imread("opencv-logo-white.png")
+
+assert img1 is not None, "Không đọc được ảnh nền"
+assert img2 is not None, "Không đọc được ảnh logo"
+
+# Tạo ROI trên ảnh nền có cùng kích thước với logo
+rows, cols, channels = img2.shape
+roi = img1[0:rows, 0:cols]
+
+# Tạo mask nhị phân của logo và mask nghịch đảo
+img2gray = cv.cvtColor(img2, cv.COLOR_BGR2GRAY)
+ret, mask = cv.threshold(img2gray, 10, 255, cv.THRESH_BINARY)
+mask_inv = cv.bitwise_not(mask)
+
+# Xóa vùng logo trên ROI nền
+img1_bg = cv.bitwise_and(roi, roi, mask=mask_inv)
+
+# Lấy đúng phần logo từ ảnh logo
+img2_fg = cv.bitwise_and(img2, img2, mask=mask)
+
+# Ghép nền và logo rồi gán lại vào ảnh gốc
+dst = cv.add(img1_bg, img2_fg)
+img1[0:rows, 0:cols] = dst
+
+cv.imshow("mask", mask)
+cv.imshow("img1_bg", img1_bg)
+cv.imshow("img2_fg", img2_fg)
+cv.imshow("result", img1)
+cv.waitKey(0)
+cv.destroyAllWindows()
+```
+![non_retangle](non_retangle.png)
+
+- **Phân tích code ví dụ :**
+- `roi = img1[0:rows, 0:cols]`: lấy một ROI hình chữ nhật trên ảnh nền có kích thước bằng ảnh logo. ROI này chỉ là vùng làm việc ban đầu.
+- `mask`: là ảnh nhị phân, trong đó phần logo có giá trị trắng và phần nền có giá trị đen. Chính mask này mới quyết định **hình dạng không chữ nhật** của vùng cần ghép.
+- `mask_inv`: là mask đảo, dùng để giữ lại phần nền trong ROI sau khi loại bỏ vị trí logo.
+- `img1_bg = cv.bitwise_and(roi, roi, mask=mask_inv)`: giữ phần nền của ROI, đồng thời làm đen vị trí logo.
+- `img2_fg = cv.bitwise_and(img2, img2, mask=mask)`: chỉ lấy phần logo cần chèn, bỏ nền của ảnh logo.
+- `dst = cv.add(img1_bg, img2_fg)`: ghép phần nền và logo lại với nhau, sau đó gán kết quả về ảnh gốc.
+
+- **Kết luận:** non-rectangular ROI trong OpenCV thường được xử lý theo hướng: dùng ROI để giới hạn khu vực thao tác, sau đó dùng `mask + bitwise` để xác định đúng hình dạng cần giữ hoặc cần chèn. Đây là kỹ thuật quan trọng khi làm việc với logo, segmentation mask, vùng vật thể hoặc các bài toán overlay ảnh có biên dạng bất kỳ.
+
+## B. Khó khăn
+- Em nghĩ ko cần thiết phải ứng dụng thêm phương pháp non-rectangular ROI vì ta có thể dùng chuột để click các tọa độ điểm ảnh của Sa bàn rồi dùng phương pháp ROI thông thường để xử lý được ạ 
 ## C. Tài liệu tham khảo
 1. **OpenCV Official** – [Cropping an Image Using OpenCV](https://opencv.org/cropping-an-image-using-opencv/)
 2. **OpenCV Official** – [Pixel Level Image Manipulation](https://opencv.org/blog/pixel-level-image-manipulation-using-opencv/)

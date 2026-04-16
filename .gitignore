@@ -5,3 +5,5 @@ __pycache__/
 *.pth
 *calibration_images/
 260409/Leanbot_detection/datasets.zip
+260416/Alignment_ECC/images/*_output/
+260416/tools/captures/

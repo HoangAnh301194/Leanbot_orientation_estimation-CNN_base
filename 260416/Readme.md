@@ -75,6 +75,9 @@ cv2.imshow("Cropped Image", cropped_img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
+- Kết quả chạy thử code test_roi.py ([link](Region_of_Interesting/test_roi.py)):
+
+![testROI](Region_of_Interesting/testROI.png)
 
 #### 1.5. Chọn ROI tương tác (User Selective ROI)
 - Khi không biết trước tọa độ chính xác, OpenCV cung cấp hàm `cv2.selectROI()` ta chỉ cần kéo chuột để chọn vùng ROI trực tiếp trên ảnh. Sau đó có thể dùng ROI này để xử lý hoặc crop tùy nhu cầu.
@@ -100,7 +103,7 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-![selectRoi](output.gif)
+![selectRoi](Region_of_Interesting/output.gif)
 
 ## B. Khó khăn
 

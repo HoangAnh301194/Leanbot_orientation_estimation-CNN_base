@@ -8,7 +8,7 @@
         - [1.3. Cú pháp trích xuất ROI](#13-cú-pháp-trích-xuất-roi)
         - [1.4. Cắt ảnh từ ROI (Cropping)](#14-cắt-ảnh-từ-roi-cropping)
         - [1.5. Chọn ROI tương tác (User Selective ROI)](#15-chọn-roi-tương-tác-user-selective-roi)
-        - [1.6. Bitwise Operations và ROI không chữ nhật](#16-bitwise-operations-và-roi-không-chữ-nhật)
+        - [1.6. Bitwise Operations và ROI non-rectangular](#16-bitwise-operations-và-roi-non-rectangular)
 - [B. Khó khăn](#b-khó-khăn)
 - [C. Tài liệu tham khảo](#c-tài-liệu-tham-khảo)
 - [D. Công việc tiếp theo](#d-công-việc-tiếp-theo)

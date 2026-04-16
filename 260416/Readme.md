@@ -10,6 +10,7 @@
         - [1.5. Chọn ROI tương tác (User Selective ROI)](#15-chọn-roi-tương-tác-user-selective-roi)
 - [B. Khó khăn](#b-khó-khăn)
 - [C. Tài liệu tham khảo](#c-tài-liệu-tham-khảo)
+- [D. Công việc tiếp theo](#d-công-việc-tiếp-theo)
 
 ## A. Công việc đã làm
 - Tìm hiểu về Region of Interest (ROI) trong OpenCV

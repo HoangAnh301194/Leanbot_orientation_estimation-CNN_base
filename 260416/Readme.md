@@ -76,7 +76,7 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-- Kết quả chạy thử code test_roi.py ([link](Region_of_Interesting/test_roi.py)):
+- Kết quả chạy thử code test_roi.py ([https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260416/Region_of_Interesting/test_roi.py](Region_of_Interesting/test_roi.py)):
 
 
 ![testROI](Region_of_Interesting/testROI.png)

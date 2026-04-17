@@ -85,8 +85,11 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
 ```
 #### 3.2. Kết quả sau khi Mask
 - **Ảnh gốc sau khi chọn các điểm để tạo mask**
+
 ![original](images/original.png)
+
 - **Ảnh sau khi Mask**
+
 ![masked](images/mask.png)
 
 ## B. Khó khăn

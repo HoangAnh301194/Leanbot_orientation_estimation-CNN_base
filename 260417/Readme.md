@@ -25,9 +25,9 @@
     - **Giá trị 0 (Đen)**: Vùng nền cần loại bỏ.
 
 #### 1.2. Bản chất của Mask và Bitwise AND
-Phép toán `cv2.bitwise_and` thực hiện tính toán trên từng cặp pixel giữa ảnh đầu vào ($I_{in}$) và Mask:
+Phép toán `cv2.bitwise_and` thực hiện tính toán trên từng cặp pixel giữa ảnh đầu vào 
 
-$$I_{out}(x,y) = \begin{cases} I_{in}(x,y) & \text{nếu } Mask(x,y) = 255 \\ 0 & \text{nếu } Mask(x,y) = 0 \end{cases}$$
+![bitwise](images/bitwise.png)
 
 Về mặt logic, chỉ những điểm ảnh mà cả ảnh gốc và Mask đều có giá trị (bit 1) mới được giữ lại ở ảnh đầu ra.
 
@@ -84,10 +84,10 @@ Sử dụng phép toán Bitwise AND để lọc ảnh. Chỉ những Pixel nằm
 masked = cv2.bitwise_and(frame, frame, mask=mask)
 ```
 #### 3.2. Kết quả sau khi Mask
-- Ảnh gốc sau khi chọn các điểm để tạo mask
-![original](original.png)
-- Ảnh sau khi Mask
-![masked](mask.png)
+- **Ảnh gốc sau khi chọn các điểm để tạo mask**
+![original](images/original.png)
+- **Ảnh sau khi Mask**
+![masked](images/mask.png)
 
 ## B. Khó khăn
 - Hiện tại em đang chưa hiểu hưởng đi tổng thể cho lắm ạ :

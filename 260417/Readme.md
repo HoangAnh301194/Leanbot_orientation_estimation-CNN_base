@@ -200,6 +200,8 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
 
     ![diff](images/diff_mask.png)
 
+- Sau khi cắt riêng Mask để xử lí, và dùng CLAHE để tăng độ tương phản thì khi so sánh sai khác của ảnh thì em thấy tốt hơn, và ko bị điều kiện ánh sáng ảnh hưởng. 
+
 ## B. Khó khăn
 - Hiện tại em đang chưa hiểu hưởng đi tổng thể cho lắm ạ :
     - Trước đó Thầy có bảo em tìm hiểu về các phương pháp chọn vùng hình thang của Sa bàn rồi nắn thẳng về hình vuông và chỉ cần xử lí trên hình vuông đó, nhưng giờ lại quay về bài toán chọn vùng hình thang của sa bàn trên ảnh rồi xử lí trên hình thang ạ.

@@ -182,24 +182,30 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
         align (ECC calculation): 453.82 ms
         compute_diff: 7.12 ms
         ```
-    - **Kết luận**: Với mỗi Frame ảnh 2K, thời gian xử lý trung bình bị delay như sau:
+    - **Kết Luận** : với mỗi Frame ảnh xử lí thời gian bị delay như sau :
+        - Tiền xử lí ảnh : làm mờ Gaussion + CLAHE mất khoảng 13-15ms
+        - Căn chỉnh ảnh Alignment ECC: mất khoảng 450-500ms , cái này tùy thuộc vào độ phân giải của ảnh, vòng lặp và điều kiện dừng của thuật toán căn chỉnh ECC. Em đã thửu giảm vòng lặp căn chỉnh  từ 200 xuống 50 nhưng kết quả không cải thiện ( ban đầu là 900ms cho vòng lặp 200).
+        - Tính toán sai số ( Substract images): mất khoảng 7-10ms 
 
-| Công đoạn xử lý | Thời gian (ms) | Ghi chú |
-| :--- | :---: | :--- |
-| **Tiền xử lý (Preprocess)** | ~14 ms | CLAHE + Gaussian Blur |
-| **Căn chỉnh (ECC Alignment)** | ~450 ms | Tìm ma trận dịch chuyển |
-| **So sánh (Compute Diff)** | ~7 ms | Tính toán vùng lệch |
-| **Tổng cộng / Frame** | **~471 ms** | **Tốc độ thực tế: ~2.1 FPS** |
+- Ảnh kết quả
+    - **Ảnh gốc ban đầu**
 
-> [!NOTE]
-> Với tốc độ ~2 FPS, hệ thống đáp ứng tốt các bài toán sa bàn tĩnh hoặc chuyển động chậm. Để đạt tốc độ Real-time (>15 FPS), cần áp dụng kỹ thuật Pyramid (thu nhỏ ảnh khi tính toán) hoặc xử lý đa luồng.
+    ![origin](images/origin.png)   
+
+    - **Ảnh đã cắt lấy Mask để xử lí**
+
+    ![mask](images/mask_roi.png)
+
+    - **Ảnh so sánh sai khác so với ảnh nền (background) sau khi đã lấy mask + căn chỉnh**
+
+    ![diff](images/diff_mask.png)
 
 ## B. Khó khăn
 - Hiện tại em đang chưa hiểu hưởng đi tổng thể cho lắm ạ :
     - Trước đó Thầy có bảo em tìm hiểu về các phương pháp chọn vùng hình thang của Sa bàn rồi nắn thẳng về hình vuông và chỉ cần xử lí trên hình vuông đó, nhưng giờ lại quay về bài toán chọn vùng hình thang của sa bàn trên ảnh rồi xử lí trên hình thang ạ.
     - Ngoài ra em vẫn chưa hình dung được output của bước chuẩn bị phần cơ sở xử lý ảnh để đi vào phần AI ạ. Kiểu cần phải xử lý đến mức nào thì được ạ? 
 - Em nghĩ là sẽ có hạn chế nữa là khi mình chọn mask rồi, mà nếu sa bàn bị xê dịch một chút thì sẽ bị cắt mất một chút và mất thông tin để Alignment lại ạ. 
-
+- Em đã thử test thuật toán căn chỉnh ECC alignment trong quá trình Stream cam và thấy thời gian mất quá nhiều dẫn tới giật lag mạnh ạ. 
 ---
 ## C. Tài liệu tham khảo
 1. **Viblo** – [Arithmetic Operations on Images with OpenCV](https://viblo.asia/p/arithmetic-operations-on-images-with-opencv-gDVK2denlLj#_bitwise-operations-4)
@@ -208,4 +214,4 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
 ---
 
 ## D. Công việc tiếp theo
-- Khảo sát độ phân giải của ảnh Output sau khi Mask + alignment
+- Khảo sát độ phân giải của ảnh Output sau khi Mask + alignme

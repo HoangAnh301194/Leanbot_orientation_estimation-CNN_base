@@ -206,6 +206,7 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
     - Ngoài ra em vẫn chưa hình dung được output của bước chuẩn bị phần cơ sở xử lý ảnh để đi vào phần AI ạ. Kiểu cần phải xử lý đến mức nào thì được ạ? 
 - Em nghĩ là sẽ có hạn chế nữa là khi mình chọn mask rồi, mà nếu sa bàn bị xê dịch một chút thì sẽ bị cắt mất một chút và mất thông tin để Alignment lại ạ. 
 - Em đã thử test thuật toán căn chỉnh ECC alignment trong quá trình Stream cam và thấy thời gian mất quá nhiều dẫn tới giật lag mạnh ạ. 
+
 ---
 ## C. Tài liệu tham khảo
 1. **Viblo** – [Arithmetic Operations on Images with OpenCV](https://viblo.asia/p/arithmetic-operations-on-images-with-opencv-gDVK2denlLj#_bitwise-operations-4)

@@ -7,7 +7,7 @@
         - [1.2. Bản chất toán học của Mask và Bitwise AND](#12-bản-chất-toán-học-của-mask-và-bitwise-and)
         - [1.3. Bảng chân lý Bitwise Operations](#13-bảng-chân-lý-bitwise-operations)
     - [2. Hướng ý tưởng triển khai thực tế](#2-hướng-ý-tưởng-triển-khai-thực-tế)
-    - [3. Code và kết quả thực nghiệm](#3-code-và-kết-quả-thực-nghiệm)
+    - [2. Bộ công cụ Alignment_ECC](#2-bộ-công-cụ-alignment_ecc)
 - [B. Khó khăn](#b-khó-khăn)
 - [C. Tài liệu tham khảo](#c-tài-liệu-tham-khảo)
 - [D. Công việc tiếp theo](#d-công-việc-tiếp-theo)
@@ -15,7 +15,8 @@
 ---
 
 ## A. Công việc đã làm
-- Tìm hiểu và triển khai phương pháp xác định vùng sa bàn bằng **Polygon Mask** , **Bitwise** .
+- Tìm hiểu và triển khai phương pháp xác định vùng sa bàn bằng **Polygon Mask**, **Bitwise** .
+- Tạo bộ công cụ **Alignment_ECC** để căn chỉnh ảnh, tính toán thời gian và kiểm tra độ phân giải ảnh Output.
 ### 1. Phương pháp Polygon Masking
 
 #### 1.1. Mục đích
@@ -41,14 +42,14 @@ Bảng dưới đây mô tả logic pixel khi thực hiện phép Bitwise giữa
 | 1 | 0 | 0 | **Vùng có màu ngoài Mask -> Bị xóa (Đen)** |
 | 1 | 1 | 1 | **Vùng có màu trong Mask -> Giữ nguyên** |
 
-### 2. Hướng ý tưởng triển khai thực tế
+#### 1.4. Hướng ý tưởng triển khai thực tế
 
 - **Bước 1: Chọn tọa độ**: Click chuột 4 góc sa bàn để chọn vùng mask
 - **Bước 2: Tạo mặt nạ**: Dùng `cv2.fillPoly()` để tô trắng vùng hình thang từ 4 góc đã chọn, phần còn lại sẽ đen hoàn toàn.
 - **Bước 3: Áp dụng mask đã tạo**: Áp dụng lệnh `masked = cv2.bitwise_and(frame, frame, mask=mask)` cho mọi frame ảnh từ Cam
 
-### 3. Code và kết quả thực nghiệm
-#### 3.1. Code 
+#### 1.5. Code và kết quả thực nghiệm
+##### a. Code 
 - Link Code: [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/Mask%20ROI/mask_roi.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/Mask%20ROI/mask_roi.py)
 - **Chi tiết các hàm xử lý thuật toán:**
 
@@ -91,6 +92,107 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
 - **Ảnh sau khi Mask**
 
 ![masked](images/mask.png)
+
+### 2. Bộ công cụ Alignment_ECC
+- Mục đích : tạo các hàm để căn chỉnh ảnh, tính toán thời gian và kiểm tra độ phân giải ảnh Output. Sau này chỉ cần import lại công cụ là dùng được. 
+- Link code : [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/tools/alignment.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/tools/alignment.py)
+- Các hàm chính trong code Alignment:
+    - `preprocessing` : tiền xử lý ảnh, làm mượt ảnh, tăng cường độ tương phản, tính toán thời gian xử lí.
+        ```python 
+            def preprocess(gray):
+                """Standard preprocessing: CLAHE and Gaussian Blur."""
+                start = time.perf_counter()
+                clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+                gray = clahe.apply(gray)
+                gray = cv2.GaussianBlur(gray, (5, 5), 0)
+                end = time.perf_counter()
+                print(f"preprocess: {(end - start)*1000:.2f} ms")
+                return gray
+        ```
+    - `set_template`: Thiết lập ảnh nền mốc và tiền xử lý (CLAHE, Blur) cho ảnh mốc (backGround).
+        ```python
+            
+                def set_template(self, img):
+        """Sets and preprocesses the reference template image."""
+        start = time.perf_counter()
+        if len(img.shape) == 3:
+            self.template_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            self.template_gray = img.copy()
+        
+        self.template_preprocessed = self.preprocess(self.template_gray)
+        
+        # Reset warp matrix for new template
+        if self.motion_type == cv2.MOTION_HOMOGRAPHY:
+            self.warp_matrix = np.eye(3, 3, dtype=np.float32)
+        else:
+            self.warp_matrix = np.eye(2, 3, dtype=np.float32)
+        
+        end = time.perf_counter()
+        print(f"set_template: {(end - start)*1000:.2f} ms")
+        ```
+
+    - `align`: Thực hiện căn chỉnh ECC giữa ảnh hiện tại và ảnh nền, tính toán thời gian xử lí.
+        ```python
+            start = time.perf_counter()
+            (cc, warp) = cv2.findTransformECC(
+                self.template_preprocessed,
+                target_p,
+                self.warp_matrix.copy(),
+                self.motion_type,
+                self.criteria
+            )
+            end = time.perf_counter()
+        ```
+    - `compute_diff`: Tính toán sai khác pixel và tạo Mask nhị phân để kiểm tra độ chính xác sau khi căn chỉnh, cũng có thể dùng để thử Detect vật thể xuất hiện so với backGround ban đầu.
+        ```python
+            def compute_diff(ref_gray, test_gray, threshold=25):
+                """Computes absolute difference and binary mask."""
+                start = time.perf_counter()
+                diff = cv2.absdiff(ref_gray, test_gray)
+                _, mask = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)
+                
+                nonzero = int(np.count_nonzero(mask))
+                mean_val = float(diff.mean())
+                end = time.perf_counter()
+                print(f"compute_diff: {(end - start)*1000:.2f} ms")
+                
+                return diff, mask, nonzero, mean_val
+        ```
+
+### 3. Triển khai thực tế Pipeline tổng hợp (ROI + Alignment)
+- Link code chính: [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/tools/polygon_roi_align.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/tools/polygon_roi_align.py)
+
+- **Quy trình thực hiện:**
+    - **Bước 1 (Interactive Masking)**: Khi chạy script, chương trình sẽ yêu cầu người dùng click chọn 4 góc sa bàn.
+    - **Bước 2 (Registration)**: Nạp ảnh nền mốc (background) vừa cắt lấy ở bước 1 vào thư viện để làm điểm tựa căn chỉnh.
+    - **Bước 3 (Real-time Alignment)**: Với mọi frame tiếp theo từ Camera, chương trình **sử dụng Mask đã được tạo từ hàm `build_mask`** kết hợp với `bitwise_and` để cắt lấy vùng sa bàn, sau đó gọi hàm `align` để bù đắp rung lắc.
+    - **Bước 4 (Evaluation)**: Tính toán sai số `compute_diff` thời gian thực và hiển thị trực quan 3 cửa sổ (Ảnh gốc, Sa bàn đã căn chỉnh, Vùng pixel bị lệch).
+- Kết quả thu được:
+    - Log debug tại bước 2 - set_template: 
+        ```--- STEP 2: BACKGROUND REGISTRATION ---
+            preprocess: 18.61 ms
+            set_template: 23.33 ms
+            Background registered successfully.
+        ```
+    - Log debug tại bước 3 - align: 
+        ```--- STEP 3: REAL-TIME PIPELINE STARTED ---
+        Press 'q' or 'ESC' to exit.
+        preprocess: 13.87 ms
+        align (ECC calculation): 453.82 ms
+        compute_diff: 7.12 ms
+        ```
+    - **Kết luận**: Với mỗi Frame ảnh 2K, thời gian xử lý trung bình bị delay như sau:
+
+| Công đoạn xử lý | Thời gian (ms) | Ghi chú |
+| :--- | :---: | :--- |
+| **Tiền xử lý (Preprocess)** | ~14 ms | CLAHE + Gaussian Blur |
+| **Căn chỉnh (ECC Alignment)** | ~450 ms | Tìm ma trận dịch chuyển |
+| **So sánh (Compute Diff)** | ~7 ms | Tính toán vùng lệch |
+| **Tổng cộng / Frame** | **~471 ms** | **Tốc độ thực tế: ~2.1 FPS** |
+
+> [!NOTE]
+> Với tốc độ ~2 FPS, hệ thống đáp ứng tốt các bài toán sa bàn tĩnh hoặc chuyển động chậm. Để đạt tốc độ Real-time (>15 FPS), cần áp dụng kỹ thuật Pyramid (thu nhỏ ảnh khi tính toán) hoặc xử lý đa luồng.
 
 ## B. Khó khăn
 - Hiện tại em đang chưa hiểu hưởng đi tổng thể cho lắm ạ :

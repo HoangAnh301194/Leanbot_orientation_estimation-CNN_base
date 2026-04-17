@@ -4,9 +4,6 @@ import numpy as np
 from pathlib import Path
 
 
-points = []
-
-
 def parse_source(src: str):
     if src.isdigit():
         return int(src)
@@ -14,13 +11,13 @@ def parse_source(src: str):
 
 
 def mouse_callback(event, x, y, flags, param):
-    global points
-    scale = param
+    # param bây giờ chứa [scale, points_list]
+    scale, pts_list = param
     if event == cv2.EVENT_LBUTTONDOWN:
-        if len(points) < 4:
+        if len(pts_list) < 4:
             real_x, real_y = int(x * scale), int(y * scale)
-            points.append((real_x, real_y))
-            print(f"[INFO] Point {len(points)} = ({real_x}, {real_y})")
+            pts_list.append((real_x, real_y))
+            print(f"[INFO] point {len(pts_list)} = ({real_x}, {real_y})")
 
 
 def draw_points_and_polygon(img, pts):
@@ -41,8 +38,7 @@ def draw_points_and_polygon(img, pts):
 
 def select_four_points(frame):
     """Hiển thị ảnh thu nhỏ để chọn 4 góc, trả về toạ độ gốc (2K)."""
-    global points
-    points = []
+    local_points = [] # Sử dụng biến local thay vì global
 
     h_orig, w_orig = frame.shape[:2]
     scale = 3.0
@@ -50,10 +46,11 @@ def select_four_points(frame):
 
     win = "Select 4 points"
     cv2.namedWindow(win, cv2.WINDOW_AUTOSIZE)
-    cv2.setMouseCallback(win, mouse_callback, param=scale)
+    # Truyền cả scale và list vào param của callback
+    cv2.setMouseCallback(win, mouse_callback, param=[scale, local_points])
 
     while True:
-        pts_draw = [(int(p[0] / scale), int(p[1] / scale)) for p in points]
+        pts_draw = [(int(p[0] / scale), int(p[1] / scale)) for p in local_points]
         vis = draw_points_and_polygon(disp, pts_draw)
         cv2.putText(vis, "Click 4 corners | ENTER: confirm | c: clear | q: quit",
                     (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
@@ -61,12 +58,12 @@ def select_four_points(frame):
 
         key = cv2.waitKey(20) & 0xFF
         if key == ord("c"):
-            points = []
+            local_points.clear()
             print("[INFO] Cleared points")
-        elif key == 13:
-            if len(points) == 4:
+        elif key == 13: # ENTER
+            if len(local_points) == 4:
                 cv2.destroyWindow(win)
-                return np.array(points, dtype=np.int32)
+                return np.array(local_points, dtype=np.int32)
             print("[WARN] Need exactly 4 points")
         elif key in (ord("q"), 27):
             cv2.destroyWindow(win)

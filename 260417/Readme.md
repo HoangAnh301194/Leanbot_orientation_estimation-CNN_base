@@ -49,7 +49,7 @@ Bảng dưới đây mô tả logic pixel khi thực hiện phép Bitwise giữa
 
 ### 3. Code và kết quả thực nghiệm
 #### 3.1. Code 
-- Link Code: [mask_roi.py](file:///d:/PTIT/DTT/Nguyen_Huu_Hoang_Anh/260417/Mask%20ROI/mask_roi.py)
+- Link Code: [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/Mask%20ROI/mask_roi.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260417/Mask%20ROI/mask_roi.py)
 - **Chi tiết các hàm xử lý thuật toán:**
 
 ##### a. Hàm xử lý sự kiện chuột (Tọa độ và Tỉ lệ)

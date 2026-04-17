@@ -213,5 +213,6 @@ masked = cv2.bitwise_and(frame, frame, mask=mask)
 
 ---
 
+
 ## D. Công việc tiếp theo
 - Khảo sát độ phân giải của ảnh Output sau khi Mask + alignme

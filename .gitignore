@@ -7,3 +7,17 @@ __pycache__/
 260409/Leanbot_detection/datasets.zip
 260416/Alignment_ECC/images/*_output/
 260416/tools/captures/
+
+# 260420 generated outputs (Ignore heavy binary data)
+260420/output/sessions/
+260420/output/datasets/images/
+260420/output/datasets/preview_checks/
+260420/tools/config/
+260420/tools/captures/
+260420/tools/*.jpg
+260420/tools/*.npy
+
+# Keep only labels and folder structure
+!260420/output/datasets/images/.gitkeep
+!260420/output/datasets/labels/
+!260420/output/datasets/labels/*.txt

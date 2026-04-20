@@ -10,11 +10,11 @@
 
     - **Bước 1**: Chụp ảnh BackGround trắng (chưa có Leanbot), click chuột vào 4 góc để lấy Mask xử lí, tính toán.
 
-    ![points](points.png)
+    ![points](images/points.png)
 
     - **Bước 2**: Chụp ảnh có 9 Leanbot tại 9 trường hợp khác nhau -> căn chỉnh Alignment, CLAHE, Gaussian Blur -> Trừ ảnh với BackGround -> Tính countor, bounding box.
 
-    ![leanbot](leanbot.png)
+    ![leanbot](images/leanbot.png)
 
     - **Bước 3**: Tạo file label cho từng Leanbot.
     Ảnh sau khi xử lý sẽ được lưu vào thư mục `output/datasets/images` và `output/datasets/labels`.
@@ -26,11 +26,11 @@
     - Sau khi chạy tools bằng lệnh ```python tools/auto_label.py --source 1(tùy thuộc vào index mà camera được nhận)``` --> capture backgroud --> chọn Board ROI --> capture ảnh có Leanbot --> căn chỉnh Alignment --> thì ảnh Preview quá trình xử lý sẽ hiện lên như sau:
         - Ảnh tính toán sai khác, nhị phân hóa, tìm coutor:
 
-        ![diff](diff.png)
+        ![diff](images/diff.png)
 
         - Ảnh tìm Bounding box
 
-        ![bbox](bbox.png)
+        ![bbox](images/bbox.png)
 
     - file label sau khi chụp cho 9 Leanbot :
     ```
@@ -51,27 +51,27 @@
     - Đối với tập dữ liệu train 10 ảnh, validate 3 ảnh, mỗi ảnh có 9 leanbot ở các tư thế khác nhau.
     - Bảng đánh giá tỉ lệ phán đoán nhầm lẫn 
 
-    ![confusion](confusion_matrix.png)
+    ![confusion](images/confusion_matrix.png)
 
     - Đồ thị đánh giá độ tự tin dự đoán 
 
-    ![confidence](confidence.png)
+    ![confidence](images/confidence.png)
 
     - Detect thực tế tại 3 ảnh đánh giá model - Validation
 
-    ![detect](detect.png)
+    ![detect](images/detect.png)
 
     - **Nhận xét** : qua các kết quả đánh giá, đối với tập dữ liệu 10 ảnh ( tương đương 90 mẫu Leanbot ) thì khả năng dự đoán của model chưa cao, độ tự tin thấp, tuy nhiên chỉ có 1 Class là Leanbot nên không có sự nhầm lẫn.
 ## B. Khó khăn
 - Một số góc xuay của Leanbot khiến ánh sáng môi trường phản xạ, hoặc một số chi tiết của Leanbot khá giống với sa bàn nên khi tính sai khác, trừ ảnh sẽ bị mất pixel dẫn tới một số trường hợp countor ko ổn định, Bounding box ko hết toàn bộ Leanbot.
 
-![bug](bug.png)
+![bug](images/bug.png)
 
 - Leanbot Bounding box không bao được hết thân: 
 
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 
-![alt text](image.png)
+![alt text](images/image.png)
 
 ## C. Công việc tiếp theo
-- Triển khai trainning với tập datasets vừa thu thập bằng auto_label.py.
+- Đọc, phân tích lại code (vì cần triển khai sớm để xem mức độ hiệu quả và khả thi nên em có dùng AI để viết code, em xin Thầy thêm chút thời gian để rà soát lại code để hiểu cặn kẽ hơn ạ)

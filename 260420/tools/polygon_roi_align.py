@@ -8,7 +8,6 @@ from pathlib import Path
 # Setup paths for importing libraries
 BASE_DIR = Path(__file__).parent.parent
 sys.path.append(str(Path(__file__).parent))      # tools
-sys.path.append(str(Path(__file__).parent / "Mask ROI")) # Mask ROI inside tools
 
 from alignment import ImageAligner
 from mask_roi import select_four_points, build_mask

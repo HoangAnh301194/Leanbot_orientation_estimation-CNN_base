@@ -21,7 +21,6 @@ from pathlib import Path
 # setup paths for importing libraries
 CURRENT_DIR = Path(__file__).parent
 sys.path.append(str(CURRENT_DIR))
-sys.path.append(str(CURRENT_DIR / "Mask ROI"))
 
 # --- QUẢN LÝ ĐƯỜNG DẪN MỚI ---
 OUTPUT_ROOT = CURRENT_DIR.parent / "output"
@@ -276,7 +275,7 @@ def main():
     parser.add_argument("--max_width", type=int, default=600, help="Max bbox width (default 600)")
     parser.add_argument("--min_height", type=int, default=40, help="Min bbox height (default 20)")
     parser.add_argument("--max_height", type=int, default=600, help="Max bbox height (default 600)")
-    parser.add_argument("--merge_dist", type=int, default=20, help="Distance to merge nearby bboxes (default 20)")
+    parser.add_argument("--merge_dist", type=int, default=40, help="Distance to merge nearby bboxes (default 20)")
     parser.add_argument("--class_id", type=int, default=0, help="Default class ID for labeling")
     args = parser.parse_args()
 

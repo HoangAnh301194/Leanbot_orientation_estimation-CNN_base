@@ -25,8 +25,11 @@
 - Kết quả :
     - Sau khi chạy tools bằng lệnh ```python tools/auto_label.py --source 1(tùy thuộc vào index mà camera được nhận)``` --> capture backgroud --> chọn Board ROI --> capture ảnh có Leanbot --> căn chỉnh Alignment --> thì ảnh Preview quá trình xử lý sẽ hiện lên như sau:
         - Ảnh tính toán sai khác, nhị phân hóa, tìm coutor:
+        
         ![diff](diff.png)
+
         - Ảnh tìm Bounding box
+
         ![bbox](bbox.png)
 
     - file label sau khi chụp cho 9 Leanbot :
@@ -44,7 +47,10 @@
 
 ## B. Khó khăn
 - Một số góc xuay của Leanbot khiến ánh sáng môi trường phản xạ, hoặc một số chi tiết của Leanbot khá giống với sa bàn nên khi tính sai khác, trừ ảnh sẽ bị mất pixel dẫn tới một số trường hợp countor ko ổn định, Bounding box ko hết toàn bộ Leanbot.
+
 ![bug](bug.png)
+
+- Leanbot Bounding box không bao được hết thân: 
 
 ![alt text](image-1.png)
 

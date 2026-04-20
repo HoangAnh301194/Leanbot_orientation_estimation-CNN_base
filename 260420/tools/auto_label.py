@@ -325,7 +325,10 @@ def main():
             aligner = ImageAligner()
             aligner.set_template(bg_masked)
             mask = board_mask
-        
+
+        if cap is None:
+            cap = setup_camera(parse_source(args.source))
+
         # --- BƯỚC 2: CHỤP LOẠT (CAPTURE MODE) ---
         captured_frames = []
         print("\n--- CHẾ ĐỘ CHỤP LOẠT (CAPTURE MODE) ---")

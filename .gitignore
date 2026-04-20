@@ -12,6 +12,7 @@ __pycache__/
 260420/output/sessions/
 260420/output/datasets/images/
 260420/output/datasets/preview_checks/
+260420/output/*.zip
 260420/tools/config/
 260420/tools/captures/
 260420/tools/*.jpg

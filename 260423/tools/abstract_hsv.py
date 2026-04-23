@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pathlib import Path
 
 
 def get_screen_size():
@@ -84,8 +85,7 @@ def compute_hsv_diff(
         "nonzero": int(np.count_nonzero(mask)),
     }
 
-
-def compute_gray_hue_diff(img1, img2, w_gray=1.0, w_hue=2.0, threshold=40, min_saturation=20, blur_ksize=3, use_clahe=False):
+def compute_gray_hue_diff(img1, img2, w_gray=1.0, w_hue=0.5, threshold=40, min_saturation=20, blur_ksize=5, use_clahe=True):
     """
     Kết hợp Grayscale difference và Hue difference.
     """
@@ -125,7 +125,8 @@ def compute_gray_hue_diff(img1, img2, w_gray=1.0, w_hue=2.0, threshold=40, min_s
     weight_total = w_gray + w_hue
     if weight_total <= 0: weight_total = 1.0
     
-    score = (w_gray * dGray + w_hue * dH) / weight_total
+    #core = (w_gray * dGray + w_hue * dH) / weight_total
+    score = np.maximum(w_gray * dGray, w_hue * dH)
     score = np.clip(score, 0, 255).astype(np.uint8)
 
     _, mask = cv2.threshold(score, threshold, 255, cv2.THRESH_BINARY)
@@ -140,15 +141,16 @@ def compute_gray_hue_diff(img1, img2, w_gray=1.0, w_hue=2.0, threshold=40, min_s
 
 
 def main():
-    img1_raw = cv2.imread("background.jpg")
-    img2_raw = cv2.imread("leanbot.jpg")
+    base_dir = Path(__file__).resolve().parent
+    img1_raw = cv2.imread(str(base_dir / "background.jpg"))
+    img2_raw = cv2.imread(str(base_dir / "leanbot.jpg"))
 
     if img1_raw is None or img2_raw is None:
-        print("[Error] Could not find background.jpg or leanbot.jpg.")
+        print(f"[Error] Could not find background.jpg or leanbot.jpg in: {base_dir}")
         return
 
     # Window names
-    CTRL_WIN = "Controls"
+    CTRL_WIN = "Controls (raw x0.2)"
     RES_WIN = "Results (HSV | Hybrid | Gray)"
     COMP_WIN = "Components Detail"
     screen_w, screen_h = get_screen_size()
@@ -176,6 +178,7 @@ def main():
     cv2.createTrackbar("CLAHE", CTRL_WIN, 0, 1, nothing)
 
     print("\n[INFO] Interactive multi-algorithm tool started.")
+    print(f"       Running file: {Path(__file__).resolve()}")
     print("       Press 's' to save/print parameters. 'q' to exit.")
 
     scale = 0.15
@@ -249,11 +252,15 @@ def main():
         row_hybrid = np.hstack([to_bgr(resize(res_hybrid["score"])), to_bgr(resize(res_hybrid["mask"]))])
         row_gray = np.hstack([to_bgr(resize(g_diff)), to_bgr(resize(g_mask))])
 
-        cv2.putText(row_hsv, f"1. HSV Only (Score | Mask) | WH={wh_base:.1f} WS={ws_base:.1f} WV={wv_base:.1f}", (10, 30), 1, 1.2, (0, 255, 0), 2)
-        cv2.putText(row_hybrid, f"2. Hybrid Hue+Gray (Score | Mask) | WGray={wg_mix:.1f} WHue={wh_mix:.1f}", (10, 30), 1, 1.2, (255, 255, 0), 2)
+        cv2.putText(row_hsv, f"1. HSV Only (Score | Mask)", (10, 30), 1, 1.5, (0, 255, 0), 2)
+        cv2.putText(row_hybrid, f"2. Hybrid Hue+Gray (Score | Mask)", (10, 30), 1, 1.5, (255, 255, 0), 2)
         cv2.putText(row_gray, f"3. Gray Baseline (Diff | Mask)", (10, 30), 1, 1.5, (0, 0, 255), 2)
 
-        res_stack = np.vstack([row_hsv, row_hybrid, row_gray])
+        status_bar = np.zeros((70, row_hsv.shape[1], 3), dtype=np.uint8)
+        cv2.putText(status_bar, f"HSV: WH={wh_base:.1f} WS={ws_base:.1f} WV={wv_base:.1f} | Hybrid: WGray={wg_mix:.1f} WHue={wh_mix:.1f}", (10, 28), 1, 1.0, (255, 255, 255), 2)
+        cv2.putText(status_bar, "Trackbar raw index 0..25 => actual weight 0.0..5.0, step 0.2", (10, 58), 1, 0.9, (0, 220, 255), 2)
+
+        res_stack = np.vstack([status_bar, row_hsv, row_hybrid, row_gray])
         cv2.imshow(RES_WIN, res_stack)
 
         # Components for HSV

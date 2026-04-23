@@ -17,6 +17,7 @@ __pycache__/
 260420/tools/captures/
 260420/tools/*.jpg
 260420/tools/*.npy
+260421/output/
 
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep

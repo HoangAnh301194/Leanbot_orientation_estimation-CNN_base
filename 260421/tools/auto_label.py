@@ -109,7 +109,7 @@ def load_config(config_dir):
         return bg_frame, points
     return None, None
 
-def merge_bboxes(bboxes, dist_threshold=20):
+def merge_bboxes(bboxes, dist_threshold=10):
     """
     Groups nearby bounding boxes and merges them into a single larger box.
     Uses an iterative approach: if two boxes are closer than dist_threshold, merge them.
@@ -166,7 +166,8 @@ def merge_bboxes(bboxes, dist_threshold=20):
     return [tuple(b) for b in curr_bboxes]
 
 # Step 2 : caculate the bounding box for each leanbot
-def detect_leanbot(frame, bg_bgr, aligner, board_mask, diff_mode='1', threshold=50, blur_ksize=5,
+def detect_leanbot(frame, bg_bgr, aligner, board_mask, diff_mode='3', threshold=50, blur_ksize=5,
+                   w_gray=10.0, w_hue=3.0, w_h=5.0, w_s=1.0, w_v=10.0,
                    min_area=500, max_area=100000,
                    min_width=20, max_width=600, min_height=20, max_height=600, merge_dist=20):
     # get the board mask ROI
@@ -207,23 +208,22 @@ def detect_leanbot(frame, bg_bgr, aligner, board_mask, diff_mode='1', threshold=
         
         _, diff_mask, _, _ = aligner.compute_diff(bg_p, aligned_p, threshold=threshold)
     elif diff_mode == '2':
-        # Mode 2: Mix (Hue + Gray Hybrid) - Đồng bộ với Debug (G=10.0, H=3.0)
-        res = compute_gray_hue_diff(bg_bgr, aligned_color, w_gray=10.0, w_hue=3.0, 
+        # Mode 2: Mix (Hue + Gray Hybrid)
+        res = compute_gray_hue_diff(bg_bgr, aligned_color, w_gray=w_gray, w_hue=w_hue, 
                                     threshold=threshold, blur_ksize=blur_ksize, use_clahe=True)
         diff_mask = res["mask"]
     elif diff_mode == '3':
-        # Mode 3: Hue Only (HSV Weighted) - Đồng bộ với Debug (H=5.0, S=1.0, V=10.0)
-        res = compute_hsv_diff(bg_bgr, aligned_color, w_h=5.0, w_s=1.0, w_v=10.0,
+        # Mode 3: Hue Only (HSV Weighted)
+        res = compute_hsv_diff(bg_bgr, aligned_color, w_h=w_h, w_s=w_s, w_v=w_v,
                                threshold=threshold, blur_ksize=blur_ksize, use_clahe=True)
         diff_mask = res["mask"]
     else:
-        # Dự phòng: quay lại grayscale
         diff_mask = cv2.absdiff(aligner.template_gray, aligned_gray)
         _, diff_mask = cv2.threshold(diff_mask, threshold, 255, cv2.THRESH_BINARY)
     
     # 4. Xử lý hình thái học để "quét nhiễu" và "hàn" vật thể
-    kernel_small = np.ones((3, 3), np.uint8)
-    kernel_large = np.ones((25, 25), np.uint8) # Tăng lên 25 để nối các mảnh ở xa nhau
+    kernel_small = np.ones((3, 3), np.uint8) # Xóa vệt nhiễu nhỏ
+    kernel_large = np.ones((25, 25), np.uint8) 
     
     # Bước A: MORPH_OPEN để xóa nhiễu li ti
     diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
@@ -241,7 +241,10 @@ def detect_leanbot(frame, bg_bgr, aligner, board_mask, diff_mode='1', threshold=
     
     diff_mask = cv2.dilate(diff_mask, np.ones((3, 3), np.uint8), iterations=1)
     
-    diff_mask = cv2.bitwise_and(diff_mask, diff_mask, mask=board_mask)
+    # --- CÁCH XÓA VIỀN SÁNG Ở MÉP SA BÀN ---
+    # Dùng cv2.erode để bóp mặt nạ sa bàn vào 15 pixel, loại bỏ dứt điểm nhiễu do sai số Warp
+    eroded_board_mask = cv2.erode(board_mask, np.ones((15, 15), np.uint8))
+    diff_mask = cv2.bitwise_and(diff_mask, diff_mask, mask=eroded_board_mask)
 
     # 4. Tìm các đường bao (Contours)
     contours, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -290,18 +293,26 @@ def main():
     parser.add_argument("--source", default="0", help="Camera source")
     parser.add_argument("--mode", choices=["capture", "relabel"], default="capture", help="Processing mode")
     parser.add_argument("--reuse", action="store_true", help="Reuse config from the latest session")
-    parser.add_argument("--threshold", type=int, default=120, help="Brightness difference threshold (default 50)")
-    parser.add_argument("--blur", type=int, default = 5, help="Gaussian blur kernel size")
+    parser.add_argument("--threshold", type=int, default=85, help="Brightness difference threshold (default 50)")
+    parser.add_argument("--blur", type=int, default = 3, help="Gaussian blur kernel size")
     parser.add_argument("--min_area", type=int, default=1500, help="Min contour area (default 500)")
-    parser.add_argument("--max_area", type=int, default=100000, help="Max contour area (default 100000)")
+    parser.add_argument("--max_area", type=int, default=500000, help="Max contour area (default 100000)")
     parser.add_argument("--min_width", type=int, default=60, help="Min bbox width (default 20)")
-    parser.add_argument("--max_width", type=int, default=600, help="Max bbox width (default 600)")
+    parser.add_argument("--max_width", type=int, default=2000, help="Max bbox width (default 600)")
     parser.add_argument("--min_height", type=int, default=40, help="Min bbox height (default 20)")
-    parser.add_argument("--max_height", type=int, default=600, help="Max bbox height (default 600)")
-    parser.add_argument("--merge_dist", type=int, default=60, help="Distance to merge nearby bboxes (default 20)")
+    parser.add_argument("--max_height", type=int, default=2000, help="Max bbox height (default 600)")
+    parser.add_argument("--merge_dist", type=int, default=5, help="Distance to merge nearby bboxes (default 20)")
     parser.add_argument("--class_id", type=int, default=0, help="Default class ID for labeling")
     parser.add_argument("--diff_mode", choices=["1", "2", "3"], default="1", 
                         help="Differencing Mode: 1-Gray, 2-Mix (Hybrid), 3-Hue (HSV)")
+    
+    # weights for diff modes
+    parser.add_argument("--w_gray", type=float, default=10.0, help="Weight for Gray in Mix mode")
+    parser.add_argument("--w_hue", type=float, default=3.0, help="Weight for Hue in Mix mode")
+    parser.add_argument("--w_h", type=float, default=5.0, help="Weight for Hue in HSV mode")
+    parser.add_argument("--w_s", type=float, default=1.0, help="Weight for Saturation in HSV mode")
+    parser.add_argument("--w_v", type=float, default=10.0, help="Weight for Value in HSV mode")
+
     args = parser.parse_args()
 
     # Đảm bảo thư mục gốc tồn tại
@@ -409,9 +420,9 @@ def main():
     if args.diff_mode == '1':
         print(f"        -> Params: Threshold={args.threshold}, Blur={args.blur}, CLAHE=True")
     elif args.diff_mode == '2':
-        print(f"        -> Params: Weights(G=10.0, H=3.0), Threshold={args.threshold}, Blur={args.blur}, CLAHE=True")
+        print(f"        -> Params: Weights(G={args.w_gray}, H={args.w_hue}), Threshold={args.threshold}, Blur={args.blur}, CLAHE=True")
     elif args.diff_mode == '3':
-        print(f"        -> Params: Weights(H=5.0, S=1.0, V=10.0), Threshold={args.threshold}, Blur={args.blur}, CLAHE=True")
+        print(f"        -> Params: Weights(H={args.w_h}, S={args.w_s}, V={args.w_v}), Threshold={args.threshold}, Blur={args.blur}, CLAHE=True")
 
     for session_dir, frames in sessions_to_process:
         s_id = session_dir.name
@@ -430,6 +441,8 @@ def main():
                 diff_mode=args.diff_mode,
                 threshold=args.threshold, 
                 blur_ksize=args.blur,
+                w_gray=args.w_gray, w_hue=args.w_hue,
+                w_h=args.w_h, w_s=args.w_s, w_v=args.w_v,
                 min_area=args.min_area, 
                 max_area=args.max_area,
                 min_width=args.min_width,

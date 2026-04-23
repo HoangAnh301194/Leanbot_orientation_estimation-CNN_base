@@ -66,6 +66,7 @@ use_clahe = True
 ## B. Khó khăn
 - Không.
 ## C. Công việc tiếp theo
+- Hiện tại em đã chốt với anh Hữu là sẽ sử dụng chân Tripod 1m7 như hiện tại ạ. 
 - Đề xuất thêm
     - Khi tìm hiểm, promt hỏi AI về vấn đề vật thể khi trừ ảnh bị cắt và mất pixel ở trong thân dẫn tới bị vật bị chia thành 2 phần, thì em nhận được một số phương pháp giải quyết sau :
         - Fill toàn bộ những pixel bị mất mà bị bao quanh bởi pixel đã được phát hiện là có vật thể (fill hết pixel đen bị bao quanh bởi trắng) 

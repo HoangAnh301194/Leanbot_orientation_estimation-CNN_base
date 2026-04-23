@@ -35,8 +35,12 @@ score = (w_gray * dGray + w_hue * dH) / weight_total
 ```
 
 - Công thức mới:
-```python
+```
 score = max(w_gray * dGray, w_hue * dH)
+```
+- Code tính toán thực tế khi so sánh ma trận pixel :
+```python
+    score = np.maximum(w_gray * dGray, w_hue * dH)
 ```
 
 - Thông qua việc chạy thử với ảnh, kết quả tốt nhất ở các hệ số sau:
@@ -60,7 +64,7 @@ use_clahe = True
 - Kết luận: phương pháp lấy `max(w_gray * dGray, w_hue * dH)` cho kết quả tách biệt rõ hơn một chút so với cách lấy trung bình có trọng số trước đó. Tuy nhiên đồng thời nó cũng sẽ nhiều nhiễu hơn, em đã phải giảm hệ số của cả 2 kênh Gray và Hue để tối ưu giữa nhiễu và độ phủ kín của thân Leanbot ( ko bị lỗ và cắt ở trong thân)
 
 ## B. Khó khăn
-
+- Không.
 ## C. Công việc tiếp theo
 - Đề xuất thêm
     - Khi tìm hiểm, promt hỏi AI về vấn đề vật thể khi trừ ảnh bị cắt và mất pixel ở trong thân dẫn tới bị vật bị chia thành 2 phần, thì em nhận được một số phương pháp giải quyết sau :

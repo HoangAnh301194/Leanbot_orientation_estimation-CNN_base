@@ -7,9 +7,9 @@
 
 ### 1. Kiến trúc tập ảnh mà Tools sinh ra khi sử dụng
 
-- Khi chạy tool ở mode ```python auto_label.py --source 1 --mode capture``` thì sẽ sinh ra folder Output có kiến trúc như sau:
+- Khi chạy tool capture theo lệnh ```python tools/capture_session.py --source 1``` thì sẽ sinh ra folder Output có kiến trúc như sau:
 
-![alt text](image.png)
+![alt text](images/achitecture.png)
 
 - Bên trong output có ```datasets``` là nơi chứa ảnh và label sau khi chạy tool xử lí toàn bộ lượng ảnh có trong sessions ở chế độ đánh nhãn.
 
@@ -29,31 +29,34 @@
 ```
 
 ### 2. Hướng dẫn sử dụng Tools
+- Cách chạy mới khuyến nghị dùng 2 tool tách riêng:
+    - ```python tools/capture_session.py --source 1```
+    - ```python tools/process_auto_label.py --diff_mode 1```
+- Lệnh ```python tools/auto_label.py --mode ...``` vẫn được giữ làm wrapper tương thích.
 - Tools có 2 mode 
-    - capture: chụp ảnh, lưu vào folder output/sessions và chỉ xử lý auto label cho session đó.
-    - auto_label: xử lý toàn bộ folder sesion nhỏ trong folder sessions, lưu vào folder datasets theo 3 chế độ tùy chọn:
+    - capture: chụp background và ảnh thô, lưu vào folder output/sessions, chưa chạy auto label.
+    - auto_label: xử lý toàn bộ các session trong folder sessions, lưu ảnh và label vào folder datasets theo 3 chế độ tùy chọn:
         - ```diff_mode 1``` : tính sai khác bằng Gray Scale
         - ```diff_mode 2``` : tính sai khác bằng Hue + Gray Scale
         - ```diff_mode 3``` : tính sai khác bằng HSV
 
 #### 2.1. Mode cature
-- **Bước 1:**: Lệnh thực thi : ```python auto_label.py --source index --mode capture --diff_mode mode_number```
+- **Bước 1:**: Lệnh thực thi : ```python tools/capture_session.py --source index```
 
     - index: chỉ số camera, có thể là 0, 1, 2, 3 tùy số lượng camera kết nối với máy.
-    - mode_number: mode để tính toán ảnh nền, có thể là 1, 2, 3 tùy lựa chọn mode sử dụng.
 - **Bước 2:**: Sau khi thực thi lệnh -> Sessions tại thời điểm chụp sẽ được tạo trong ```output/sessions``` -> cửa sổ stream Cam sẽ hiện lên để người dùng tự điều chỉnh vị trí Cam rồi bấm ```C```  để chụp lấy Back ground. 
 
 - **Bước 3:**: Sau khi capture back ground -> click chuột chọn 4 điểm ROI Mask --> bấm Enter để bắt đầu chụp data --> 
     - sau đó trongbấm 'c' để chụp ảnh . Ảnh sẽ được lưu vào ```output/sessions/session_YYYYMMDD_HHMMSS/raw_images/```
 
-- **Bước 4**:  Sau khi chụp xong lượng ảnh mong muốn thì bấm `s` để lưu và bắt đầu chạy thuật toán tính toán BBox tự động. Cửa sổ Debug sẽ hiện lên để người dùng theo dõi quá trình tính toán. 
+- **Bước 4**:  Sau khi chụp xong lượng ảnh mong muốn thì bấm `s` để lưu và kết thúc session. Sau đó chạy ```python tools/process_auto_label.py --diff_mode mode_number``` để bắt đầu tính toán BBox tự động.
 
 ![debug](./images/debug.png)
 
 #### 2.2. Mode relabel
-- Lệnh thực thi : ```python auto_label.py --mode relabel --diff_mode mode_number```
+- Lệnh thực thi : ```python tools/process_auto_label.py --diff_mode mode_number```
     - mode_number: mode để tính toán ảnh nền, có thể là 1, 2, 3 tùy lựa chọn mode sử dụng.
-- Sau khi chạy lệnh thực thi thì toàn bộ quá trình sẽ diện ra tự động hoàn toàn. Tool sẽ quét toàn bộ ảnh trong các session nhỏ trong folder ```output/session/```, tự tính toán bouding box và tạo file label tương ứng rồi lưu toàn bộ vào ```output/datasets```. Người dùng chủ cần zip folder ```datasets``` để upload lên Google Colab để train model.
+- Sau khi chạy lệnh thực thi thì toàn bộ quá trình sẽ diễn ra tự động hoàn toàn. Tool sẽ quét toàn bộ ảnh trong các session nhỏ trong folder ```output/sessions/```, tự tính toán bouding box và tạo file label tương ứng rồi lưu toàn bộ vào ```output/datasets```. Người dùng chỉ cần zip folder ```datasets``` để upload lên Google Colab để train model.
 
 - Tool có hiển thị cửa sổ quan sát trong quá trình tính toán, để người dùng theo dõi quá trình tính toán.
 

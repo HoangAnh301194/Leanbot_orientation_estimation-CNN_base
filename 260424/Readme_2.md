@@ -55,11 +55,11 @@ raw_image/
 
 ![storage](image-4.png)
 
-
+### 1.2. Tool auto_label.py
 
 ## B. Khó khăn
 - Hiện tại việc chụp nhiều Back Ground theo như em hiểu là để đối chiếu, tính sai khác tối ưu hơn trong quá trình tính sai khác khi ánh sáng môi trường có thay đổi và tăng độ đa dạng cho dataset sau này . Em xin Thầy xác nhận xem em hiểu đúng không ạ Thầy ?
-
+- Hiện tại khi chụp nhiều back ground trên 1 session , thì khi tính sai khác thì sẽ tính trên back ground nào ạ Thầy ? Theo em nghĩ thì sẽ tính theo Back ground mà được chụp tại thời điểm trước so với thời điểm chụp của ảnh có Leanbot mà đang được xử lí.
 ## C. Công việc tiếp theo
 - Chỉnh sửa tools Auto label :
     - Đọc ảnh từ ```raw_image/session_X``` xuất ra ``` tool1_output/session_X``` tương ứng.

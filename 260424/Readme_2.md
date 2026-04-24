@@ -41,6 +41,7 @@ raw_image/
 - `backgrounds/`: nhiều ảnh back ground trong cùng một session.
 - `raw_images/`: ảnh cần đưa vào tool auto-label sau này.
 - Độ phân giải ảnh và dung lượng 1 ảnh như sau ( thông tin được lấy từ file/folder properties - window ) : 
+
     - Dung lượng của 1 ảnh.
 
         ![dung luong ](image-1.png)
@@ -48,6 +49,7 @@ raw_image/
     - Độ phân giải :
 
         ![resolution](image-2.png)
+
 - Dung lượng của Folder sẽ tùy thuộc vào lượng ảnh chụp.
 
     ![storage](image-4.png)

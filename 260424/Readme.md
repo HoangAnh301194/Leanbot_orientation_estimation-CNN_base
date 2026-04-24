@@ -35,13 +35,17 @@
         - ```diff_mode 1``` : tính sai khác bằng Gray Scale
         - ```diff_mode 2``` : tính sai khác bằng Hue + Gray Scale
         - ```diff_mode 3``` : tính sai khác bằng HSV
+
 #### 2.1. Mode cature
 - **Bước 1:**: Lệnh thực thi : ```python auto_label.py --source index --mode capture --diff_mode mode_number```
+
     - index: chỉ số camera, có thể là 0, 1, 2, 3 tùy số lượng camera kết nối với máy.
     - mode_number: mode để tính toán ảnh nền, có thể là 1, 2, 3 tùy lựa chọn mode sử dụng.
 - **Bước 2:**: Sau khi thực thi lệnh -> Sessions tại thời điểm chụp sẽ được tạo trong ```output/sessions``` -> cửa sổ stream Cam sẽ hiện lên để người dùng tự điều chỉnh vị trí Cam rồi bấm ```C```  để chụp lấy Back ground. 
+
 - **Bước 3:**: Sau khi capture back ground -> click chuột chọn 4 điểm ROI Mask --> bấm Enter để bắt đầu chụp data --> 
     - sau đó trongbấm 'c' để chụp ảnh . Ảnh sẽ được lưu vào ```output/sessions/session_YYYYMMDD_HHMMSS/raw_images/```
+
 - **Bước 4**:  Sau khi chụp xong lượng ảnh mong muốn thì bấm `s` để lưu và bắt đầu chạy thuật toán tính toán BBox tự động. Cửa sổ Debug sẽ hiện lên để người dùng theo dõi quá trình tính toán. 
 
 ![debug](./images/debug.png)
@@ -59,11 +63,13 @@
 ```python
     score = np.maximum(w_gray * dGray, w_hue * dH)
 ```
+
 Bản chất là lấy pixel mà có sai khác lớn nhất với ảnh back ground đối với 2 kênh sai khác. Ví dụ 1 pixel được đánh giá sai lệnh ở kênh gray là 5 nhưng đánh giá sai lệnh ở kênh Hue là 10 , thì score để trừ ảnh được tính là 10 .
 
 ![alt text](images/image.png)
 
 ![alt text](images/image-1.png)
+
 - Như kết quả ảnh có thể thấy nếu môi trường bị detect rõ thì sẽ khiến tool nhầm countor của nhiễu và leanbot .  Để giải quyết vấn đề này thì em có thêm cái giới hạn diện tích , chu vi như bài báo cáo trước đó.
 - Ngoài ra với vấn đề này thì em đã thử tăng ngưỡng tính threshold khi nhị phân hóa ảnh thì được xử lí tương đối ổn hơn ạ 
 - ngưỡng hiện tại sử dụng là 80 ``` "--threshold", type=int, default=80, help="Brightness difference threshold (default 50)" ```

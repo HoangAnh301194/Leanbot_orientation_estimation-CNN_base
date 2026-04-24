@@ -82,7 +82,7 @@ Bản chất là lấy pixel mà có sai khác lớn nhất với ảnh back gro
 
 ![alt text](images/image-2.png)
 
-- Về vấn đề lỗ bị cắt trong thân, vì em thấy nó lỗ chỗ quá nhìn nó cứ sao sao nên em thêm thuật toán fill hết mấy lỗ đó vào ạ.  
+- Về vấn đề lỗ bị cắt trong thân thì không ảnh hưởng gì tới BBox a. Em thêm vào chỉ có mục đích lấp lỗ trống và không có lý do kĩ thuật nào khác ạ.
 
 ## B. Khó khăn
 

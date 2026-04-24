@@ -293,7 +293,7 @@ def main():
     parser.add_argument("--source", default="0", help="Camera source")
     parser.add_argument("--mode", choices=["capture", "relabel"], default="capture", help="Processing mode")
     parser.add_argument("--reuse", action="store_true", help="Reuse config from the latest session")
-    parser.add_argument("--threshold", type=int, default=90, help="Brightness difference threshold (default 50)")
+    parser.add_argument("--threshold", type=int, default=80, help="Brightness difference threshold (default 50)")
     parser.add_argument("--blur", type=int, default = 3, help="Gaussian blur kernel size")
     parser.add_argument("--min_area", type=int, default=5000, help="Min contour area (default 500)")
     parser.add_argument("--max_area", type=int, default=500000, help="Max contour area (default 100000)")

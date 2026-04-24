@@ -18,15 +18,14 @@
 
 -  Code đặt trên folder sessions : 
 ```python 
-session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 ```
 
 - Code đặt tên ảnh trong các sessions :
 
 ```python
-idx = len(captured_frames)
-img_name = f"raw_{idx:03d}.jpg"
-
+    idx = len(captured_frames)
+    img_name = f"raw_{idx:03d}.jpg"
 ```
 
 ### 2. Hướng dẫn sử dụng Tools

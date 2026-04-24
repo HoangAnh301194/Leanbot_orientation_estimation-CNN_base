@@ -15,16 +15,20 @@
 
 - Bên trong output có ```sessions``` là nơi chứa các session ảnh tại mỗi lần chụp một tập dữ liệu.
 - Mỗi session được đặt tên tự động theo thời điểm chụp ```session_YYYYMMDD_HHMMSS```. Và mỗi session đề có backgroud riêng, ma trận điểm ROI Masked cũng riêng biệt, không lẫn với các session khác. Ảnh trong các Session cũng được đặt tên tự động theo thứ tự chụp từ ```raw_000.jpg``` đến ```raw_001.jpg``` ,```...```, ```raw_0NN.jpg```  . 
+
 -  Code đặt trên folder sessions : 
 ```python 
 session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 ```
+
 - Code đặt tên ảnh trong các sessions :
+
 ```python
 idx = len(captured_frames)
 img_name = f"raw_{idx:03d}.jpg"
 
 ```
+
 ### 2. Hướng dẫn sử dụng Tools
 - Tools có 2 mode 
     - capture: chụp ảnh, lưu vào folder output/sessions và chỉ xử lý auto label cho session đó.

@@ -9,7 +9,7 @@
 ## 1. Cấu trúc lại Tools
 
 ### 1.1. Tool thu thập dữ liệu
-- Link code : **(https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260424/tools/capture_session.py)[https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260424/tools/capture_session.py]**
+- Link code : [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260424/tools/capture_session.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260424/tools/capture_session.py)
 - Lệnh chạy tool : 
 
 ```bash

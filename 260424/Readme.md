@@ -8,24 +8,9 @@
 ### 1. Kiến trúc tập ảnh mà Tools sinh ra khi sử dụng
 
 - Khi chạy tool ở mode ```python auto_label.py --source 1 --mode capture``` thì sẽ sinh ra folder Output có kiến trúc như sau:
-```
-    output/
-    |--datasets/
-    |   |--images/  # chứa các ảnh 
-    |   |--labels/  # chứa file text đánh nhãn tương ứng với ảnh trong images
-    |
-    |--sessions/
-    |   |--session_20260424_133920/
-    |       |--config/
-    |       |   |--background.jpg             # ảnh nền để so sánh với các ảnh trong images của session
-    |       |   |--board_points.npy           # các điểm ROI Masked  
-    |       |--raw_images/
-    |       |   |--raw_000.jpg                # ảnh gốc
-    |       |   |--raw_001.jpg                # ảnh gốc
-    |       |   |--raw_002.jpg                # ảnh gốc
-    |       |   |--...         
 
-```
+![alt text](image.png)
+
 - Bên trong output có ```datasets``` là nơi chứa ảnh và label sau khi chạy tool xử lí toàn bộ lượng ảnh có trong sessions ở chế độ đánh nhãn.
 
 - Bên trong output có ```sessions``` là nơi chứa các session ảnh tại mỗi lần chụp một tập dữ liệu.

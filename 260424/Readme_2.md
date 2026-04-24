@@ -52,7 +52,7 @@ raw_image/
 
 - Dung lượng của Folder sẽ tùy thuộc vào lượng ảnh chụp.
 
-    ![storage](image-4.png)
+![storage](image-4.png)
 
 
 

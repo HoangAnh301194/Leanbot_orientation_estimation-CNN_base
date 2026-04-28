@@ -53,6 +53,7 @@
     - Output là folder `tool1_output/` có cấu trúc như trên. 
 
 - File thông tin cấu hình Json có dạng sau :
+
 ```json
 {
   "created_at": "2026-04-28 09:03:19",

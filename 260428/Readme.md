@@ -6,6 +6,7 @@
     -  Thêm file json/text chứa thông tin các thông số cấu hình đã sử dụng trong tool auto label ( threshold, w_s, w_h, w_gray,...)
 - Tắt tính năng Fill Hole trong thân Leanbot.
 - Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
+- Thêm tính năng merge BBox .
 
 ### 1. Chỉnh sửa tools auto label
 - Tách từ tools gốc thành tools có chức năng auto label riêng
@@ -200,9 +201,9 @@ Có một vài hạn chế khi chỉ merge như sau :
   ```
   - Với hệ số Lọc min_area = 0, min_width = 0,min_height = 0, merge_dist = 20 thì sẽ tính luôn cả nhiễu của môi trường.
 
-  |Diff_Countor|BBox|
-  |:---:|:---:|
-  |![alt text](diff_countor.png)|![alt text](bbox.png)|
+|Diff_Countor|BBox|
+|:---:|:---:|
+|![alt text](diff_countor.png)|![alt text](bbox.png)|
 
 
   - Nếu tăng các hệ số này lên thì những đốm nhỏ, các phần nhỏ trên thân Leanbot sẽ bị loại bỏ --> không merge các phần đó --> BBox bị mất 1 phần. 
@@ -210,8 +211,11 @@ Có một vài hạn chế khi chỉ merge như sau :
 
 ### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.
 - Leanbot_front : 
+
     ![Leanbot_front](front.jpg)
+
 - Leanbot_Back : 
+
     ![Leanbot_back](back.jpg)
  
 

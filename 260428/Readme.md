@@ -5,7 +5,7 @@
     - Tự yêu cầu chọn RoI Mask nếu chưa có file ma trận cấu hình.
     -  Thêm file json/text chứa thông tin các thông số cấu hình đã sử dụng trong tool auto label ( threshold, w_s, w_h, w_gray,...)
 - Tắt tính năng Fill Hole trong thân Leanbot.
-- Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
+
 
 ### 1. Chỉnh sửa tools auto label
 - Tách từ tools gốc thành tools có chức năng auto label riêng

@@ -44,11 +44,11 @@
     - chạy lệnh ```python .\tools\process_auto_label.py```
     - Hiện ra cửa sổ để chọn RoI mask ( nếu trước đó chưa tồn tại file config.npy).
 
-    ![alt text](roi.png)
+    ![alt text](images/roi.png)
 
     - Tools sẽ đọc toàn bộ các `session_X` tạo bởi `capture_session.py` trong `Raw_images/` và thực hiện auto label.
 
-    ![alt text](session.png)
+    ![alt text](images/session.png)
 
     - Output là folder `tool1_output/` có cấu trúc như trên. 
 
@@ -116,7 +116,7 @@
 ```
 - Kết quả sau khi tắt các công đoạn trên : 
 
-![after_process](after_process.png)
+![after_process](images/after_process.png)
 
 -  Kết quả cho thấy khi tắt các bước xử lí hình thái nhưu giãn nở, đóng mở ảnh, kết hợp với fill hole thì Leanbot bị chia thành nhiều phần nhỏ làm các countor riêng rẽ -> khó phân biệt countor của Leanbot với môi trường.
 
@@ -183,7 +183,7 @@ def merge_bboxes(bboxes, dist_threshold=10):
 
 |Trước merge|Sau merge|
 |:---:|:---:|
-| ![alt text](before_merge.png) | ![alt text](after_merge.png) |
+| ![alt text](images/before_merge.png) | ![alt text](images/after_merge.png) |
 - Kết quả cho thấy khi áp dụng thuật toán merge các countor gần nhau thì đã gộp các countor riêng rẽ thành 1 . 
 
 - Hạn chế :
@@ -203,7 +203,7 @@ Có một vài hạn chế khi chỉ merge như sau :
 
 |Diff_Countor|BBox|
 |:---:|:---:|
-|![alt text](diff_countor.png)|![alt text](bbox.png)|
+|![alt text](images/diff_countor.png)|![alt text](images/bbox.png)|
 
 
   - Nếu tăng các hệ số này lên thì những đốm nhỏ, các phần nhỏ trên thân Leanbot sẽ bị loại bỏ --> không merge các phần đó --> BBox bị mất 1 phần. 
@@ -212,11 +212,11 @@ Có một vài hạn chế khi chỉ merge như sau :
 ### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.
 - Leanbot_front : 
 
-    ![Leanbot_front](front.jpg)
+    ![Leanbot_front](images/front.jpg)
 
 - Leanbot_Back : 
 
-    ![Leanbot_back](back.jpg)
+    ![Leanbot_back](images/back.jpg)
  
 
 ## B.Khó khăn

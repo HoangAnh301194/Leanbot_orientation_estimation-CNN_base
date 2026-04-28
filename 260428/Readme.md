@@ -5,7 +5,7 @@
     - Tự yêu cầu chọn RoI Mask nếu chưa có file ma trận cấu hình.
     -  Thêm file json/text chứa thông tin các thông số cấu hình đã sử dụng trong tool auto label ( threshold, w_s, w_h, w_gray,...)
 - Tắt tính năng Fill Hole trong thân Leanbot.
-
+- Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
 
 ### 1. Chỉnh sửa tools auto label
 - Tách từ tools gốc thành tools có chức năng auto label riêng
@@ -118,8 +118,104 @@
 ![after_process](after_process.png)
 
 -  Kết quả cho thấy khi tắt các bước xử lí hình thái nhưu giãn nở, đóng mở ảnh, kết hợp với fill hole thì Leanbot bị chia thành nhiều phần nhỏ làm các countor riêng rẽ -> khó phân biệt countor của Leanbot với môi trường.
-## B.Khó khăn
-- không
-## C. Công việc tiếp theo.
 
-- Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
+### 3. Thử phương pháp Merge các countor gần nhau và tạo Bounding box lớn nhất :
+- Về tư tưởng thuật toán : Tìm các countor có khoảng cách gần nhau theo trục X và trục Y (trong khoảng `dist_merge` có thể config) và tạo ra một Bounding box lớn nhất chứa tất cả các countor trong nhóm.
+- Code sử dụng :
+```python
+def merge_bboxes(bboxes, dist_threshold=10):
+    if not bboxes:
+        return []
+
+    curr_bboxes = [list(b) for b in bboxes]
+    changed = True
+    while changed:
+        changed = False
+        new_bboxes = []
+        visited = [False] * len(curr_bboxes)
+
+        for i in range(len(curr_bboxes)):
+            if visited[i]:
+                continue
+
+            group = [curr_bboxes[i]]
+            visited[i] = True
+
+            for j in range(i + 1, len(curr_bboxes)):
+                if visited[j]:
+                    continue
+
+                b1 = curr_bboxes[i]
+                b2 = curr_bboxes[j]
+                
+                # Kiểm tra khoảng cách giữa 2 hộp theo trục X và Y
+                x_overlap = not (
+                    b1[0] + b1[2] + dist_threshold < b2[0]
+                    or b2[0] + b2[2] + dist_threshold < b1[0]
+                )
+                y_overlap = not (
+                    b1[1] + b1[3] + dist_threshold < b2[1]
+                    or b2[1] + b2[3] + dist_threshold < b1[1]
+                )
+
+                # Nếu nằm trong phạm vi khoảng cách đủ gần, cho vào cùng một nhóm
+                if x_overlap and y_overlap:
+                    group.append(curr_bboxes[j])
+                    visited[j] = True
+                    changed = True
+
+            if len(group) == 1:
+                new_bboxes.append(group[0])
+            else:
+                # Tìm tọa độ bao quát toàn bộ nhóm (Bounding Box lớn nhất)
+                x_min = min(b[0] for b in group)
+                y_min = min(b[1] for b in group)
+                x_max = max(b[0] + b[2] for b in group)
+                y_max = max(b[1] + b[3] for b in group)
+                new_bboxes.append([x_min, y_min, x_max - x_min, y_max - y_min])
+
+        curr_bboxes = new_bboxes
+
+    return [tuple(b) for b in curr_bboxes]
+```
+- Kết quả :
+
+|Trước merge|Sau merge|
+|:---:|:---:|
+| ![alt text](before_merge.png) | ![alt text](after_merge.png) |
+- Kết quả cho thấy khi áp dụng thuật toán merge các countor gần nhau thì đã gộp các countor riêng rẽ thành 1 . 
+
+- Hạn chế :
+Có một vài hạn chế khi chỉ merge như sau :
+  - Nhầm lẫn Leanbot với môi trường -> BBox cả môi trường.
+  - Hiện tại các hệ số lọc như sau 
+  ```python
+   parser.add_argument("--min_area", type=int, default=0, help="Minimum contour area")
+    parser.add_argument("--max_area", type=int, default=500000, help="Maximum contour area")
+    parser.add_argument("--min_width", type=int, default=0, help="Minimum bbox width")
+    parser.add_argument("--max_width", type=int, default=2000, help="Maximum bbox width")
+    parser.add_argument("--min_height", type=int, default=0, help="Minimum bbox height")
+    parser.add_argument("--max_height", type=int, default=2000, help="Maximum bbox height")
+    parser.add_argument("--merge_dist", type=int, default=20, help="Distance to merge nearby bboxes")
+  ```
+  - Với hệ số Lọc min_area = 0, min_width = 0,min_height = 0, merge_dist = 20 thì sẽ tính luôn cả nhiễu của môi trường.
+
+  |Diff_Countor|BBox|
+  |:---:|:---:|
+  |![alt text](diff_countor.png)|![alt text](bbox.png)|
+
+
+  - Nếu tăng các hệ số này lên thì những đốm nhỏ, các phần nhỏ trên thân Leanbot sẽ bị loại bỏ --> không merge các phần đó --> BBox bị mất 1 phần. 
+  - Nếu đổi thứ tự Merge xong rồi mới lọc bằng các hệ số kia thì sẽ có thêm 1 khả năng là nhiễu môi trường khi merge sẽ thành một khối lớn --> BBox nhầm thành Leanbot. ( Rủi ro này là em dự đoán, hiện tại thực tế thì chưa gặp ạ, thuật toán trừ sai khác ảnh chưa có nhiễu dạng nhưu vậy ).
+
+### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.
+- Leanbot_front : 
+    ![Leanbot_front](front.jpg)
+- Leanbot_Back : 
+    ![Leanbot_back](back.jpg)
+ 
+
+## B.Khó khăn
+- Hiện tại em nghĩ việc dùng các thuật toán xử lí hình thái (giản nở ảnh, đóng mở ảnh,...) để fill các lỗ trống, các phần nhỏ bị cắt trên thân Leanbot kết hợp với Merge BBox thì sẽ tối ưu hơn cho việc phân biệt Leanbot với môi trường ạ 
+## C. Công việc tiếp theo.
+- Em xin phép xin thêm ý kiến từ Thầy ạ. 

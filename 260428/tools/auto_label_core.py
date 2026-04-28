@@ -73,6 +73,7 @@ def create_output_session_dir(session_name: str):
         "session_dir": session_dir,
         "aligned_dir": session_dir / "aligned_images",
         "labels_dir": session_dir / "labels",
+        "debug_dir": session_dir / "debug",
     }
     for path in paths.values():
         path.mkdir(parents=True, exist_ok=True)
@@ -337,13 +338,13 @@ def save_processing_report(output_session_dir: Path, input_session_dir: Path, co
 def add_processing_arguments(parser: argparse.ArgumentParser):
     parser.add_argument("--threshold", type=int, default=80, help="Brightness difference threshold")
     parser.add_argument("--blur", type=int, default=3, help="Gaussian blur kernel size")
-    parser.add_argument("--min_area", type=int, default=5000, help="Minimum contour area")
+    parser.add_argument("--min_area", type=int, default=0, help="Minimum contour area")
     parser.add_argument("--max_area", type=int, default=500000, help="Maximum contour area")
-    parser.add_argument("--min_width", type=int, default=60, help="Minimum bbox width")
+    parser.add_argument("--min_width", type=int, default=0, help="Minimum bbox width")
     parser.add_argument("--max_width", type=int, default=2000, help="Maximum bbox width")
-    parser.add_argument("--min_height", type=int, default=40, help="Minimum bbox height")
+    parser.add_argument("--min_height", type=int, default=0, help="Minimum bbox height")
     parser.add_argument("--max_height", type=int, default=2000, help="Maximum bbox height")
-    parser.add_argument("--merge_dist", type=int, default=5, help="Distance to merge nearby bboxes")
+    parser.add_argument("--merge_dist", type=int, default=20, help="Distance to merge nearby bboxes")
     parser.add_argument("--class_id", type=int, default=0, help="Class ID used when saving labels")
     parser.add_argument(
         "--diff_mode",
@@ -479,7 +480,7 @@ def detect_leanbot(
     max_width=600,
     min_height=20,
     max_height=600,
-    merge_dist=20,
+    merge_dist=50,
 ):
     frame_masked = cv2.bitwise_and(frame, frame, mask=board_mask)
 
@@ -591,8 +592,22 @@ def save_yolo_label(bboxes, img_width, img_height, output_path, class_id=0):
 def save_detection_outputs(output_paths: dict[str, Path], base_name: str, aligned_img, diff_mask, bboxes, class_id=0):
     aligned_path = output_paths["aligned_dir"] / f"{base_name}.jpg"
     label_path = output_paths["labels_dir"] / f"{base_name}.txt"
+    mask_path = output_paths["debug_dir"] / f"{base_name}_mask.jpg"
+    bbox_path = output_paths["debug_dir"] / f"{base_name}_bbox.jpg"
 
+    # Save main aligned image
     cv2.imwrite(str(aligned_path), aligned_img)
+
+    # Save debug: Difference Mask
+    if diff_mask is not None:
+        cv2.imwrite(str(mask_path), diff_mask)
+
+    # Save debug: Image with Bounding Boxes
+    bbox_img = aligned_img.copy()
+    for x, y, w, h in bboxes:
+        cv2.rectangle(bbox_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(bbox_img, f"cls:{class_id}", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+    cv2.imwrite(str(bbox_path), bbox_img)
 
     img_height, img_width = aligned_img.shape[:2]
     save_yolo_label(bboxes, img_width, img_height, str(label_path), class_id=class_id)

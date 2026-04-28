@@ -368,6 +368,17 @@ def add_processing_arguments(parser: argparse.ArgumentParser):
         action="store_true",
         help="Force ROI selection again even if tool1_output/session_X/config.npy already exists.",
     )
+    parser.add_argument(
+        "--use_overlap_merge",
+        action="store_true",
+        help="Use area-based overlap merging instead of distance-based merging.",
+    )
+    parser.add_argument(
+        "--overlap_ratio",
+        type=float,
+        default=0.1,
+        help="Significant overlap ratio (0.0 to 1.0) for area-based merging.",
+    )
     return parser
 
 
@@ -388,6 +399,8 @@ def build_detection_kwargs(args):
         "min_height": args.min_height,
         "max_height": args.max_height,
         "merge_dist": args.merge_dist,
+        "use_overlap_merge": args.use_overlap_merge,
+        "overlap_ratio": args.overlap_ratio,
     }
 
 
@@ -461,6 +474,65 @@ def merge_bboxes(bboxes, dist_threshold=10):
     return [tuple(b) for b in curr_bboxes]
 
 
+def merge_bboxes_overlap(bboxes, overlap_ratio=0.25):
+    if not bboxes:
+        return []
+
+    curr_bboxes = [list(b) for b in bboxes]
+    changed = True
+    while changed:
+        changed = False
+        new_bboxes = []
+        visited = [False] * len(curr_bboxes)
+
+        for i in range(len(curr_bboxes)):
+            if visited[i]:
+                continue
+
+            group = [curr_bboxes[i]]
+            visited[i] = True
+
+            for j in range(i + 1, len(curr_bboxes)):
+                if visited[j]:
+                    continue
+
+                b1 = curr_bboxes[i]  # [x, y, w, h]
+                b2 = curr_bboxes[j]
+
+                # Convert to [x1, y1, x2, y2]
+                r1 = [b1[0], b1[1], b1[0] + b1[2], b1[1] + b1[3]]
+                r2 = [b2[0], b2[1], b2[0] + b2[2], b2[1] + b2[3]]
+
+                # Standard AABB overlap check
+                if not (r2[0] > r1[2] or r2[2] < r1[0] or r2[1] > r1[3] or r2[3] < r1[1]):
+                    # Calculate intersection area
+                    inter_x = min(r1[2], r2[2]) - max(r1[0], r2[0])
+                    inter_y = min(r1[3], r2[3]) - max(r1[1], r2[1])
+                    inter_area = inter_x * inter_y
+
+                    area1 = b1[2] * b1[3]
+                    area2 = b2[2] * b2[3]
+
+                    # Significant overlap logic (at least X% of either's area)
+                    if (inter_area >= overlap_ratio * area1) or (inter_area >= overlap_ratio * area2):
+                        group.append(curr_bboxes[j])
+                        visited[j] = True
+                        changed = True
+
+            if len(group) == 1:
+                new_bboxes.append(group[0])
+            else:
+                x_min = min(b[0] for b in group)
+                y_min = min(b[1] for b in group)
+                x_max = max(b[0] + b[2] for b in group)
+                y_max = max(b[1] + b[3] for b in group)
+                new_bboxes.append([x_min, y_min, x_max - x_min, y_max - y_min])
+
+        curr_bboxes = new_bboxes
+
+    return [tuple(b) for b in curr_bboxes]
+
+
 def detect_leanbot(
     frame,
     bg_bgr,
@@ -481,6 +553,8 @@ def detect_leanbot(
     min_height=20,
     max_height=600,
     merge_dist=50,
+    use_overlap_merge=False,
+    overlap_ratio=0.15,
 ):
     frame_masked = cv2.bitwise_and(frame, frame, mask=board_mask)
 
@@ -546,26 +620,26 @@ def detect_leanbot(
         diff_mask = cv2.absdiff(aligner.template_gray, aligned_gray)
         _, diff_mask = cv2.threshold(diff_mask, threshold, 255, cv2.THRESH_BINARY)
 
-    kernel_small = np.ones((3, 3), np.uint8)
-    kernel_large = np.ones((25, 25), np.uint8)
+    # kernel_small = np.ones((3, 3), np.uint8)
+    # kernel_large = np.ones((25, 25), np.uint8)
 
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
-    diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
+    # diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
 
-    cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in cnts:
-        cv2.drawContours(diff_mask, [contour], -1, 255, thickness=-1)
+    # cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # for contour in cnts:
+    #     cv2.drawContours(diff_mask, [contour], -1, 255, thickness=-1)
 
-    diff_mask = cv2.dilate(diff_mask, np.ones((3, 3), np.uint8), iterations=1)
+    # diff_mask = cv2.dilate(diff_mask, np.ones((3, 3), np.uint8), iterations=1)
 
     eroded_board_mask = cv2.erode(board_mask, np.ones((15, 15), np.uint8))
     diff_mask = cv2.bitwise_and(diff_mask, diff_mask, mask=eroded_board_mask)
 
     contours, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    mask_filled = np.zeros_like(diff_mask)
-    cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
-    contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # mask_filled = np.zeros_like(diff_mask)
+    # cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
+    # contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     bboxes = []
     for contour in contours:
@@ -575,7 +649,12 @@ def detect_leanbot(
             if (min_width < w < max_width) and (min_height < h < max_height):
                 bboxes.append((x, y, w, h))
 
-    merged_bboxes = merge_bboxes(bboxes, dist_threshold=merge_dist)
+    if use_overlap_merge:
+        # Sử dụng thuật toán gộp theo diện tích chồng lấn
+        merged_bboxes = merge_bboxes_overlap(bboxes, overlap_ratio=overlap_ratio)
+    else:
+        merged_bboxes = merge_bboxes(bboxes, dist_threshold=merge_dist)
+
     return aligned_color, merged_bboxes, diff_mask
 
 

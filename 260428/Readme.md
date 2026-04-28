@@ -1,5 +1,15 @@
 # Báo cáo công việc ngày 28/04/2026
 
+## Mục lục
+- [A. Công việc đã làm](#a-công-việc-đã-làm)
+    - [1. Chỉnh sửa tools auto label](#1-chỉnh-sửa-tools-auto--label)
+    - [2. Tắt Fill hole và các thuật toán xử lí hình thái đóng mở ảnh](#2-tắt-fill-hole-và-các-thuật-toán-xử-lí-hình-thái-đóng-mở-ảnh)
+    - [3. Thử phương pháp Merge các countor gần nhau và tạo Bounding box lớn nhất](#3-thử-phương-pháp-merge-các-countor-gần-nhau-và-tạo-bounding-box-lớn-nhất)
+    - [3.2 Phương pháp Merge các BBox dựa trên sự chồng lấn về diện tích.](#32-phương-pháp-merge-các-bbox-dựa-trên-sự-chồng-lấn-về-diện-tích)
+    - [4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.](#4-tiến-hành-chụp-các-mẫu-data-leanbot_front-và-leanbot_back)
+- [B. Khó khăn](#b-khó-khăn)
+- [C. Công việc tiếp theo.](#c-công-việc-tiếp-theo)
+
 ## A. Công việc đã làm
 - Chỉnh sửa tools Auto label : Đọc ảnh từ raw_image/session_X xuất ra tool1_output/session_X tương ứng.
     - Tự yêu cầu chọn RoI Mask nếu chưa có file ma trận cấu hình.
@@ -7,7 +17,7 @@
 - Tắt tính năng Fill Hole trong thân Leanbot.
 - Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
 - Thêm tính năng merge BBox .
-
+- Thử thuật toán gộp BBox bằng phương pháp chồng lấn BBox ( Overlap ratio )
 ### 1. Chỉnh sửa tools auto label
 - Tách từ tools gốc thành tools có chức năng auto label riêng
     - Đọc ảnh từ ```raw_image/session_X```  xuất ra ```tool1_output/session_X``` tương ứng.
@@ -209,6 +219,86 @@ Có một vài hạn chế khi chỉ merge như sau :
   - Nếu tăng các hệ số này lên thì những đốm nhỏ, các phần nhỏ trên thân Leanbot sẽ bị loại bỏ --> không merge các phần đó --> BBox bị mất 1 phần. 
   - Nếu đổi thứ tự Merge xong rồi mới lọc bằng các hệ số kia thì sẽ có thêm 1 khả năng là nhiễu môi trường khi merge sẽ thành một khối lớn --> BBox nhầm thành Leanbot. ( Rủi ro này là em dự đoán, hiện tại thực tế thì chưa gặp ạ, thuật toán trừ sai khác ảnh chưa có nhiễu dạng nhưu vậy ).
 
+### 3.2 Phương pháp Merge các BBox dựa trên sự chồng lấn về diện tích.
+- Tài liệu tham khảo :
+  - [https://github.com/dusty-nv/jetson-inference/issues/195](https://github.com/dusty-nv/jetson-inference/issues/195)
+- Về tư tưởng thuật toán : Tìm các BBox có sự chồng lấn về diện tích với ngưỡng "overlap_ratio" thì sẽ tính lại BBox bao hàm toàn bộ các BBox trong nhóm. 
+- Code sử dụng : 
+```python
+def merge_bboxes_overlap(bboxes, overlap_ratio=0.25):
+    if not bboxes:
+        return []
+
+    curr_bboxes = [list(b) for b in bboxes]
+    changed = True
+    while changed:
+        changed = False
+        new_bboxes = []
+        visited = [False] * len(curr_bboxes)
+
+        for i in range(len(curr_bboxes)):
+            if visited[i]:
+                continue
+
+            group = [curr_bboxes[i]]
+            visited[i] = True
+
+            for j in range(i + 1, len(curr_bboxes)):
+                if visited[j]:
+                    continue
+
+                b1 = curr_bboxes[i]  # [x, y, w, h]
+                b2 = curr_bboxes[j]
+
+                # Chuyển đổi sang tọa độ [x1, y1, x2, y2] để tính toán
+                r1 = [b1[0], b1[1], b1[0] + b1[2], b1[1] + b1[3]]
+                r2 = [b2[0], b2[1], b2[0] + b2[2], b2[1] + b2[3]]
+
+                # 1. Kiểm tra chồng lấn cơ bản (AABB Check)
+                if not (r2[0] > r1[2] or r2[2] < r1[0] or r2[1] > r1[3] or r2[3] < r1[1]):
+                    
+                    # 2. Tính diện tích vùng giao nhau
+                    inter_x = min(r1[2], r2[2]) - max(r1[0], r2[0])
+                    inter_y = min(r1[3], r2[3]) - max(r1[1], r2[1])
+                    inter_area = inter_x * inter_y
+
+                    # 3. Tính diện tích của từng hộp
+                    area1 = b1[2] * b1[3]
+                    area2 = b2[2] * b2[3]
+
+                    # 4. Kiểm tra tỷ lệ chồng lấn (mặc định bạn đang để 0.1 = 10%)
+                    if (inter_area >= overlap_ratio * area1) or (inter_area >= overlap_ratio * area2):
+                        group.append(curr_bboxes[j])
+                        visited[j] = True
+                        changed = True
+
+            # Tạo Bounding Box lớn nhất bao trùm cả nhóm
+            if len(group) == 1:
+                new_bboxes.append(group[0])
+            else:
+                x_min = min(b[0] for b in group)
+                y_min = min(b[1] for b in group)
+                x_max = max(b[0] + b[2] for b in group)
+                y_max = max(b[1] + b[3] for b in group)
+                new_bboxes.append([x_min, y_min, x_max - x_min, y_max - y_min])
+
+        curr_bboxes = new_bboxes
+
+    return [tuple(b) for b in curr_bboxes]
+
+```
+
+- Kết quả : 
+
+![alt text](image.png)
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
+- Kết quả cho thấy đối với các phần BBox không chồng lấn nhau thì thuật toán này không phù hợp bằng Merge BBox sử dụng phương pháp gộp bằng ngưỡng khoảng cách.
 ### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.
 - Leanbot_front : 
 

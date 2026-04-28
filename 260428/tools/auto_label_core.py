@@ -545,26 +545,26 @@ def detect_leanbot(
         diff_mask = cv2.absdiff(aligner.template_gray, aligned_gray)
         _, diff_mask = cv2.threshold(diff_mask, threshold, 255, cv2.THRESH_BINARY)
 
-    kernel_small = np.ones((3, 3), np.uint8)
-    kernel_large = np.ones((25, 25), np.uint8)
+    # kernel_small = np.ones((3, 3), np.uint8)
+    # kernel_large = np.ones((25, 25), np.uint8)
 
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
-    diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
+    # diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
 
-    cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in cnts:
-        cv2.drawContours(diff_mask, [contour], -1, 255, thickness=-1)
+    # cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # for contour in cnts:
+    #     cv2.drawContours(diff_mask, [contour], -1, 255, thickness=-1)
 
-    diff_mask = cv2.dilate(diff_mask, np.ones((3, 3), np.uint8), iterations=1)
+    # diff_mask = cv2.dilate(diff_mask, np.ones((3, 3), np.uint8), iterations=1)
 
     eroded_board_mask = cv2.erode(board_mask, np.ones((15, 15), np.uint8))
     diff_mask = cv2.bitwise_and(diff_mask, diff_mask, mask=eroded_board_mask)
 
     contours, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    mask_filled = np.zeros_like(diff_mask)
-    cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
-    contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # mask_filled = np.zeros_like(diff_mask)
+    # cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
+    # contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     bboxes = []
     for contour in contours:

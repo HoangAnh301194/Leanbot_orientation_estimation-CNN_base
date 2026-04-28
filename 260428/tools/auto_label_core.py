@@ -334,9 +334,8 @@ def build_processing_config(args, input_session_dir: Path, output_session_dir: P
 def save_processing_report(output_session_dir: Path, input_session_dir: Path, config: dict, summary: dict):
     pass
 
-
 def add_processing_arguments(parser: argparse.ArgumentParser):
-    parser.add_argument("--threshold", type=int, default=80, help="Brightness difference threshold")
+    parser.add_argument("--threshold", type=int, default=70, help="Brightness difference threshold")
     parser.add_argument("--blur", type=int, default=3, help="Gaussian blur kernel size")
     parser.add_argument("--min_area", type=int, default=0, help="Minimum contour area")
     parser.add_argument("--max_area", type=int, default=500000, help="Maximum contour area")
@@ -344,7 +343,7 @@ def add_processing_arguments(parser: argparse.ArgumentParser):
     parser.add_argument("--max_width", type=int, default=2000, help="Maximum bbox width")
     parser.add_argument("--min_height", type=int, default=0, help="Minimum bbox height")
     parser.add_argument("--max_height", type=int, default=2000, help="Maximum bbox height")
-    parser.add_argument("--merge_dist", type=int, default=20, help="Distance to merge nearby bboxes")
+    parser.add_argument("--merge_dist", type=int, default=5, help="Distance to merge nearby bboxes")
     parser.add_argument("--class_id", type=int, default=0, help="Class ID used when saving labels")
     parser.add_argument(
         "--diff_mode",
@@ -580,23 +579,29 @@ def detect_leanbot(
                 flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
                 borderMode=cv2.BORDER_REPLICATE,
             )
+        # Do NOT mask the final aligned_color here, as user wants the full image in output.
+        # We will mask a copy for processing instead.
+        
     except Exception as exc:
         print(f"Error aligning image: {exc}")
         return None, [], None
+
+    aligned_color_masked = cv2.bitwise_and(aligned_color, aligned_color, mask=board_mask)
+    aligned_gray_masked = cv2.bitwise_and(aligned_gray, aligned_gray, mask=board_mask)
 
     if diff_mode == "1":
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         bg_p = clahe.apply(aligner.template_gray)
         bg_p = cv2.GaussianBlur(bg_p, (blur_ksize, blur_ksize), 0)
 
-        aligned_p = clahe.apply(aligned_gray)
+        aligned_p = clahe.apply(aligned_gray_masked)
         aligned_p = cv2.GaussianBlur(aligned_p, (blur_ksize, blur_ksize), 0)
 
         _, diff_mask, _, _ = aligner.compute_diff(bg_p, aligned_p, threshold=threshold)
     elif diff_mode == "2":
         res = compute_gray_hue_diff(
             bg_bgr,
-            aligned_color,
+            aligned_color_masked,
             w_gray=w_gray,
             w_hue=w_hue,
             threshold=threshold,
@@ -607,25 +612,26 @@ def detect_leanbot(
     elif diff_mode == "3":
         res = compute_hsv_diff(
             bg_bgr,
-            aligned_color,
+            aligned_color_masked,
             w_h=w_h,
             w_s=w_s,
             w_v=w_v,
             threshold=threshold,
+            min_saturation=20,
             blur_ksize=blur_ksize,
             use_clahe=True,
         )
         diff_mask = res["mask"]
     else:
-        diff_mask = cv2.absdiff(aligner.template_gray, aligned_gray)
+        diff_mask = cv2.absdiff(aligner.template_gray, aligned_gray_masked)
         _, diff_mask = cv2.threshold(diff_mask, threshold, 255, cv2.THRESH_BINARY)
 
     # kernel_small = np.ones((3, 3), np.uint8)
     # kernel_large = np.ones((25, 25), np.uint8)
 
-    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
-    # diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
-    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
+    #diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
+    #diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
+    #diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
 
     # cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # for contour in cnts:
@@ -637,9 +643,9 @@ def detect_leanbot(
     diff_mask = cv2.bitwise_and(diff_mask, diff_mask, mask=eroded_board_mask)
 
     contours, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # mask_filled = np.zeros_like(diff_mask)
-    # cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
-    # contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    mask_filled = np.zeros_like(diff_mask)
+    cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
+    contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     bboxes = []
     for contour in contours:
@@ -677,9 +683,13 @@ def save_detection_outputs(output_paths: dict[str, Path], base_name: str, aligne
     # Save main aligned image
     cv2.imwrite(str(aligned_path), aligned_img)
 
-    # Save debug: Difference Mask
+    # Save debug: Difference Mask WITH Bboxes
     if diff_mask is not None:
-        cv2.imwrite(str(mask_path), diff_mask)
+        # Convert grayscale mask to BGR to draw colored boxes
+        mask_bgr = cv2.cvtColor(diff_mask, cv2.COLOR_GRAY2BGR)
+        for x, y, w, h in bboxes:
+            cv2.rectangle(mask_bgr, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.imwrite(str(mask_path), mask_bgr)
 
     # Save debug: Image with Bounding Boxes
     bbox_img = aligned_img.copy()

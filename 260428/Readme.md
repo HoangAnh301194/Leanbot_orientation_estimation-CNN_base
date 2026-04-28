@@ -267,7 +267,7 @@ Có một vài hạn chế khi chỉ merge như sau :
                       area1 = b1[2] * b1[3]
                       area2 = b2[2] * b2[3]
 
-                      # 4. Kiểm tra tỷ lệ chồng lấn (mặc định bạn đang để 0.1 = 10%)
+                      # 4. Kiểm tra tỷ lệ chồng lấn 
                       if (inter_area >= overlap_ratio * area1) or (inter_area >= overlap_ratio * area2):
                           group.append(curr_bboxes[j])
                           visited[j] = True
@@ -298,6 +298,13 @@ Có một vài hạn chế khi chỉ merge như sau :
 
 ![alt text](image-3.png)
 
+- Ảnh ở dạng GrayScale
+
+![alt text](image-7.png)
+
+![alt text](image-5.png)
+
+![alt text](image-6.png)
 - Kết quả cho thấy đối với các phần BBox không chồng lấn nhau thì thuật toán này không phù hợp bằng Merge BBox sử dụng phương pháp gộp bằng ngưỡng khoảng cách.
 
 ### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.

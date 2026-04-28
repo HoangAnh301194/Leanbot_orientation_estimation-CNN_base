@@ -4,9 +4,7 @@
 - Chỉnh sửa tools Auto label : Đọc ảnh từ raw_image/session_X xuất ra tool1_output/session_X tương ứng.
     - Tự yêu cầu chọn RoI Mask nếu chưa có file ma trận cấu hình.
     -  Thêm file json/text chứa thông tin các thông số cấu hình đã sử dụng trong tool auto label ( threshold, w_s, w_h, w_gray,...)
--  Trong quá trình thu thập dữ liệu, chạy tool, tách ra các ảnh dễ bị nhiễu, Bbox sai để thử nghiệm các tools.
-- Tạm thời bỏ các bước xử lí lấp pixel đen bên trong countor Leanbot
--  Thu thập ảnh cho 2 Class Leanbot_front và Leanbot_back ở các góc từ -45 -> 45 độ
+
 
 ### 1. Chỉnh sửa tools auto label
 - Tách từ tools gốc thành tools có chức năng auto label riêng
@@ -95,4 +93,3 @@
 ## C. Công việc tiếp theo.
 - Tắt tính năng Fill Hole trong thân Leanbot. 
 - Tiến hành chụp các góc phía trước Leanbot_front và sau Leanbot_back từ góc -45 -> 45 độ. Tiến hành auto label, lọc ảnh nhiễu ra 1 folder riêng `difficult`
-- 

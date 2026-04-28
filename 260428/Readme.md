@@ -224,68 +224,68 @@ Có một vài hạn chế khi chỉ merge như sau :
   - [https://github.com/dusty-nv/jetson-inference/issues/195](https://github.com/dusty-nv/jetson-inference/issues/195)
 - Về tư tưởng thuật toán : Tìm các BBox có sự chồng lấn về diện tích với ngưỡng "overlap_ratio" thì sẽ tính lại BBox bao hàm toàn bộ các BBox trong nhóm. 
 - Code sử dụng : 
+
 ```python
-def merge_bboxes_overlap(bboxes, overlap_ratio=0.25):
-    if not bboxes:
-        return []
+  def merge_bboxes_overlap(bboxes, overlap_ratio=0.25):
+      if not bboxes:
+          return []
 
-    curr_bboxes = [list(b) for b in bboxes]
-    changed = True
-    while changed:
-        changed = False
-        new_bboxes = []
-        visited = [False] * len(curr_bboxes)
+      curr_bboxes = [list(b) for b in bboxes]
+      changed = True
+      while changed:
+          changed = False
+          new_bboxes = []
+          visited = [False] * len(curr_bboxes)
 
-        for i in range(len(curr_bboxes)):
-            if visited[i]:
-                continue
+          for i in range(len(curr_bboxes)):
+              if visited[i]:
+                  continue
 
-            group = [curr_bboxes[i]]
-            visited[i] = True
+              group = [curr_bboxes[i]]
+              visited[i] = True
 
-            for j in range(i + 1, len(curr_bboxes)):
-                if visited[j]:
-                    continue
+              for j in range(i + 1, len(curr_bboxes)):
+                  if visited[j]:
+                      continue
 
-                b1 = curr_bboxes[i]  # [x, y, w, h]
-                b2 = curr_bboxes[j]
+                  b1 = curr_bboxes[i]  # [x, y, w, h]
+                  b2 = curr_bboxes[j]
 
-                # Chuyển đổi sang tọa độ [x1, y1, x2, y2] để tính toán
-                r1 = [b1[0], b1[1], b1[0] + b1[2], b1[1] + b1[3]]
-                r2 = [b2[0], b2[1], b2[0] + b2[2], b2[1] + b2[3]]
+                  # Chuyển đổi sang tọa độ [x1, y1, x2, y2] để tính toán
+                  r1 = [b1[0], b1[1], b1[0] + b1[2], b1[1] + b1[3]]
+                  r2 = [b2[0], b2[1], b2[0] + b2[2], b2[1] + b2[3]]
 
-                # 1. Kiểm tra chồng lấn cơ bản (AABB Check)
-                if not (r2[0] > r1[2] or r2[2] < r1[0] or r2[1] > r1[3] or r2[3] < r1[1]):
-                    
-                    # 2. Tính diện tích vùng giao nhau
-                    inter_x = min(r1[2], r2[2]) - max(r1[0], r2[0])
-                    inter_y = min(r1[3], r2[3]) - max(r1[1], r2[1])
-                    inter_area = inter_x * inter_y
+                  # 1. Kiểm tra chồng lấn cơ bản (AABB Check)
+                  if not (r2[0] > r1[2] or r2[2] < r1[0] or r2[1] > r1[3] or r2[3] < r1[1]):
+                      
+                      # 2. Tính diện tích vùng giao nhau
+                      inter_x = min(r1[2], r2[2]) - max(r1[0], r2[0])
+                      inter_y = min(r1[3], r2[3]) - max(r1[1], r2[1])
+                      inter_area = inter_x * inter_y
 
-                    # 3. Tính diện tích của từng hộp
-                    area1 = b1[2] * b1[3]
-                    area2 = b2[2] * b2[3]
+                      # 3. Tính diện tích của từng hộp
+                      area1 = b1[2] * b1[3]
+                      area2 = b2[2] * b2[3]
 
-                    # 4. Kiểm tra tỷ lệ chồng lấn (mặc định bạn đang để 0.1 = 10%)
-                    if (inter_area >= overlap_ratio * area1) or (inter_area >= overlap_ratio * area2):
-                        group.append(curr_bboxes[j])
-                        visited[j] = True
-                        changed = True
+                      # 4. Kiểm tra tỷ lệ chồng lấn (mặc định bạn đang để 0.1 = 10%)
+                      if (inter_area >= overlap_ratio * area1) or (inter_area >= overlap_ratio * area2):
+                          group.append(curr_bboxes[j])
+                          visited[j] = True
+                          changed = True
 
-            # Tạo Bounding Box lớn nhất bao trùm cả nhóm
-            if len(group) == 1:
-                new_bboxes.append(group[0])
-            else:
-                x_min = min(b[0] for b in group)
-                y_min = min(b[1] for b in group)
-                x_max = max(b[0] + b[2] for b in group)
-                y_max = max(b[1] + b[3] for b in group)
-                new_bboxes.append([x_min, y_min, x_max - x_min, y_max - y_min])
+              # Tạo Bounding Box lớn nhất bao trùm cả nhóm
+              if len(group) == 1:
+                  new_bboxes.append(group[0])
+              else:
+                  x_min = min(b[0] for b in group)
+                  y_min = min(b[1] for b in group)
+                  x_max = max(b[0] + b[2] for b in group)
+                  y_max = max(b[1] + b[3] for b in group)
+                  new_bboxes.append([x_min, y_min, x_max - x_min, y_max - y_min])
 
-        curr_bboxes = new_bboxes
+          curr_bboxes = new_bboxes
 
-    return [tuple(b) for b in curr_bboxes]
-
+      return [tuple(b) for b in curr_bboxes]
 ```
 
 - Kết quả : 
@@ -299,6 +299,7 @@ def merge_bboxes_overlap(bboxes, overlap_ratio=0.25):
 ![alt text](image-3.png)
 
 - Kết quả cho thấy đối với các phần BBox không chồng lấn nhau thì thuật toán này không phù hợp bằng Merge BBox sử dụng phương pháp gộp bằng ngưỡng khoảng cách.
+
 ### 4. Tiến hành chụp các mẫu Data Leanbot_front và Leanbot_Back.
 - Leanbot_front : 
 

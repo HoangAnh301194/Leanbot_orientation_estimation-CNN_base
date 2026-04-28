@@ -96,7 +96,6 @@
 
 - Code đã comment: 
 ```python
-
     # kernel_small = np.ones((3, 3), np.uint8)
     # kernel_large = np.ones((25, 25), np.uint8)
 
@@ -113,7 +112,6 @@
     # mask_filled = np.zeros_like(diff_mask)
     # cv2.drawContours(mask_filled, contours, -1, 255, thickness=-1)
     # contours, _ = cv2.findContours(mask_filled, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
 ```
 - Kết quả sau khi tắt các công đoạn trên : 
 

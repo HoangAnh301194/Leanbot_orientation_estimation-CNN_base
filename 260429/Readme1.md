@@ -66,8 +66,8 @@ def merge_bboxes(bboxes, dist_threshold=10):
 
 | Image | Merge BBoxes Distance-based| Merge BBoxes Overlap Based |
 | -----| --------| --------|
-|RGB Debug|![distance_base](distance_base.jpg) | ![overlap_based](overlap.jpg)|
-|Gray Debug|![distance_base_gray](distance_base_mask.jpg) | ![overlap_based_gray](overlap_mask.jpg)|
+|RGB Debug|![distance_base](images/distance_base.jpg) | ![overlap_based](images/overlap.jpg)|
+|Gray Debug|![distance_base_gray](images/distance_base_mask.jpg) | ![overlap_based_gray](images/overlap_mask.jpg)|
 
 -> Kết quả cho thấy so với phương pháp Merge BBoxes Overlap Based thì phương pháp Merge BBoxes Distance-based cho kết quả tốt hơn, BBox được hợp lại tốt hơn, không bị cắt bởi các BBox không được chồng lấn.
 ### 2. Các phương pháp xử lí hình thái 
@@ -75,15 +75,15 @@ def merge_bboxes(bboxes, dist_threshold=10):
 
 | Threshold | Image|
 |:---:|:---:|
-|Current : 70 |![70](distance_base_mask.jpg)|
-|Increased : 120 |![120](threshold120.jpg)| 
+|Current : 70 |![70](images/distance_base_mask.jpg)|
+|Increased : 120 |![120](images/threshold120.jpg)| 
 
 - Để giải quyết vấn đề loại bỏ nhiễu mà không cần tăng ngưỡng lọc nhị phân để giữ nhiều chi tiết của Leanbot nhất có thể, em có tìm hiểu một số phương pháp xử lí hình thái như sau :
 #### 2.1. Opening ( phép mở ảnh)
 - Là sự kết hợp của phép co (erosion) -> giãn ảnh (dilation). Có tách dụng loại bỏ các điểm ảnh nhiễu.
 - Tài liệu tham khảo : [https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html](https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html)
 
-![alt text](image.png)
+![alt text](images/image.png)
 
 - Hàm sử dụng :
 ```python
@@ -94,7 +94,7 @@ opening = cv.morphologyEx(img, cv.MORPH_OPEN, kernel)
 - Là sự kết hợp của phép giãn ảnh (dilation) -> co (erosion). Có tách dụng làm liền các vết nứt nhỏ, lấp đầy các lỗ hổng nhỏ.
 - Tài liệu tham khảo : [https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html](https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html)
 
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 
 - Hàm sử dụng :
 ```python
@@ -104,7 +104,7 @@ closing = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
 
 |Threshold|None Morphological| Opening + Closing |
 |:----:|:----:|:----:|
-|70|![none morphological](overlap_mask.jpg)|![opening + closing](morphological.jpg)| 
+|70|![none morphological](images/overlap_mask.jpg)|![opening + closing](images/morphological.jpg)| 
 
 -> Kết quả cho thấy nhiễu nhỏ của Môi trường đã bị loại bỏ.
 ## B. Khó khăn.

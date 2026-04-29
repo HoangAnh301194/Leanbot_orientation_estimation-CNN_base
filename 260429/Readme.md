@@ -79,8 +79,8 @@ if use_group_rectangles:
 
 |Image|OverLap|GroupRectangles|
 |:---:|:---:|:---:|
-|RGB Debug|![overlap](overlap.jpg)|![rectangles_bbox](rectangles_bbox.jpg)|
-|Gray Debug|![gray_overlap](overlap_mask.jpg)|![gray_rectangles_bbox](rectangles_mask.jpg)|
+|RGB Debug|![overlap](images/overlap.jpg)|![rectangles_bbox](images/rectangles_bbox.jpg)|
+|Gray Debug|![gray_overlap](images/overlap_mask.jpg)|![gray_rectangles_bbox](images/rectangles_mask.jpg)|
 
 - **Kết quả và đánh giá:**
     - Kết quả cho thấy `cv2.groupRectangles()` chưa tối ưu cho bài toán hiện tại. Nguyên nhân là hàm này không merge các bbox theo kiểu lấy bao ngoài, mà chỉ gom nhóm các rectangle có vị trí và kích thước gần giống nhau.

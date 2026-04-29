@@ -33,7 +33,7 @@ from alignment import ImageAligner
 
 def build_parser():
     parser = argparse.ArgumentParser(
-        description="Read raw_image/session_X and export auto-label results to tool1_output/session_X."
+        description="Read raw_image/session_X and export auto-label results using Mask-Based Merging."
     )
     parser.add_argument(
         "--session",
@@ -152,7 +152,7 @@ def process_session(session_dir: Path, args):
         base_name = image_path.stem
         summary["images"] += 1
 
-        aligned_img, bboxes, diff_mask = detect_leanbot(
+        aligned_img, bboxes, diff_mask, debug_masks = detect_leanbot(
             frame,
             bg_masked,
             aligner,
@@ -175,6 +175,7 @@ def process_session(session_dir: Path, args):
             diff_mask=diff_mask,
             bboxes=bboxes,
             class_id=args.class_id,
+            debug_masks=debug_masks,
         )
 
         if not bboxes:
@@ -195,6 +196,9 @@ def build_shared_config(args, sessions_processed: list[str], total: dict) -> dic
     mode_names = {"1": "GRAY", "2": "MIX", "3": "HUE"}
     return {
         "created_at": now_stamp(),
+        "merge_method": "mask-based",
+        "mask_merge_kernel": args.mask_merge_kernel,
+        "mask_merge_iterations": args.mask_merge_iterations,
         "diff_mode": mode_names.get(args.diff_mode, args.diff_mode),
         "threshold": args.threshold,
         "blur": args.blur,
@@ -204,7 +208,6 @@ def build_shared_config(args, sessions_processed: list[str], total: dict) -> dic
         "max_width": args.max_width,
         "min_height": args.min_height,
         "max_height": args.max_height,
-        "merge_dist": args.merge_dist,
         "class_id": args.class_id,
         "background_index": args.background_index,
         "w_gray": args.w_gray,
@@ -228,6 +231,7 @@ def main(argv=None):
         return 0
 
     print_processing_configuration(args)
+    print(f"        -> Merge: Mask-Based (kernel={args.mask_merge_kernel}, iterations={args.mask_merge_iterations})")
 
     total = {"sessions": 0, "images": 0, "positive": 0, "negative": 0, "failed": 0}
     sessions_processed = []

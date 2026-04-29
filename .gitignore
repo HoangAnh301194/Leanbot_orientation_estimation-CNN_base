@@ -27,6 +27,7 @@ __pycache__/
 260428/datasets/
 260429/raw_image/
 260429/tool1_output/ 
+260429/raw_image_0/
 
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep

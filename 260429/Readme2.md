@@ -4,6 +4,7 @@
 - Thử nghiệm phương pháp **Mask-Based BBox Merging**
 - Đánh giá , so sánh với phương pháp cũ đã thử.
 - Thêm bộ lọc diện tích BBox để loại bỏ BBox nhiễu.
+
 ## 1. Phương pháp Mask-Based BBox Merging
 
 ### 1.1. Ý tưởng cốt lõi
@@ -104,4 +105,6 @@ x, y, w, h = cv2.boundingRect(tight_mask)
 - Kết quả cho thấy Phương pháp Mask_base tối ưu hơn cả, không cần xử lí hình thái ảnh trước khi gộp BBox, không làm thay đổi tính chất ban đầu của ảnh. 
 
 ## B. Khó khăn
+- Không
 ## C. Công việc tiếp theo.
+- Em xin phép nhận công việc tiếp theo mới từ Thầy ạ. 

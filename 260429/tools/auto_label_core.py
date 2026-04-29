@@ -378,6 +378,23 @@ def add_processing_arguments(parser: argparse.ArgumentParser):
         default=0.1,
         help="Significant overlap ratio (0.0 to 1.0) for area-based merging.",
     )
+    parser.add_argument(
+        "--use_group_rectangles",
+        action="store_true",
+        help="Use cv2.groupRectangles() for merging instead of distance-based or overlap-based.",
+    )
+    parser.add_argument(
+        "--group_threshold",
+        type=int,
+        default=1,
+        help="groupThreshold for cv2.groupRectangles (min rectangles in a cluster to keep it).",
+    )
+    parser.add_argument(
+        "--group_eps",
+        type=float,
+        default=0.5,
+        help="eps for cv2.groupRectangles (relative difference between sides to merge).",
+    )
     return parser
 
 
@@ -400,6 +417,9 @@ def build_detection_kwargs(args):
         "merge_dist": args.merge_dist,
         "use_overlap_merge": args.use_overlap_merge,
         "overlap_ratio": args.overlap_ratio,
+        "use_group_rectangles": args.use_group_rectangles,
+        "group_threshold": args.group_threshold,
+        "group_eps": args.group_eps,
     }
 
 
@@ -554,6 +574,9 @@ def detect_leanbot(
     merge_dist=50,
     use_overlap_merge=False,
     overlap_ratio=0.15,
+    use_group_rectangles=False,
+    group_threshold=1,
+    group_eps=0.5,
 ):
     frame_masked = cv2.bitwise_and(frame, frame, mask=board_mask)
 
@@ -629,9 +652,9 @@ def detect_leanbot(
     kernel_small = np.ones((4, 4), np.uint8)
     kernel_large = np.ones((25, 25), np.uint8)
 
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel_small)
     # diff_mask = cv2.dilate(diff_mask, np.ones((5, 5), np.uint8), iterations=1)
-    diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
+    # diff_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_CLOSE, kernel_large)
 
     # cnts, _ = cv2.findContours(diff_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # for contour in cnts:
@@ -655,10 +678,20 @@ def detect_leanbot(
             if (min_width < w < max_width) and (min_height < h < max_height):
                 bboxes.append((x, y, w, h))
 
-    if use_overlap_merge:
-        # Sử dụng thuật toán gộp theo diện tích chồng lấn
+    if use_group_rectangles:
+        # Phương pháp 3: Sử dụng cv2.groupRectangles()
+        if bboxes:
+            # Trick: thêm mỗi bbox 2 lần để giữ lại phát hiện đơn lẻ
+            rect_list = [list(b) for b in bboxes] * 2
+            rect_list, _ = cv2.groupRectangles(rect_list, groupThreshold=group_threshold, eps=group_eps)
+            merged_bboxes = [tuple(r) for r in rect_list]
+        else:
+            merged_bboxes = []
+    elif use_overlap_merge:
+        # Phương pháp 2: Gộp theo diện tích chồng lấn
         merged_bboxes = merge_bboxes_overlap(bboxes, overlap_ratio=overlap_ratio)
     else:
+        # Phương pháp 1: Gộp theo khoảng cách (mặc định)
         merged_bboxes = merge_bboxes(bboxes, dist_threshold=merge_dist)
 
     return aligned_color, merged_bboxes, diff_mask

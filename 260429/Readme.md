@@ -4,26 +4,27 @@
 - Tìm hiểu ```cv2.groupRectangles()```
 - Báo cáo chi tiết toàn bộ code tìm BBox hiện tại.
 
-### 1. Hàm ```cv2.groupRectangles()```.
+### 1. Hàm ```cv2.groupRectangles()```
+- Tài liệu tham khảo:  [OpenCV Official Docs — groupRectangles](https://docs.opencv.org/4.x/de/de1/group__objdetect__common.html)
 
 #### 1.1. Tổng quan
-- `cv2.groupRectangles()` là hàm có sẵn trong OpenCV (`opencv2/objdetect.hpp`), được thiết kế để gộp các hình chữ nhật (rectangles) ứng viên từ các bộ phát hiện đối tượng như **Cascade Classifier**, **HOG**, hoặc **matchTemplate()**.
-- Hàm này thường được sử dụng khi một đối tượng bị phát hiện nhiều lần (overlapping detections), cần gộp lại thành 1 kết quả duy nhất.
-
-#### 1.2. Cú pháp sử dụng (Python)
+- `cv2.groupRectangles()` được dùng để gom nhóm (clustering) các hình chữ nhật (rectangles) ứng viên từ các bộ phát hiện đối tượng như **Cascade Classifier**, **HOG**, hoặc **matchTemplate()**.
+- Hàm này thường được sử dụng khi một đối tượng bị phát hiện nhiều lần (nhiều detection gần trùng nhau quanh cùng một object), cần gom lại thành 1 kết quả duy nhất.
+- **Lưu ý:** `cv2.groupRectangles()` không thực hiện merge hình học theo kiểu lấy bao ngoài (union box), mà thực hiện clustering các rectangle tương tự nhau và trả về **rectangle trung bình** (average) của mỗi cluster.
+- Cú pháp:
 ```python
 rectangles, weights = cv2.groupRectangles(rectList, groupThreshold, eps)
 ```
 
-#### 1.3. Các tham số
+- Các tham số
 
 | Tham số | Kiểu | Mặc định | Ý nghĩa |
 |:---|:---:|:---:|:---|
-| `rectList` | list of [x, y, w, h] | — | Danh sách các hình chữ nhật đầu vào cần gộp |
-| `groupThreshold` | int | — | Số lượng rectangle tối thiểu trong 1 nhóm (cluster) để giữ lại. Nếu = 0 thì không gộp gì cả. Nếu = 1 thì cần ít nhất 2 rectangle chồng nhau mới giữ |
-| `eps` | float | 0.2 | Tỉ lệ sai khác tương đối giữa các cạnh của 2 rectangle để coi chúng là "tương tự". Giá trị càng lớn → gộp càng dễ |
+| `rectList` | list of [x, y, w, h] | — | Danh sách các hình chữ nhật đầu vào cần gom nhóm |
+| `groupThreshold` | int | — | Ngưỡng lọc cluster. Các nhóm có số lượng rectangle ≤ `groupThreshold` sẽ bị loại. Ví dụ `groupThreshold=1` nghĩa là một nhóm cần ít nhất 2 rectangle tương tự nhau để được giữ lại. Nếu `groupThreshold=0`, gần như không thực hiện grouping thực sự |
+| `eps` | float | 0.2 | Tỉ lệ sai khác tương đối giữa các cạnh của 2 rectangle để coi chúng là "tương tự". Giá trị càng lớn → gom nhóm càng dễ |
 
-#### 1.4. Thuật toán bên trong (từ source code OpenCV)
+#### 1.2. Bản chất thuật toán 
 
 - Hàm `groupRectangles()` là wrapper của hàm generic `cv::partition()`.
 - Bên trong sử dụng class `SimilarRects` để xác định 2 rectangle có "tương tự" hay không:
@@ -51,31 +52,40 @@ public:
     - Hai rectangle được coi là "tương tự" khi cả 4 điều kiện sau đều thỏa mãn:
         - Sai lệch tọa độ góc trên trái (x, y) ≤ `delta`
         - Sai lệch tọa độ góc dưới phải (x+w, y+h) ≤ `delta`
-    - → Tức là 2 rectangle phải có **kích thước gần bằng nhau** VÀ **vị trí gần nhau**.
+    - -> Tức là 2 rectangle phải có **kích thước gần bằng nhau** và **vị trí gần nhau**.
 
 - **Quy trình xử lý:**
-    1. Dùng `cv::partition()` với `SimilarRects` để phân cụm (clustering) tất cả rectangle thành các nhóm.
+    1. Dùng `cv::partition()` với `SimilarRects` để phân cụm (clustering) tất cả rectangle thành các nhóm gồm các rectangle có vị trí và kích thước tương tự nhau.
     2. Loại bỏ các nhóm có số lượng rectangle ≤ `groupThreshold`.
     3. Với mỗi nhóm còn lại, tính **rectangle trung bình** (average) của tất cả rectangle trong nhóm → đây là kết quả đầu ra.
 
-#### 1.5. Lưu ý quan trọng (Trick)
-- **Vấn đề:** Nếu một đối tượng chỉ được phát hiện đúng 1 lần (không có rectangle nào chồng lấn), `groupRectangles()` với `groupThreshold=1` sẽ **loại bỏ** kết quả đó (vì nhóm chỉ có 1 phần tử ≤ threshold).
-- **Giải pháp:** Thêm mỗi rectangle vào danh sách **2 lần** để đảm bảo các phát hiện đơn lẻ cũng được giữ lại:
+#### 1.3. Thử nghiệm và đánh giá.
+- Code sử dụng :
 ```python
-rectangles = []
-for loc in locations:
-    rect = [int(loc[0]), int(loc[1]), needle_w, needle_h]
-    rectangles.append(rect)
-    rectangles.append(rect)  # Thêm lần 2 để giữ lại phát hiện đơn lẻ
-
-rectangles, weights = cv2.groupRectangles(rectangles, groupThreshold=1, eps=0.5)
+# auto_label_core.py dòng 681-689
+if use_group_rectangles:
+    if bboxes:
+        rect_list = [list(b) for b in bboxes] * 2  # Nhân đôi mỗi bbox
+        rect_list, _ = cv2.groupRectangles(rect_list, groupThreshold=group_threshold, eps=group_eps)
+        merged_bboxes = [tuple(r) for r in rect_list]
+    else:
+        merged_bboxes = []
 ```
 
-#### 1.6. Tài liệu tham khảo
-- [OpenCV Official Docs — groupRectangles](https://docs.opencv.org/4.x/de/de1/group__objdetect__common.html)
-- [OpenCV Source — objdetect.hpp (class SimilarRects)](https://github.com/opencv/opencv/blob/4.x/modules/objdetect/include/opencv2/objdetect.hpp)
-- [OpenCV Source — cascadedetect.cpp](https://github.com/opencv/opencv/blob/4.x/modules/objdetect/src/cascadedetect.cpp)
-- [LearnCodeByGaming — Grouping Rectangles into Click Points](https://learncodebygaming.com/blog/grouping-rectangles-into-click-points)
+- **Giải thích `* 2` (duplicate trick):** Do `groupThreshold=1` yêu cầu một cluster phải có ít nhất 2 rectangle tương tự nhau, mỗi bbox được nhân đôi trước khi đưa vào `groupRectangles()`. Cách này giúp các bbox đơn lẻ không bị loại bỏ chỉ vì không có rectangle tương tự khác.
+- **Hạn chế:** Tuy nhiên việc nhân đôi bbox chỉ giúp giữ lại bbox đơn lẻ, không làm thay đổi bản chất của `groupRectangles()`. Hàm vẫn không merge các bbox khác kích thước hoặc nằm cạnh nhau thành một bbox lớn bao ngoài.
+
+- Kết quả so sánh Overlap và groupRectangles()
+
+|Image|OverLap|GroupRectangles|
+|:---:|:---:|:---:|
+|RGB Debug|![overlap](overlap.jpg)|![rectangles_bbox](rectangles_bbox.jpg)|
+|Gray Debug|![gray_overlap](overlap_mask.jpg)|![gray_rectangles_bbox](rectangles_mask.jpg)|
+
+- **Kết quả và đánh giá:**
+    - Kết quả cho thấy `cv2.groupRectangles()` chưa tối ưu cho bài toán hiện tại. Nguyên nhân là hàm này không merge các bbox theo kiểu lấy bao ngoài, mà chỉ gom nhóm các rectangle có vị trí và kích thước gần giống nhau.
+    - Trong bài toán background subtraction, các bbox sinh ra từ contour thường đại diện cho nhiều vùng khác nhau của cùng một robot, ví dụ thân robot, bánh xe, bóng hoặc vùng phản xạ. Các bbox này có thể nằm gần nhau nhưng kích thước và vị trí không đủ tương tự theo điều kiện `SimilarRects`, nên `groupRectangles()` không gom chúng thành một bbox lớn bao quanh toàn bộ robot.
+    - Việc nhân đôi bbox trước khi gọi `groupRectangles()` giúp tránh trường hợp bbox đơn lẻ bị loại do `groupThreshold`, nhưng không giải quyết được vấn đề chính: hàm vẫn không phù hợp để merge các bbox khác kích thước hoặc chỉ nằm gần nhau.
 
 ### 2. Code tìm BBox hiện tại. 
 
@@ -471,5 +481,5 @@ tool1_output/session_X/
     - Sử dụng phép biến đổi hình thái ảnh Morphological ( Opening + Closing)
     - Gộp BBox xử dụng Distace base
     - Kết quả thử nghiệm và so sánh với Overlap base cụ thể chi tiết trong báo cáo sau :
-        - [link](akshdsajfla)
+        - [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260429/Readme1.md](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260429/Readme1.md)
 ## C. Công việc tiếp theo

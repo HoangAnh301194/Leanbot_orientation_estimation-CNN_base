@@ -151,6 +151,7 @@ Dựa trên kết quả thực nghiệm với bộ dữ liệu gồm 14 mẫu (7
 *   Thu thập dữ liệu trên nhiều môi trường nền và điều kiện ánh sáng khác nhau.
 *   Sử dụng thêm các kỹ thuật **Data Augmentation** (tăng cường dữ liệu) mạnh hơn (thay đổi độ sáng, Hue, xoay, lật, cắt,... sau mỗi batch trong quá trình train)
 ## B. Khó khăn
+- Hiện tại trong quá trình Auto label em chưa gặp ảnh nào bị lỗi nên chưa báo cáo riêng thành folder ```dificult_images``` ạ .
 - *Mục đích là để đánh giá khả năng phát hiện góc Leanbot trên sa bàn (không phải góc nhìn của camera)*  
     - Em đã hiểu ý tưởng của Thầy rồi ạ, tuy nhiên em thắc mắc là Cam sẽ lấy data của nhiều Leanbot ở các vị trí khác nhau trên sa bàn nên dữ liệu của Leanbot đặt 30 độ ở góc trái sa bàn sẽ khác với Leanbot đặt 30 độ ở góc phải sa bàn ạ. Nên em nghĩ sẽ không thể theo cách này để phân biệt được góc Leanbot trên sa bàn ạ. 
 - Vì 2 Class  Leanbot_front và Leanbot_back có độ tương đồng cao nên khó để phân biệt được ạ. Các đặc trưng để phân biệt 2 class này là rất nhỏ so với tổng thể ( ví dụ sự khác biệt giữa mặt trước và sau là có thể nhìn thấy 2 mắt tròn của cảm biến HC-SR04 ở mặt trước, nhưng đặc trưng này là quá nhỏ so với các đặc trưng tổng thể như màu Đỏ của Leanbot, Hình dáng chung,...)  

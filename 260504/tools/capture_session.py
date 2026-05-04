@@ -23,6 +23,8 @@ def build_parser():
         default=None,
         help="Optional session name. Default: session_YYYYMMDD_HHMMSS",
     )
+    parser.add_argument("--class_name", default="Leanbot", help="Name of the class being captured")
+    parser.add_argument("--class_id", type=int, default=0, help="ID of the class being captured")
     return parser
 
 
@@ -39,11 +41,12 @@ def main(argv=None):
         cap = setup_camera(parse_source(args.source))
         result = capture_session_frames(cap, session_id, backgrounds_dir, raw_dir)
 
-        manifest = save_capture_session_report(session_dir)
+        manifest = save_capture_session_report(session_dir, class_name=args.class_name, class_id=args.class_id)
         print(f"\n[FINISH] Session saved: {session_dir}")
+        print(f"[FINISH] Class: {manifest['class_name']} (ID: {manifest['class_id']})")
         print(f"[FINISH] Background images: {manifest['background_count']}")
         print(f"[FINISH] Raw images: {manifest['raw_image_count']}")
-        print(f"[FINISH] Report: {session_dir / 'session_structure.txt'}")
+        print(f"[FINISH] Metadata: {session_dir / 'session_metadata.json'}")
         if result["user_quit"]:
             print("[INFO] Capture stopped by user with 'q'.")
     finally:

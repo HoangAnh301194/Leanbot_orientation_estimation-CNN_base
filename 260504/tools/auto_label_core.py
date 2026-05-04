@@ -224,13 +224,15 @@ def save_json(json_path: Path, payload: dict):
     )
 
 
-def save_capture_session_report(session_dir: Path):
+def save_capture_session_report(session_dir: Path, class_name: str = "unknown", class_id: int = 0):
     backgrounds = list_image_paths(session_dir / "backgrounds")
     raw_images = list_image_paths(session_dir / "raw_images")
     manifest = {
         "session_name": session_dir.name,
         "session_dir": str(session_dir),
         "created_at": now_stamp(),
+        "class_name": class_name,
+        "class_id": class_id,
         "background_count": len(backgrounds),
         "raw_image_count": len(raw_images),
         "background_files": [path.name for path in backgrounds],
@@ -240,6 +242,9 @@ def save_capture_session_report(session_dir: Path):
             "raw_images": "Images containing Leanbot that will be processed by the labeling tool.",
         },
     }
+    
+    report_path = session_dir / "session_metadata.json"
+    save_json(report_path, manifest)
     return manifest
 
 

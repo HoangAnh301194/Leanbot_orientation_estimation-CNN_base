@@ -71,7 +71,7 @@ def choose_background(backgrounds, background_index: int):
     return backgrounds[background_index]
 
 
-def prepare_session_context(session_dir: Path, output_paths: dict[str, Path], args):
+def prepare_session_context(session_dir: Path, output_paths: dict[str, Path], args, effective_class_id: int = None):
     backgrounds = load_background_images(session_dir)
     background_path, background_image = choose_background(backgrounds, args.background_index)
 
@@ -92,6 +92,11 @@ def prepare_session_context(session_dir: Path, output_paths: dict[str, Path], ar
     aligner = ImageAligner()
     aligner.set_template(bg_masked)
 
+    # Temporarily override args.class_id for building config if effective_class_id is provided
+    original_class_id = args.class_id
+    if effective_class_id is not None:
+        args.class_id = effective_class_id
+
     config = build_processing_config(
         args=args,
         input_session_dir=session_dir,
@@ -99,6 +104,8 @@ def prepare_session_context(session_dir: Path, output_paths: dict[str, Path], ar
         background_path=background_path,
         roi_points=roi_points,
     )
+    # Restore original args.class_id
+    args.class_id = original_class_id
     if old_config.get("roi_points") and not args.reset_roi:
         config["roi_points"] = old_config["roi_points"]
         config["roi_background_path"] = old_config.get("roi_background_path", str(background_path))
@@ -136,11 +143,28 @@ def process_session(session_dir: Path, args):
 
     output_paths = create_output_session_dir(session_name)
     print(f"\n>>> Processing {session_name}")
+    
+    # Load class metadata if available
+    metadata_path = session_dir / "session_metadata.json"
+    effective_class_id = args.class_id
+    if metadata_path.exists():
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            effective_class_id = metadata.get("class_id", args.class_id)
+            class_name = metadata.get("class_name", "unknown")
+            print(f"    Class : {class_name} (ID: {effective_class_id}) [from metadata]")
+        except Exception:
+            print("    [WARN] Could not parse session_metadata.json, using defaults.")
+    else:
+        print(f"    Class : ID={effective_class_id} [from arguments]")
+
     print(f"    Input : {session_dir}")
     print(f"    Output: {output_paths['session_dir']}")
 
     try:
-        bg_masked, board_mask, aligner, config = prepare_session_context(session_dir, output_paths, args)
+        bg_masked, board_mask, aligner, config = prepare_session_context(
+            session_dir, output_paths, args, effective_class_id=effective_class_id
+        )
     except Exception as exc:
         print(f"   [FAIL] Could not prepare session context: {exc}")
         return {"images": 0, "positive": 0, "negative": 0, "failed": len(raw_images)}
@@ -174,7 +198,7 @@ def process_session(session_dir: Path, args):
             aligned_img=aligned_img,
             diff_mask=diff_mask,
             bboxes=bboxes,
-            class_id=args.class_id,
+            class_id=effective_class_id,
             debug_masks=debug_masks,
         )
 

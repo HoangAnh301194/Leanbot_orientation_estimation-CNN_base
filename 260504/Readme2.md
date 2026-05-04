@@ -9,10 +9,10 @@
         ![confusion_matrix2](confusion_matrix2.png)
 
     - Kết quả so sánh ảnh Leabel gốc và detection của Model:
-    
-        |Label gốc| Model|
-        |:---:|:---:|
-        |![alt text](image-1.png)|![alt text](image-2.png)|
+
+|Label gốc| Model|
+|:---:|:---:|
+|![alt text](image-1.png)|![alt text](image-2.png)|
 
     - Kết quả trên tập test_images:
 

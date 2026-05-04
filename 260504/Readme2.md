@@ -44,7 +44,7 @@ python webcam_infer.py --source 1
 ## B. Khó khăn 
 - Không
 ## C. Công việc tiếp theo
-- **Báo cáo rõ ràng và tạo bảng thông tin dataset cho training** : 
+- Báo cáo rõ ràng và tạo bảng thông tin dataset cho training : 
     - Những session nào 
     - Bao nhiêu ảnh mỗi loại (cả background)
     - Bao nhiêu label mỗi loại

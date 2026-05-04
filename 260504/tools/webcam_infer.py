@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
         default="0",
         help="Nguon camera. Mac dinh la webcam 0. Co the dung 1, 2... hoac duong dan video.",
     )
-    parser.add_argument("--conf", type=float, default=0.8, help="Nguong confidence de hien thi box.")
+    parser.add_argument("--conf", type=float, default=0.2, help="Nguong confidence de hien thi box.")
     parser.add_argument("--imgsz", type=int, default=640, help="Kich thuoc anh suy luan.")
     parser.add_argument(
         "--window-name",

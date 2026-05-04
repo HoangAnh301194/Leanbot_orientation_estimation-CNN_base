@@ -44,13 +44,13 @@ python webcam_infer.py --source 1
 ## B. Khó khăn 
 - Không
 ## C. Công việc tiếp theo
-1. Báo cáo rõ ràng và tạo bảng thông tin dataset cho training : 
-- Những session nào 
-- Bao nhiêu ảnh mỗi loại (cả background)
-- Bao nhiêu label mỗi loại
-- Chia ra tỷ lệ bao nhiêu cho training / validation /.test...  ?
-- Thời gian training ?
+- **Báo cáo rõ ràng và tạo bảng thông tin dataset cho training** : 
+    - Những session nào 
+    - Bao nhiêu ảnh mỗi loại (cả background)
+    - Bao nhiêu label mỗi loại
+    - Chia ra tỷ lệ bao nhiêu cho training / validation /.test...  ?
+    - Thời gian training ?
 
-2. Kiểm tra độ chính xác Detection khi chỉ training mỗi Class Leanbot trên cùng tập datasets cũ.
+- Kiểm tra độ chính xác Detection khi chỉ training mỗi Class Leanbot trên cùng tập datasets cũ.
 
-3. Tìm hiểu Data Augmentation có sẵn trong YOLO training 
+- Tìm hiểu Data Augmentation có sẵn trong YOLO training 

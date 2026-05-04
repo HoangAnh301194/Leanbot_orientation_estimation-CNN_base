@@ -4,17 +4,18 @@
 
 ### 1. Thu thập thêm data, Training và đánh giá kết quả
 - Dữ liệu đã thu thập thêm bao gồm 42 ảnh (21 ảnh cho Class Leanbot_front và 21 ảnh cho Class Leanbot_back). Ảnh được chụp tại các vị trí khác nhau trên sa bàn ( Line đen, góc sa bàn,...) 
-- Kết quả sau khi Training với bộ dữ liệu mới như sau :
-    - Ma trận nhầm lẫn: 
+
+- **Kết quả sau khi Training với bộ dữ liệu mới như sau :**
+- Ma trận nhầm lẫn: 
         ![confusion_matrix2](confusion_matrix2.png)
 
-    - Kết quả so sánh ảnh Leabel gốc và detection của Model:
+- **Kết quả so sánh ảnh Leabel gốc và detection của Model:**
 
 |Label gốc| Model|
 |:---:|:---:|
 |![alt text](image-1.png)|![alt text](image-2.png)|
 
-    - Kết quả trên tập test_images:
+- Kết quả trên tập test_images:
 
     ![alt text](image.png)
     ![alt text](image-3.png)

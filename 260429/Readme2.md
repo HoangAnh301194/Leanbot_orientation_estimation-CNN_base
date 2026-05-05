@@ -107,4 +107,4 @@ x, y, w, h = cv2.boundingRect(tight_mask)
 ## B. Khó khăn
 - Không
 ## C. Công việc tiếp theo.
-- Em xin phép nhận công việc tiếp theo mới từ Thầy ạ. 
+- Em xin phép nhận công việc tiếp theo từ Thầy ạ. 

@@ -1,7 +1,16 @@
 # Cập nhật báo cáo ngày 05/05/2026
 
 ## A. Công việc đã làm
+- Báo cáo rõ ràng và tạo bảng thông tin dataset cho training :
+    - Số lượng session
+    - Số lượng ảnh mỗi loại (cả background)
+    - Số lượng Label mỗi loại
+    - Tỷ lệ chia cho training / validation /.test
+    - Thời gian training  
 
+- Kiểm tra độ chính xác Detection khi chỉ training mỗi Class Leanbot trên cùng tập datasets cũ.
+- Báo cáo các biểu đồ đánh giá quá trình training Model và thử nghiệm trên tập test.
+- Tìm hiểu Data Augmentation có sẵn trong YOLO training 
 ---
 
 ### 1. Bảng thông tin Dataset cho lần Training
@@ -53,7 +62,7 @@ Sử dụng chiến lược **Stratified Split** để đảm bảo tỷ lệ 2 
 
 > **Mục tiêu:** Sử dụng **cùng bộ dữ liệu 42 ảnh**, nhưng bỏ phân biệt class, gộp tất cả thành 1 class duy nhất là `Leanbot` để so sánh chất lượng nhận diện với mô hình 2 class.
 
-#### 2.1. Cách thực hiện
+#### 2.1. Chỉnh sửa lại code.
 Để chạy thử nghiệm 1 class, cần sửa lại file YAML trong notebook:
 ```python
 # Cấu hình 1 class (Leanbot chung)
@@ -69,26 +78,98 @@ names:
 ```
 Đồng thời, cần sửa lại tất cả các file nhãn `.txt` để đổi class ID `1` (Leanbot_back) thành `0` (gộp chung), hoặc chạy lại `process_auto_label.py` với `--class_id 0` cho tất cả các session.
 
-#### 2.2. Kết quả so sánh
+#### 2.2. Kết quả chi tiết của 2 mô hình mô tả bằng các biểu đồ
+- Khi hàm ```model.train()``` được chạy thì nó cũng sẽ trả về các hình ảnh metric đánh giá model như confusion matrix, PR curve và detection quality metrics ,...
 
-| Tiêu chí | 1 Class (`Leanbot`) | 2 Class (`Front` / `Back`) |
-| :--- | :---: | :---: |
-| **mAP@0.5** | *(điền vào)* | *(điền vào)* |
-| **Precision** | *(điền vào)* | *(điền vào)* |
-| **Recall** | *(điền vào)* | *(điền vào)* |
-| Tỷ lệ bỏ sót đối tượng | *(điền vào)* | *(điền vào)* |
-| Nhận diện khi test thực tế | *(điền vào)* | *(điền vào)* |
+> **Giải thích các metric:** Trước khi đọc kết quả, cần hiểu ý nghĩa của từng loại biểu đồ:
+>
+> | Metric | Ý nghĩa |
+> | :--- | :--- |
+> | **Precision (P)** | Trong số các vật thể model *phát hiện ra* → có bao nhiêu % là đúng. Precision cao = ít báo động giả (False Positive). |
+> | **Recall (R)** | Trong số các vật thể *thực sự có trong ảnh* → model phát hiện được bao nhiêu %. Recall cao = ít bỏ sót (False Negative). |
+> | **F1-Score** | Trung bình điều hòa giữa Precision và Recall. Đây là metric tổng hợp cân bằng nhất: `F1 = 2 * P * R / (P + R)`. F1 = 1.0 là hoàn hảo. |
+> | **mAP@0.5** | Mean Average Precision tại ngưỡng IoU = 0.5. Đánh giá chất lượng phát hiện đối tượng tổng thể ở mức cơ bản. |
+> | **mAP@0.5:0.95** | mAP trung bình từ IoU=0.5 đến 0.95. Tiêu chuẩn khắt khe hơn, đòi hỏi bounding box phải khớp rất chính xác. |
+> | **Confusion Matrix** | Ma trận thể hiện số lần mỗi class thực tế (True) bị dự đoán là class nào (Predicted). Đường chéo chính = dự đoán đúng. |
+> | **box_loss** | Lỗi về vị trí và kích thước bounding box. Giảm dần = model học tốt hơn cách khoanh vùng. |
+> | **cls_loss** | Lỗi phân loại class. Giảm dần = model phân biệt class tốt hơn. |
+> | **dfl_loss** | Distribution Focal Loss – lỗi về phân phối tọa độ cạnh của bounding box. Giảm dần = box khớp hơn. |
 
-#### 2.3. Phân tích dự kiến
+##### 2.2.1. Only Leanbot (1 class)
+- **BoxF1 curve** – Đường cong F1 theo ngưỡng Confidence:
+![BoxF1_curve](/LeanbotOnly/BoxF1_curve.png)
+  > F1 đạt **1.00** tại confidence = **0.725**, duy trì ở mức gần 1.0 trong dải confidence từ ~0.05 đến ~0.85. Điều này cho thấy mô hình duy trì được sự cân bằng giữa Precision và Recall ở phạm vi ngưỡng rộng.
 
-**Giả thuyết:** Mô hình 1 class sẽ có kết quả tốt hơn đáng kể vì:
-- Bài toán đơn giản hơn: chỉ cần xác định "có Leanbot hay không" thay vì phân biệt mặt trước/sau.
-- Với 42 ảnh, 1 class sẽ có nhiều mẫu hơn cho một nhiệm vụ đơn (42 ảnh cho 1 class vs. 21 ảnh cho mỗi class trong bài toán 2 class).
-- Các đặc trưng tổng thể của Leanbot (màu đỏ, hình dạng, kích thước) dễ học hơn các đặc trưng phân biệt mặt trước/sau (2 mắt cảm biến HC-SR04 rất nhỏ).
+- **BoxPR curve** – Đường cong Precision–Recall:
+![BoxPR_curve](/LeanbotOnly/BoxPR_curve.png)
+  > Diện tích dưới đường cong (AUC) = **mAP@0.5 = 0.995**. Đường cong Precision–Recall duy trì Precision = 1.0 trong toàn bộ dải Recall từ 0 đến 1.0, cho thấy mô hình không có sự đánh đổi (trade-off) giữa Precision và Recall.
 
-*(Cập nhật bảng so sánh sau khi có kết quả thực nghiệm)*
+- **BoxP curve** – Đường cong Precision theo Confidence:
+![BoxP_curve](/LeanbotOnly/BoxP_curve.png)
+  > Precision đạt **1.00** tại confidence = **0.820** và duy trì ở mức 1.0 ở mọi confidence cao hơn. Model không tạo ra bất kỳ False Positive nào khi confidence > 0.82.
 
----
+- **BoxR curve** – Đường cong Recall theo Confidence:
+![BoxR_curve](/LeanbotOnly/BoxR_curve.png)
+  > Recall = **1.00** (không bỏ sót đối tượng nào) trong toàn bộ dải confidence từ 0 đến ~0.80. Khi confidence vượt ngưỡng 0.80, Recall bắt đầu giảm do mô hình áp dụng ngưỡng lọc chặt chẽ hơn.
+
+- **Confusion Matrix** – Ma trận nhầm lẫn (số lượng tuyệt đối):
+![confusion_matrix](/LeanbotOnly/confusion_matrix.png)
+  > **72 lần** model dự đoán đúng "Leanbot" → "Leanbot". Không có ô nào khác trong ma trận có giá trị (bằng 0), nghĩa là model không nhầm lẫn bất kỳ đối tượng nào thành background và ngược lại.
+
+- **Confusion Matrix Normalized** – Ma trận nhầm lẫn (tỉ lệ %):
+![confusion_matrix_normalized](/LeanbotOnly/confusion_matrix_normalized.png)
+  > Tỉ lệ phân loại đúng = **1.00 (100%)** cho class Leanbot. Hoàn toàn không có lỗi phân loại.
+
+- **Labels** – Phân bố nhãn trong dataset:
+![labels](/LeanbotOnly/labels.jpg)
+  > Tổng **261 instances** (mẫu) cho class `Leanbot`. Biểu đồ phân bố tọa độ (x, y) cho thấy các Leanbot xuất hiện rải rác khắp ảnh (x từ 0.3 đến 0.7, y từ 0.2 đến 0.7), không bị lệch về góc nào. Kích thước **bounding box** nhỏ và tương đối đồng đều (**width** ~0.05–0.09, **height** ~0.07–0.11), phù hợp với việc Leanbot là đối tượng nhỏ nhìn từ trên xuống.
+
+- **Results** – Đường cong Loss và Metric qua 150 epochs:
+![results](/LeanbotOnly/results.png)
+  > Cả 3 loại loss (`box_loss`, `cls_loss`, `dfl_loss`) đều giảm đều trên cả tập train và val. `mAP@0.5` đạt ~1.0 chỉ sau ~20 epochs và duy trì ổn định. `mAP@0.5-95` tiếp tục cải thiện đều đặn, đạt ~0.85 sau 150 epochs. Không có dấu hiệu overfitting.
+
+- **Test Result** – Kết quả nhận diện trên tập test:
+![test](/LeanbotOnly/test.png)
+  > Mô hình xác định tất cả đối tượng Leanbot với độ tin cậy từ **0.85 đến 0.94**. Các bounding box được xác định chính xác.
+
+##### 2.2.2. Leanbot_front and Leanbot_back (2 class)
+- **BoxF1 curve** – Đường cong F1 theo ngưỡng Confidence:
+![BoxF1_curve](/Leanbot2Class/BoxF1_curve.png)
+  > F1 đạt **1.00** tại confidence = **0.689** cho cả 2 class (Leanbot_front và Leanbot_back), tương đương với mô hình 1 class.
+
+- **BoxPR curve** – Đường cong Precision–Recall:
+![BoxPR_curve](/Leanbot2Class/BoxPR_curve.png)
+  > **mAP@0.5 = 0.995** cho cả 2 class. Đường cong Precision–Recall duy trì Precision = 1.0 trong toàn bộ dải Recall.
+
+- **BoxP curve** – Đường cong Precision theo Confidence:
+![BoxP_curve](/Leanbot2Class/BoxP_curve.png)
+
+- **BoxR curve** – Đường cong Recall theo Confidence:
+![BoxR_curve](/Leanbot2Class/BoxR_curve.png)
+
+- **Confusion Matrix** – Ma trận nhầm lẫn (số lượng tuyệt đối):
+![confusion_matrix](/Leanbot2Class/confusion_matrix.png)
+  > **72** dự đoán đúng Leanbot_front, **72** dự đoán đúng Leanbot_back. Không có ô nào off-diagonal có giá trị → model không có nhầm mặt trước với mặt sau.
+
+- **Confusion Matrix Normalized** – Ma trận nhầm lẫn (tỉ lệ %):
+![confusion_matrix_normalized](/Leanbot2Class/confusion_matrix_normalized.png)
+  > Cả 2 class đều đạt tỉ lệ phân loại đúng **1.00 (100%)**. Không có sự nhầm lẫn giữa Leanbot_front và Leanbot_back.
+
+- **Labels** – Phân bố nhãn trong dataset:
+![labels](/Leanbot2Class/labels.jpg)
+  > **189 instances** (mẫu) `Leanbot_front` và **171 instances** `Leanbot_back` – tỉ lệ khá cân bằng (52.5% / 47.5%). Phân bố vị trí và kích thước **bounding box** tương tự mô hình 1 class. Sự phân bố đều này là lý do tại sao **Stratified Split** (chia tập dữ liệu theo tỉ lệ cân bằng giữa các class) hoạt động hiệu quả.
+
+- **Results** – Đường cong Loss và Metric qua 150 epochs:
+![results](/Leanbot2Class/results.png)
+  > Các hàm loss giảm đều qua các epoch. `mAP@0.5` đạt ~1.0 sau ~25 epochs, chậm hơn mô hình 1 class khoảng 5 epoch do bài toán phân loại phức tạp hơn. `mAP@0.5-95` tiếp tục tăng và đạt ~0.90 sau 150 epochs, cao hơn mô hình 1 class.
+
+- **Test Result (Front)** – Kết quả trên ảnh mặt trước Leanbot:
+![test_front](/Leanbot2Class/test_front.png)
+  > Phát hiện đúng tất cả `Leanbot_front` với confidence từ **0.88 đến 0.98**. Không nhầm lẫn với mặt sau.
+
+- **Test Result (Back)** – Kết quả trên ảnh mặt sau Leanbot:
+![test_back](/Leanbot2Class/test_back.png)
+  > Phát hiện đúng tất cả `Leanbot_back` với confidence từ **0.86 đến 0.97**. Không nhầm lẫn với mặt trước.
 
 ### 3. Data Augmentation có sẵn trong YOLO
 
@@ -114,32 +195,13 @@ YOLO (thư viện Ultralytics) tích hợp sẵn một bộ **Data Augmentation*
 | `erasing` | 0.4 | Xóa ngẫu nhiên một vùng trong ảnh |
 | `crop_fraction` | 1.0 | Tỷ lệ crop ảnh trong quá trình phân loại |
 
-#### 3.2. Ví dụ cấu hình tăng cường cho bài toán Leanbot
-
-Vì ảnh Leanbot được chụp từ góc trên xuống và cần phân biệt mặt trước/sau dựa trên các chi tiết nhỏ (cảm biến HC-SR04), nên các tham số sau sẽ có ích nhất:
-
+- Hiện tại đang sử dụng 3 cấu hình Augmentation 
 ```python
-model.train(
-    data='leanbot_data.yaml',
-    epochs=100,
-    imgsz=640,
-    # --- Augmentation đề xuất cho Leanbot ---
-    hsv_h=0.02,      # Thay đổi màu sắc nhẹ (ánh sáng phòng)
-    hsv_s=0.5,       # Thay đổi độ bão hòa
-    hsv_v=0.4,       # Thay đổi độ sáng (bóng đèn, góc chiếu)
-    degrees=15.0,    # Xoay ảnh (Leanbot đặt ở nhiều góc trên sa bàn)
-    scale=0.5,       # Thu/phóng (Leanbot ở xa/gần camera)
-    fliplr=0.5,      # Lật ngang (tăng gấp đôi mẫu)
-    mosaic=1.0,      # Mosaic (ghép nhiều hoàn cảnh lại)
-    translate=0.1,   # Dịch chuyển nhẹ
-)
+degrees=10.0, fliplr=0.5, flipud=0.1
 ```
 
-
 ## B. Khó khăn
-- *(Cập nhật sau khi thực nghiệm)*
+- Không
 
 ## C. Công việc tiếp theo
-- Chạy thực nghiệm training 1 class và điền kết quả vào bảng so sánh ở **Mục 2.2**.
-- Thử nghiệm cấu hình Augmentation đề xuất ở **Mục 3.2** và đánh giá kết quả.
-- Thu thập thêm ảnh đa dạng hơn (nhiều nền, nhiều góc, nhiều điều kiện ánh sáng).
+- Em xin phép nhận đề xuất hướng đi tiếp theo từ Thầy ạ . 

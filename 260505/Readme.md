@@ -99,78 +99,78 @@ names:
 
 ##### 2.2.1. Only Leanbot (1 class)
 - **BoxF1 curve** – Đường cong F1 theo ngưỡng Confidence:
-![BoxF1_curve](/LeanbotOnly/BoxF1_curve.png)
+![BoxF1_curve](LeanbotOnly/BoxF1_curve.png)
   > F1 đạt **1.00** tại confidence = **0.725**, duy trì ở mức gần 1.0 trong dải confidence từ ~0.05 đến ~0.85. Điều này cho thấy mô hình duy trì được sự cân bằng giữa Precision và Recall ở phạm vi ngưỡng rộng.
 
 - **BoxPR curve** – Đường cong Precision–Recall:
-![BoxPR_curve](/LeanbotOnly/BoxPR_curve.png)
+![BoxPR_curve](LeanbotOnly/BoxPR_curve.png)
   > Diện tích dưới đường cong (AUC) = **mAP@0.5 = 0.995**. Đường cong Precision–Recall duy trì Precision = 1.0 trong toàn bộ dải Recall từ 0 đến 1.0, cho thấy mô hình không có sự đánh đổi (trade-off) giữa Precision và Recall.
 
 - **BoxP curve** – Đường cong Precision theo Confidence:
-![BoxP_curve](/LeanbotOnly/BoxP_curve.png)
+![BoxP_curve](LeanbotOnly/BoxP_curve.png)
   > Precision đạt **1.00** tại confidence = **0.820** và duy trì ở mức 1.0 ở mọi confidence cao hơn. Model không tạo ra bất kỳ False Positive nào khi confidence > 0.82.
 
 - **BoxR curve** – Đường cong Recall theo Confidence:
-![BoxR_curve](/LeanbotOnly/BoxR_curve.png)
+![BoxR_curve](LeanbotOnly/BoxR_curve.png)
   > Recall = **1.00** (không bỏ sót đối tượng nào) trong toàn bộ dải confidence từ 0 đến ~0.80. Khi confidence vượt ngưỡng 0.80, Recall bắt đầu giảm do mô hình áp dụng ngưỡng lọc chặt chẽ hơn.
 
 - **Confusion Matrix** – Ma trận nhầm lẫn (số lượng tuyệt đối):
-![confusion_matrix](/LeanbotOnly/confusion_matrix.png)
+![confusion_matrix](LeanbotOnly/confusion_matrix.png)
   > **72 lần** model dự đoán đúng "Leanbot" → "Leanbot". Không có ô nào khác trong ma trận có giá trị (bằng 0), nghĩa là model không nhầm lẫn bất kỳ đối tượng nào thành background và ngược lại.
 
 - **Confusion Matrix Normalized** – Ma trận nhầm lẫn (tỉ lệ %):
-![confusion_matrix_normalized](/LeanbotOnly/confusion_matrix_normalized.png)
+![confusion_matrix_normalized](LeanbotOnly/confusion_matrix_normalized.png)
   > Tỉ lệ phân loại đúng = **1.00 (100%)** cho class Leanbot. Hoàn toàn không có lỗi phân loại.
 
 - **Labels** – Phân bố nhãn trong dataset:
-![labels](/LeanbotOnly/labels.jpg)
+![labels](LeanbotOnly/labels.jpg)
   > Tổng **261 instances** (mẫu) cho class `Leanbot`. Biểu đồ phân bố tọa độ (x, y) cho thấy các Leanbot xuất hiện rải rác khắp ảnh (x từ 0.3 đến 0.7, y từ 0.2 đến 0.7), không bị lệch về góc nào. Kích thước **bounding box** nhỏ và tương đối đồng đều (**width** ~0.05–0.09, **height** ~0.07–0.11), phù hợp với việc Leanbot là đối tượng nhỏ nhìn từ trên xuống.
 
 - **Results** – Đường cong Loss và Metric qua 150 epochs:
-![results](/LeanbotOnly/results.png)
+![results](LeanbotOnly/results.png)
   > Cả 3 loại loss (`box_loss`, `cls_loss`, `dfl_loss`) đều giảm đều trên cả tập train và val. `mAP@0.5` đạt ~1.0 chỉ sau ~20 epochs và duy trì ổn định. `mAP@0.5-95` tiếp tục cải thiện đều đặn, đạt ~0.85 sau 150 epochs. Không có dấu hiệu overfitting.
 
 - **Test Result** – Kết quả nhận diện trên tập test:
-![test](/LeanbotOnly/test.png)
+![test](LeanbotOnly/test.png)
   > Mô hình xác định tất cả đối tượng Leanbot với độ tin cậy từ **0.85 đến 0.94**. Các bounding box được xác định chính xác.
 
 ##### 2.2.2. Leanbot_front and Leanbot_back (2 class)
 - **BoxF1 curve** – Đường cong F1 theo ngưỡng Confidence:
-![BoxF1_curve](/Leanbot2Class/BoxF1_curve.png)
+![BoxF1_curve](Leanbot2Class/BoxF1_curve.png)
   > F1 đạt **1.00** tại confidence = **0.689** cho cả 2 class (Leanbot_front và Leanbot_back), tương đương với mô hình 1 class.
 
 - **BoxPR curve** – Đường cong Precision–Recall:
-![BoxPR_curve](/Leanbot2Class/BoxPR_curve.png)
+![BoxPR_curve](Leanbot2Class/BoxPR_curve.png)
   > **mAP@0.5 = 0.995** cho cả 2 class. Đường cong Precision–Recall duy trì Precision = 1.0 trong toàn bộ dải Recall.
 
 - **BoxP curve** – Đường cong Precision theo Confidence:
-![BoxP_curve](/Leanbot2Class/BoxP_curve.png)
+![BoxP_curve](Leanbot2Class/BoxP_curve.png)
 
 - **BoxR curve** – Đường cong Recall theo Confidence:
-![BoxR_curve](/Leanbot2Class/BoxR_curve.png)
+![BoxR_curve](Leanbot2Class/BoxR_curve.png)
 
 - **Confusion Matrix** – Ma trận nhầm lẫn (số lượng tuyệt đối):
-![confusion_matrix](/Leanbot2Class/confusion_matrix.png)
+![confusion_matrix](Leanbot2Class/confusion_matrix.png)
   > **72** dự đoán đúng Leanbot_front, **72** dự đoán đúng Leanbot_back. Không có ô nào off-diagonal có giá trị → model không có nhầm mặt trước với mặt sau.
 
 - **Confusion Matrix Normalized** – Ma trận nhầm lẫn (tỉ lệ %):
-![confusion_matrix_normalized](/Leanbot2Class/confusion_matrix_normalized.png)
+![confusion_matrix_normalized](Leanbot2Class/confusion_matrix_normalized.png)
   > Cả 2 class đều đạt tỉ lệ phân loại đúng **1.00 (100%)**. Không có sự nhầm lẫn giữa Leanbot_front và Leanbot_back.
 
 - **Labels** – Phân bố nhãn trong dataset:
-![labels](/Leanbot2Class/labels.jpg)
+![labels](Leanbot2Class/labels.jpg)
   > **189 instances** (mẫu) `Leanbot_front` và **171 instances** `Leanbot_back` – tỉ lệ khá cân bằng (52.5% / 47.5%). Phân bố vị trí và kích thước **bounding box** tương tự mô hình 1 class. Sự phân bố đều này là lý do tại sao **Stratified Split** (chia tập dữ liệu theo tỉ lệ cân bằng giữa các class) hoạt động hiệu quả.
 
 - **Results** – Đường cong Loss và Metric qua 150 epochs:
-![results](/Leanbot2Class/results.png)
+![results](Leanbot2Class/results.png)
   > Các hàm loss giảm đều qua các epoch. `mAP@0.5` đạt ~1.0 sau ~25 epochs, chậm hơn mô hình 1 class khoảng 5 epoch do bài toán phân loại phức tạp hơn. `mAP@0.5-95` tiếp tục tăng và đạt ~0.90 sau 150 epochs, cao hơn mô hình 1 class.
 
 - **Test Result (Front)** – Kết quả trên ảnh mặt trước Leanbot:
-![test_front](/Leanbot2Class/test_front.png)
+![test_front](Leanbot2Class/test_front.png)
   > Phát hiện đúng tất cả `Leanbot_front` với confidence từ **0.88 đến 0.98**. Không nhầm lẫn với mặt sau.
 
 - **Test Result (Back)** – Kết quả trên ảnh mặt sau Leanbot:
-![test_back](/Leanbot2Class/test_back.png)
+![test_back](Leanbot2Class/test_back.png)
   > Phát hiện đúng tất cả `Leanbot_back` với confidence từ **0.86 đến 0.97**. Không nhầm lẫn với mặt trước.
 
 ### 3. Data Augmentation có sẵn trong YOLO

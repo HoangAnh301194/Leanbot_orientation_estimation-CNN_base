@@ -2,6 +2,7 @@
 
 ## A. Công việc đã làm
 - Báo cáo rõ ràng và tạo bảng thông tin dataset cho training :
+    - Model nền tảng sử dụng.
     - Số lượng session
     - Số lượng ảnh mỗi loại (cả background)
     - Số lượng Label mỗi loại

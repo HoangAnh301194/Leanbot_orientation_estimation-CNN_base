@@ -11,6 +11,8 @@
 - Kiểm tra độ chính xác Detection khi chỉ training mỗi Class Leanbot trên cùng tập datasets cũ.
 - Báo cáo các biểu đồ đánh giá quá trình training Model và thử nghiệm trên tập test.
 - Tìm hiểu Data Augmentation có sẵn trong YOLO training 
+
+
 ---
 
 ### 1. Bảng thông tin Dataset cho lần Training

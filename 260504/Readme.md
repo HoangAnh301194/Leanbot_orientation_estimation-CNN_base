@@ -129,13 +129,13 @@ with open('leanbot_data.yaml', 'w') as f:
 - Kết quả train: 
 + Ma trận nhầm lẫn :
 
-![confusion_matrix](confusion_matrix.png)
+![confusion_matrix](images/confusion_matrix.png)
 
 + Kết quả model trên tập ảnh test :
 
 |Ảnh gốc được đánh nhãn | Ảnh Model dự đoán|
 |:---:|:---:|
-|![raw](raw.png)|![model](model.png)| 
+|![raw](images/raw.png)|![model](images/model.png)| 
 
 **Đánh giá kết quả và Kết luận**
 

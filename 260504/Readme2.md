@@ -7,22 +7,22 @@
 
 - **Kết quả sau khi Training với bộ dữ liệu mới như sau :**
 - Ma trận nhầm lẫn: 
-        ![confusion_matrix2](confusion_matrix2.png)
+        ![confusion_matrix2](images/confusion_matrix2.png)
 
 - **Kết quả so sánh ảnh Leabel gốc và detection của Model:**
 
 |Label gốc| Model|
 |:---:|:---:|
-|![alt text](image-1.png)|![alt text](image-2.png)|
+|![alt text](images/image-1.png)|![alt text](images/image-2.png)|
 
 - Kết quả trên tập test_images:
 
-![alt text](image.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
+![alt text](images/image.png)
+![alt text](images/image-3.png)
+![alt text](images/image-4.png)
+![alt text](images/image-5.png)
+![alt text](images/image-6.png)
+![alt text](images/image-7.png)
             
             
 - **Tải model, thử nghiệm và đánh giá kết quả tổng quan:**
@@ -32,12 +32,12 @@ python webcam_infer.py --source 1
 ```
 - Kết quả : 
 
-![alt text](image-8.png)
+![alt text](images/image-8.png)
 
 - **Kết luận** :
     - **Ưu điểm**: Sau khi tăng data thì model có cải thiện rõ rệt hơn về độ chính xác và khả năng phát hiện khi test trên tập ảnh test . 
     - **Hạn chế**: Tuy nhiên, khi tải model và chạy thực tế thì vẫn còn phát hiện nhầm lẫn với các Leanbot ở xa và có hiện tượng thiên lệch sang Leanbot Back ( có thể là đặc trưng dễ nhận diện hơn Leanbot_front) 
-    ![alt text](image-9.png)
+    ![alt text](images/image-9.png)
 
     - Với hạn chế này em nghĩ chỉ cần tăng thêm data là được ạ.
 

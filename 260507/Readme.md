@@ -1,8 +1,10 @@
 # Báo cáo công việc ngày 07/05/2026
 
 ## A. Công việc đã làm
-- Thu thập thêm ảnh Leanbot_Left và Leanbot_Right với các góc nghiêng : 0, +-15, +-30 độ.
-- Trainning và đánh giá kết quả so với 2 mô hình trước đó 
+- Sửa lại bảng thống kê datasets và thông tin Training
+- Báo cáo cách upload datasets lên Colab
+- Cập nhật hình ảnh ví dụ Batch ảnh được đưa vào training
+- Cấu hình lại Augmentation, train lại và đánh giá 
 
 ### 1. Thu thập data Leanbot_Left và Leanbot_Right
 - Với các góc từ 0, +-15, +-30 độ:
@@ -20,14 +22,14 @@
 - Tổng lượng ảnh cơ sở là 10, tuy nhiên lượng ảnh như vậy là quá ít để training -> Thu thập thêm data các góc ở nhiều vị trí trên sa bàn. 
 - Thống kê datasets như bảng sau : 
 
-| Session | Class | Số ảnh Background | Số ảnh Raw | Số nhãn trên 1 ảnh |
+| Session | Class | Số ảnh Background | Số ảnh Raw | Tổng số nhãn |
 | :--- | :---: | :---: | :---: | :---: |
-| `session_20260507_093650` (Base) | `Leanbot_Right` | 1 | 5 | 9 |
-| `session_20260507_093932` (Base) | `Leanbot_Left` | 1 | 5 | 9 |
-| `session_20260505_115856` | `Leanbot_right` | 1 | 10 | 9 |
-| `session_20260505_120425` | `Leanbot_left` | 1 | 10 | 9 |
-| `session_20260507_094132` | `Leanbot_Left` | 1 | 10 | 9 |
-| `session_20260507_094449` | `Leanbot_Right` | 1 | 10 | 9 |
+| `session_20260507_093650` (Base) | `Leanbot_Right` | 1 | 5 | 45 |
+| `session_20260507_093932` (Base) | `Leanbot_Left` | 1 | 5 | 45 |
+| `session_20260505_115856` | `Leanbot_right` | 1 | 10 | 90 |
+| `session_20260505_120425` | `Leanbot_left` | 1 | 10 | 90 |
+| `session_20260507_094132` | `Leanbot_Left` | 1 | 10 | 90 |
+| `session_20260507_094449` | `Leanbot_Right` | 1 | 10 | 90 |
 | **Tổng cộng** | | **6** | **50** | **450** |
 
 #### 1.2. Thống kê theo class :
@@ -57,6 +59,8 @@ Sử dụng chiến lược **Stratified Split** để đảm bảo tỷ lệ 2 
 | :--- | :---: | :---: | :---: |
 | Model nền tảng | `yolov8n.pt` | `yolov8n.pt` | `yolov8n.pt` |
 | Số class | 1 | 2 | 2 |
+| **Tổng số ảnh** | 42 | 42 | 50 |
+| **Tổng số nhãn** | 378 | 378 | 450 |
 | Epochs | 100 | 100 | 100 |
 | Batch size | 16 | 16 | 16 |
 | Image size | 640 × 640 | 640 × 640 | 640 × 640 |
@@ -65,15 +69,57 @@ Sử dụng chiến lược **Stratified Split** để đảm bảo tỷ lệ 2 
 | Môi trường | Google Colab | Google Colab | Google Colab |
 | Link Notebook | [Link Colab](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260507/tools/finetuning_yolo_Leanbot.ipynb) | [Link Colab](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260505/tools/finetuning_yolo_Leanbot.ipynb) | [Link Colab](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260507/tools/finetuning_yolo_Leanbot.ipynb) |
 
+#### 1.5. Data Augmentation: fliplr và flipud
+- `fliplr`: Lật ảnh theo chiều ngang (trái - phải).
+- `flipud`: Lật ảnh theo chiều dọc (trên - dưới).
+
+> **Yêu cầu:** Khi huấn luyện mô hình phân biệt Left/Right, **bắt buộc phải set `fliplr=0.0` và `flipud=0.0`**.
+
+- Trước đó em đã để `degrees=10.0`, `fliplr=0.5`, `flipud=0.1` dẫn tới việc kết quả training không tốt.  Đã sửa lại thành :  `degrees=0.0`, `fliplr=0.0`, `flipud=0.0`. 
+
+**Code training áp dụng thông số chuẩn:**
+```python
+results = model.train(
+    data="dataset.yaml",
+    epochs=100,
+    imgsz=640,
+    fliplr=0.0,   # TẮT hoàn toàn lật ngang
+    flipud=0.0,   # TẮT hoàn toàn lật dọc
+    degrees=0.0, # Tắt xuay ảnh
+    hsv_h=0.015, hsv_s=0.7, hsv_v=0.4 # Đổi màu, độ sáng chuẩn YOLO
+)
+```
+- Khi training thêm Print để chắc chắn :
+
+![alt text](image-1.png)
+
+#### 1.6. Xem ảnh 640x640 thực tế mà YOLO sử dụng
+
+- Trong quá trình training, YOLO sẽ tự động resize ảnh về kích thước `imgsz=640` -> ghép 4 ảnh thành 1 (Mosaic) -> Áp dụng Data Augmentation -> Đưa vào Model để training.
+- Một vài ví dụ 1 vài batch ảnh được trainig
+
+![batch0](LeanbotLeftRight/train_batch0.jpg)
+![batch1](LeanbotLeftRight/train_batch1.jpg)
+
+
+ 
+#### 1.7. Hướng dẫn Upload dữ liệu lên Google Colab 
+
+- Tại máy tính, nén thư mục dataset thành **`datasets.zip`**
+- Upload file `datasets.zip` tại giao diện colab.
+![alt text](image.png)
+- Tổng thời gian upload khoảng 30 giây.
+
 ##### 1.4.2. Kết quả cuối cùng (Best Model) trên tập Validation
+- Sau khi chỉnh sửa lại các thông số Augmetation thu được kết quả trainig như sau: 
 
 | Metric | 1 Class (`Leanbot`) | 2 Class (`Front`/`Back`) | 2 Class (`Left`/`Right`) |
 | :--- | :---: | :---: | :---: |
-| **Precision (P)** | 0.997 | 1.00 | ~0.50 |
-| **Recall (R)** | 1.00 | 1.00 | ~1.00 |
-| **mAP@0.5** | 0.995 | 0.995 | 0.696 |
-| **mAP@0.5:0.95** | 0.850 | ~0.900 | ~0.60 |
-| **F1-Score** | ~1.00 (conf=0.725) | ~1.00 (conf=0.689) | 0.67 (conf=0.403) |
+| **Precision (P)** | 0.997 | 1.00 | 0.995 |
+| **Recall (R)** | 1.00 | 1.00 | 1.00 |
+| **mAP@0.5** | 0.995 | 0.995 | 0.995 |
+| **mAP@0.5:0.95** | 0.850 | ~0.900 | ~0.900 |
+| **F1-Score** | ~1.00 (conf=0.725) | ~1.00 (conf=0.689) | ~1.00 (conf=0.807) |
 
 ##### 1.4.3. Kết quả nhận diện trên tập Test
 
@@ -81,67 +127,51 @@ Sử dụng chiến lược **Stratified Split** để đảm bảo tỷ lệ 2 
 | :--- | :--- |
 | **1 Class** | Phát hiện đúng tất cả Leanbot với confidence **0.85 – 0.94**. Không có False Positive. |
 | **2 Class (Front/Back)** | Phát hiện đúng cả 2 class với confidence **0.86 – 0.98**. Không nhầm lẫn giữa Front và Back. |
-| **2 Class (Left/Right)** |  Confidence thấp **0.48 – 0.72**. Nhầm lẫn Left ↔ Right thường xuyên. Nhiều False Positive trên background. |
+| **2 Class (Left/Right)** | Phát hiện đúng cả 2 class với confidence từ **0.95 – 0.99**. Không còn nhầm lẫn Left ↔ Right. Không có False Positive. |
 
-### 2. Phân tích chi tiết kết quả Model Left/Right
+### 2. Phân tích chi tiết kết quả Model Left/Right (Sau khi fix Augmentation)
 
-> **Nhận xét tổng quan:** Mô hình Left/Right cho kết quả **kém hơn đáng kể** so với 2 mô hình trước.
+> **Nhận xét tổng quan:** Sau khi tắt tham số lật ngang (`fliplr=0.0`), mô hình Left/Right đạt mAP@0.5 = 0.995. Sự nhầm lẫn giữa hai class Left và Right được khắc phục. Nguyên nhân gây lỗi trước đó là do thiết lập Data Augmentation chưa phù hợp với đặc trưng bất đối xứng của đối tượng.
 
 - **BoxF1 curve** – Đường cong F1 theo ngưỡng Confidence:
 ![BoxF1_curve](LeanbotLeftRight/BoxF1_curve.png)
-  > F1 chỉ đạt **0.67** tại confidence = **0.403** (so với 1.00 của 2 model trước). Đường cong F1 giảm nhanh khi confidence > 0.5.
+  > F1 đạt **1.00** tại confidence = **0.807**. Đường cong duy trì mức cao ở dải confidence rộng, cho thấy mô hình hoạt động ổn định.
 
 - **BoxPR curve** – Đường cong Precision–Recall:
 ![BoxPR_curve](LeanbotLeftRight/BoxPR_curve.png)
-  > **mAP@0.5 = 0.696** (Right: 0.734, Left: 0.659) — thấp hơn rất nhiều so với 0.995 của 2 model trước.
-
-- **BoxP curve** – Đường cong Precision theo Confidence:
-![BoxP_curve](LeanbotLeftRight/BoxP_curve.png)
-  > Precision chỉ đạt **1.00** khi confidence > **0.833**. Trong dải thực tế (0.3–0.6), Precision chỉ ở mức **0.50–0.65**.
-
-- **BoxR curve** – Đường cong Recall theo Confidence:
-![BoxR_curve](LeanbotLeftRight/BoxR_curve.png)
-  > Recall giảm rất nhanh: ở confidence = 0.5, Recall chỉ còn ~0.6. Model bỏ sót ~40% đối tượng.
+  > **mAP@0.5 = 0.995** cho cả 2 class (tương đương model Front/Back).
 
 - **Confusion Matrix** – Ma trận nhầm lẫn:
 ![confusion_matrix](LeanbotLeftRight/confusion_matrix.png)
-  > - `Leanbot_right`: dự đoán đúng 26, nhầm thành Left 19 lần.
-  > - `Leanbot_left`: dự đoán đúng 21, nhầm thành Right 24 lần.
-  > - 90 vùng background bị nhầm thành Leanbot → **False Positive rất cao**.
-
-- **Confusion Matrix Normalized**:
-![confusion_matrix_normalized](LeanbotLeftRight/confusion_matrix_normalized.png)
-  > Tỉ lệ phân loại đúng chỉ **0.58** (Right) và **0.47** (Left) → gần như **đoán ngẫu nhiên (50/50)**.
-
-- **Labels** – Phân bố nhãn:
-![labels](LeanbotLeftRight/labels.jpg)
-  > **153 instances** mỗi class — hoàn toàn cân bằng. Lỗi không do mất cân bằng dữ liệu mà do **hình ảnh 2 class quá giống nhau**.
+  > **Kết quả phân loại:**
+  > - `Leanbot_right`: dự đoán đúng 45/45. Nhầm thành Left: 0.
+  > - `Leanbot_left`: dự đoán đúng 45/45. Nhầm thành Right: 0.
+  > - Số lượng False Positive trên vùng background là **0**.
 
 - **Results** – Đường cong Loss và Metric qua 100 epochs:
 ![results](LeanbotLeftRight/results.png)
-  > `box_loss` giảm tốt → model khoanh vùng đúng. Nhưng `cls_loss` dừng ở ~1.0 (vs ~0.3 của Front/Back) → **không phân biệt được** Left và Right.
+  > Cả `box_loss` và đặc biệt là `cls_loss` (loss phân loại) đều giảm mạnh và hội tụ ổn định ở mức rất thấp. Các metric mAP50 và mAP50-95 tăng nhanh chóng và chạm max 1.00 chỉ sau khoảng 20 epochs.
 
-- **Test Results**:
+- **Test Results (Thực tế):**
 ![test1](LeanbotLeftRight/test1.png)
 ![test2](LeanbotLeftRight/test2.png)
-  > Confidence thấp (0.48–0.72). Nhiều đối tượng bị gán nhầm class.
+  > Mô hình nhận diện chính xác các đối tượng trong tập test. Mức độ tự tin (Confidence) dao động từ **0.95 - 0.99**.
 
 #### 2.1. Tổng kết so sánh 3 mô hình
 
 | Tiêu chí | 1 Class (`Leanbot`) | 2 Class (`Front`/`Back`) | 2 Class (`Left`/`Right`) |
 | :--- | :---: | :---: | :---: |
-| mAP@0.5 | **0.995** | **0.995** | 0.696 |
-| mAP@0.5:0.95 | 0.850 | **~0.900** | ~0.60 |
-| F1-Score (max) | **~1.00** | **~1.00** | 0.67 |
-| Confusion giữa class | N/A | ✅ Không nhầm | ❌ Nhầm ~50% |
-| False Positive trên BG | ✅ Không | ✅ Không | ❌ Rất nhiều |
-| Confidence trung bình | 0.85–0.94 | 0.86–0.98 | 0.48–0.72 |
-| **Đánh giá** | ✅ Rất tốt | ✅ Rất tốt | ❌ Chưa đạt |
+| mAP@0.5 | **0.995** | **0.995** | **0.995** |
+| mAP@0.5:0.95 | 0.850 | ~0.900 | **~0.900** |
+| F1-Score (max) | ~1.00 | ~1.00 | **1.00** |
+| Confusion giữa class | N/A | ✅ Không nhầm | **✅ Không nhầm** |
+| False Positive trên BG | ✅ Không | ✅ Không | **✅ Không** |
+| Confidence trung bình | 0.85–0.94 | 0.86–0.98 | **0.95–0.99** |
+| **Đánh giá** | Đạt | Đạt | Đạt |
 
-> **Kết luận:** Mô hình **Left/Right** cho kết quả **không tốt** vì mặt trái và phải của Leanbot nhìn từ trên xuống **khá giống nhau**, khiến model không thể học được đặc trưng phân biệt.
+> **Kết luận:** Cả 3 mô hình đều đạt mAP@0.5 = 0.995. Đối với các vật thể bất đối xứng như Leanbot (Left/Right), việc tinh chỉnh Data Augmentation (tắt lật ảnh ngang) là yếu tố quyết định để mô hình học đúng đặc trưng.
 
 ## B. Khó khăn
-- Không
-
+- Không 
 ## C. Công việc tiếp theo
-- Em có cần thu thập thêm data cho 2 class Left và Right không ạ?  
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ. 

@@ -86,7 +86,7 @@ def capture_session_frames(cap, session_id: str, backgrounds_dir: Path, raw_dir:
 
     print("\n--- CAPTURE SESSION ---")
     print("Press 'b' to capture a background image.")
-    print("Press 'c' to capture a raw image.")
+    print("Press 'z' (-30), 'x' (-15), 'c' (0), 'v' (15), 'n' (30) to capture raw images with angle prefixes.")
     print("Press 's' to save and finish the session.")
     print("Press 'q' to stop immediately.")
 
@@ -116,7 +116,7 @@ def capture_session_frames(cap, session_id: str, backgrounds_dir: Path, raw_dir:
         )
         cv2.putText(
             preview,
-            "b: background | c: raw | s: save | q: quit",
+            "b:bkg | z/x/c/v/n:raw | s:save | q:quit",
             (10, 84),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
@@ -131,8 +131,14 @@ def capture_session_frames(cap, session_id: str, backgrounds_dir: Path, raw_dir:
             cv2.imwrite(str(file_path), frame)
             background_count += 1
             print(f"[INFO] Saved background: {file_path.name}")
-        elif key == ord("c"):
-            file_path = raw_dir / f"raw_{raw_count:03d}.jpg"
+        elif key in (ord("z"), ord("x"), ord("c"), ord("v"), ord("n")):
+            if key == ord("z"): prefix = "deg_m30_"
+            elif key == ord("x"): prefix = "deg_m15_"
+            elif key == ord("c"): prefix = "deg_0_"
+            elif key == ord("v"): prefix = "deg_p15_"
+            elif key == ord("n"): prefix = "deg_p30_"
+            
+            file_path = raw_dir / f"{prefix}{raw_count:03d}.jpg"
             cv2.imwrite(str(file_path), frame)
             raw_count += 1
             print(f"[INFO] Saved raw image: {file_path.name}")

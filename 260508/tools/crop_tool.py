@@ -52,10 +52,12 @@ def main():
         
         session_crop_dir = os.path.join(crop_images_dir, session_folder)
         session_images_dir = os.path.join(session_crop_dir, "aligned_images")
+        session_raw_crop_dir = os.path.join(session_crop_dir, "raw_cropped_images")
         session_labels_dir = os.path.join(session_crop_dir, "labels")
         
         os.makedirs(session_crop_dir, exist_ok=True)
         os.makedirs(session_images_dir, exist_ok=True)
+        os.makedirs(session_raw_crop_dir, exist_ok=True)
         os.makedirs(session_labels_dir, exist_ok=True)
         
         image_files = glob.glob(os.path.join(aligned_images_dir, "*.*"))
@@ -71,10 +73,29 @@ def main():
                 
             img_h, img_w = img.shape[:2]
             
-            # Ensure crop box is within image bounds
-            y1, y2 = max(0, y), min(img_h, y + h)
-            x1, x2 = max(0, x), min(img_w, x + w)
+            # Force the crop box to be a square by expanding the shorter dimension
+            center_x = x + w // 2
+            center_y = y + h // 2
+            max_side = max(w, h)
             
+            # Calculate new square coordinates
+            new_x = center_x - max_side // 2
+            new_y = center_y - max_side // 2
+            
+            # Ensure crop box is within image bounds
+            y1, y2 = max(0, new_y), min(img_h, new_y + max_side)
+            x1, x2 = max(0, new_x), min(img_w, new_x + max_side)
+            
+            # If the square goes out of bounds, it might not be a perfect square anymore.
+            # To fix this, we should pad the image, but for now let's just use the bounds.
+            # A better approach is to adjust the box to stay within bounds while remaining square
+            if x2 - x1 < max_side:
+                if x1 == 0: x2 = min(img_w, max_side)
+                else: x1 = max(0, img_w - max_side)
+            if y2 - y1 < max_side:
+                if y1 == 0: y2 = min(img_h, max_side)
+                else: y1 = max(0, img_h - max_side)
+                
             crop_w = x2 - x1
             crop_h = y2 - y1
             
@@ -83,10 +104,19 @@ def main():
                 
             cropped_img = img[y1:y2, x1:x2]
             
+            # Save raw cropped image (not resized)
+            img_filename = os.path.basename(img_path)
+            raw_crop_path = os.path.join(session_raw_crop_dir, img_filename)
+            cv2.imwrite(raw_crop_path, cropped_img)
+            
+            crop_h_actual, crop_w_actual = cropped_img.shape[:2]
+            print(f"    [DEBUG] {img_filename} | Original: {img_w}x{img_h} | Cropped: {crop_w_actual}x{crop_h_actual}", end=" | ")
+            
             # Resize image to 640x640
             resized_img = cv2.resize(cropped_img, (640, 640))
+            res_h, res_w = resized_img.shape[:2]
+            print(f"Resized size: {res_w}x{res_h}")
             
-            img_filename = os.path.basename(img_path)
             save_path = os.path.join(session_images_dir, img_filename)
             cv2.imwrite(save_path, resized_img)
             

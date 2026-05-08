@@ -27,12 +27,23 @@
 - Luồng hoạt động như sau :
     - Đọc config.npy
     - Crop ảnh
+    ![alt text](image-2.png)
+
     - Resize ảnh
+    ![alt text](image-3.png)
+
+    - Em có thêm Debug để in ra kích thước ảnh sau khi crop và resize:
+    ```
+    Processing session: session_20260508_142829
+    -> Found Bounding Box (x=330, y=276, w=1993, h=1084) from roi_points
+    [DEBUG] deg_0_000.jpg | Cropped size: 1993x1084 | Resized size: 640x640
+    [DEBUG] deg_0_001.jpg | Cropped size: 1993x1084 | Resized size: 640x640
+    [DEBUG] deg_0_002.jpg | Cropped size: 1993x1084 | Resized size: 640x640
+    [DEBUG] deg_0_003.jpg | Cropped size: 1993x1084 | Resized size: 640x640
+    ```
     - Cập nhật Label 
 - Link code : [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260508/tools/crop_tool.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260508/tools/crop_tool.py)
-- Kết quả output sau khi chạy tool ```crop_tool.py```:
 
-![resize 640x640](640x640.png)
 #### 1.1. Mosaic Augmentation trong Yolo.
 - Mặc định khi sử dụng hàm ```model.train()``` trong Yolo có hỗ trợ Mosaic Augmentation với tỉ lệ thực hiện 1.0 (thực hiện với 100 lượng ảnh). 
 - Nếu muốn tùy chỉnh tỉ lệ này thì cần khai báo tham số ```mosaic``` trong hàm ```model.train()``` (ví dụ ```mosaic=0.5``` tức là thực hiện với 50 lượng ảnh).

@@ -46,7 +46,10 @@
 
 ## B. Khó khăn 
 - Không thể can thiệp vào code của thư viện Ultralytics để tắt bước thêm padding xám trong Mosaic Augmentation theo yêu cầu.
+- Dạ em sẽ chụp lại data và đặt tên file đầy đủ theo class + góc như yêu cầu ạ.
+- Em xin phép hỏi thêm: với mỗi class Front/Back/Left/Right, em cần chụp khoảng bao nhiêu ảnh cho từng góc 0, ±15, ±30 ạ? Còn các ảnh ±45 độ không dùng để train thì em nên chụp khoảng bao nhiêu ảnh để làm test riêng ạ? 
 ## C. Công việc tiếp theo
+- Thu thập lại data và đặt tên theo đúng các góc
 - Thử train đồng thời 4 class Front, Back, Left, Right
 - Chỉ dùng và gán nhãn với các ảnh 0, +-15, +-30
 - Các ảnh +-45 dùng để test.

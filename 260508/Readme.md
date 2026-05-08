@@ -1,7 +1,6 @@
 # Báo cáo công việc ngày 08/05/2026
 
 ## A. Công việc đã làm
-- Báo cáo lại thông tin training kèm thông tin file zip.
 - Thay đổi cấu hình degree augmentation về 10.
 - Thêm tools Crop lấy vùng sa bàn, theo mask Roi trước đó đã làm.
     - Resize ảnh Crop về kích thước ảnh 640x640 
@@ -9,7 +8,20 @@
 - Train thử để kiểm tra batch ghép ảnh Mosaic Augmentation
 ### 1. Thông tin training
 
-### 1. Tạo tools ```crop_tool.py```
+| Thông số | 4 Class (`Leanbot_front, Leanbot_back, Leanbot_left, Leanbot_right`) |
+| :--- | :---: |
+| Model nền tảng | `yolov8n.pt` (YOLOv8 Nano - Pre-trained COCO) |
+| Số class | 4 |
+| Epochs | 100 |
+| Batch size | 16 |
+| Image size | 640 × 640 |
+| Optimizer | AdamW (lr=0.002) |
+| Thời gian Training | ~Cập nhật sau |
+| Môi trường Training | Google Colab (GPU Tesla T4) |
+| Datasets.zip | ~Chờ cập nhật|
+| Link Notebook | [finetuning_yolo_Leanbot.ipynb](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260508/tools/finetuning_yolo_Leanbot.ipynb) |
+
+### 2. Tạo tools ```crop_tool.py```
 - Input của tools là folder ```tool1_output``` - output của tool ```process_auto_label.py```
 - Output của tools là folder ```crop_images``` chứa ảnh đã crop, resize 640x640 và Labels tương ứng với ảnh.
 - Luồng hoạt động như sau :

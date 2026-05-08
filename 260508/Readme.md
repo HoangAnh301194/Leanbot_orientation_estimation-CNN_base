@@ -26,21 +26,22 @@
 - Output của tools là folder ```crop_images``` chứa ảnh đã crop, resize 640x640 và Labels tương ứng với ảnh.
 - Luồng hoạt động như sau :
     - Đọc config.npy
-    - Crop ảnh
-    ![alt text](image-2.png)
+    - Crop ảnh hình vuông tính theo Mask ROI cạnh dưới của Sa bàn
+    ![alt text](image-4.png)
 
     - Resize ảnh
-    ![alt text](image-3.png)
+    ![alt text](image-5.png)
 
-    - Em có thêm Debug để in ra kích thước ảnh sau khi crop và resize:
-    ```
+    - Debug kích thước ảnh sau khi crop và resize:
+    ``` 
     Processing session: session_20260508_142829
     -> Found Bounding Box (x=330, y=276, w=1993, h=1084) from roi_points
-    [DEBUG] deg_0_000.jpg | Cropped size: 1993x1084 | Resized size: 640x640
-    [DEBUG] deg_0_001.jpg | Cropped size: 1993x1084 | Resized size: 640x640
-    [DEBUG] deg_0_002.jpg | Cropped size: 1993x1084 | Resized size: 640x640
-    [DEBUG] deg_0_003.jpg | Cropped size: 1993x1084 | Resized size: 640x640
+        [DEBUG] deg_0_000.jpg | Original: 2560x1440 | Cropped: 1993x1440 | Resized size: 640x640
+        [DEBUG] deg_0_001.jpg | Original: 2560x1440 | Cropped: 1993x1440 | Resized size: 640x640
+        [DEBUG] deg_0_002.jpg | Original: 2560x1440 | Cropped: 1993x1440 | Resized size: 640x640
+        [DEBUG] deg_0_003.jpg | Original: 2560x1440 | Cropped: 1993x1440 | Resized size: 640x640
     ```
+    - Mặc dù Crop theo hình vuông, lấy cạnh dưới sa bàn làm chuẩn, tuy nhiên cạnh dưới sa bàn có kích thước là 1993 pixel, trong khi chiều cao tối đa ảnh gốc là 1440 pixel (2560x1440), dẫn đến ảnh sau khi crop có kích thước 1993x1440 -> Vẫn là hình chữ nhật -> Resize ảnh vẫn méo. 
     - Cập nhật Label 
 - Link code : [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260508/tools/crop_tool.py](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260508/tools/crop_tool.py)
 

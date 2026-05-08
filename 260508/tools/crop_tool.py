@@ -82,27 +82,30 @@ def main():
             new_x = center_x - max_side // 2
             new_y = center_y - max_side // 2
             
-            # Ensure crop box is within image bounds
-            y1, y2 = max(0, new_y), min(img_h, new_y + max_side)
-            x1, x2 = max(0, new_x), min(img_w, new_x + max_side)
+            # Create a blank square image (black background)
+            square_crop = np.zeros((max_side, max_side, 3), dtype=np.uint8)
             
-            # If the square goes out of bounds, it might not be a perfect square anymore.
-            # To fix this, we should pad the image, but for now let's just use the bounds.
-            # A better approach is to adjust the box to stay within bounds while remaining square
-            if x2 - x1 < max_side:
-                if x1 == 0: x2 = min(img_w, max_side)
-                else: x1 = max(0, img_w - max_side)
-            if y2 - y1 < max_side:
-                if y1 == 0: y2 = min(img_h, max_side)
-                else: y1 = max(0, img_h - max_side)
-                
-            crop_w = x2 - x1
-            crop_h = y2 - y1
+            # Determine the region in the original image to copy
+            src_x1 = max(0, new_x)
+            src_y1 = max(0, new_y)
+            src_x2 = min(img_w, new_x + max_side)
+            src_y2 = min(img_h, new_y + max_side)
             
-            if crop_w <= 0 or crop_h <= 0:
-                continue
+            # Determine where to paste in the square crop
+            dst_x1 = src_x1 - new_x
+            dst_y1 = src_y1 - new_y
+            dst_x2 = dst_x1 + (src_x2 - src_x1)
+            dst_y2 = dst_y1 + (src_y2 - src_y1)
+            
+            # Only copy if there's a valid region
+            if src_x2 > src_x1 and src_y2 > src_y1:
+                square_crop[dst_y1:dst_y2, dst_x1:dst_x2] = img[src_y1:src_y2, src_x1:src_x2]
                 
-            cropped_img = img[y1:y2, x1:x2]
+            cropped_img = square_crop
+            crop_w = max_side
+            crop_h = max_side
+            x1 = new_x
+            y1 = new_y
             
             # Save raw cropped image (not resized)
             img_filename = os.path.basename(img_path)

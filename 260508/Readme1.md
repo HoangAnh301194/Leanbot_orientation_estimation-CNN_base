@@ -14,7 +14,6 @@
     ![alt text](image-8.png)
 - Log debug kích thước ảnh tại các bước như sau :
 ```
-
 Processing session: session_20260508_150734
   -> Found Bounding Box (x=333, y=270, w=1981, h=1087) from roi_points
     [DEBUG] deg_0_000.jpg | Original: 2560x1440 | RectCrop: 1600x1440 | PaddedSquare: 1600x1600 | Resized size: 640x640

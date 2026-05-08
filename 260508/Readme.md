@@ -1,11 +1,14 @@
 # Báo cáo công việc ngày 08/05/2026
 
 ## A. Công việc đã làm
+- Báo cáo lại thông tin training kèm thông tin file zip.
 - Thay đổi cấu hình degree augmentation về 10.
 - Thêm tools Crop lấy vùng sa bàn, theo mask Roi trước đó đã làm.
     - Resize ảnh Crop về kích thước ảnh 640x640 
     - Tạo tập datasets chỉ có ảnh 640x640.
 - Train thử để kiểm tra batch ghép ảnh Mosaic Augmentation
+### 1. Thông tin training
+
 ### 1. Tạo tools ```crop_tool.py```
 - Input của tools là folder ```tool1_output``` - output của tool ```process_auto_label.py```
 - Output của tools là folder ```crop_images``` chứa ảnh đã crop, resize 640x640 và Labels tương ứng với ảnh.
@@ -44,4 +47,6 @@
 ## B. Khó khăn 
 - Không thể can thiệp vào code của thư viện Ultralytics để tắt bước thêm padding xám trong Mosaic Augmentation theo yêu cầu.
 ## C. Công việc tiếp theo
-- 
+- Thử train đồng thời 4 class Front, Back, Left, Right
+- Chỉ dùng và gán nhãn với các ảnh 0, +-15, +-30
+- Các ảnh +-45 dùng để test.

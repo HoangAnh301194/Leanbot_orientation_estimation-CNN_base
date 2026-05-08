@@ -74,38 +74,33 @@ def main():
             img_h, img_w = img.shape[:2]
             
             # Force the crop box to be a square by expanding the shorter dimension
+            # 1. Crop về 1600 x 1440
+            crop_w_req = 1600
+            crop_h_req = 1440
+            
             center_x = x + w // 2
-            center_y = y + h // 2
-            max_side = max(w, h)
+            x1 = center_x - crop_w_req // 2
+            x2 = x1 + crop_w_req
+            y1 = 0
+            y2 = crop_h_req
             
-            # Calculate new square coordinates
-            new_x = center_x - max_side // 2
-            new_y = center_y - max_side // 2
-            
-            # Create a blank square image (black background)
-            square_crop = np.zeros((max_side, max_side, 3), dtype=np.uint8)
-            
-            # Determine the region in the original image to copy
-            src_x1 = max(0, new_x)
-            src_y1 = max(0, new_y)
-            src_x2 = min(img_w, new_x + max_side)
-            src_y2 = min(img_h, new_y + max_side)
-            
-            # Determine where to paste in the square crop
-            dst_x1 = src_x1 - new_x
-            dst_y1 = src_y1 - new_y
-            dst_x2 = dst_x1 + (src_x2 - src_x1)
-            dst_y2 = dst_y1 + (src_y2 - src_y1)
-            
-            # Only copy if there's a valid region
-            if src_x2 > src_x1 and src_y2 > src_y1:
-                square_crop[dst_y1:dst_y2, dst_x1:dst_x2] = img[src_y1:src_y2, src_x1:src_x2]
+            # Ensure within bounds
+            if x1 < 0:
+                x1 = 0
+                x2 = crop_w_req
+            if x2 > img_w:
+                x2 = img_w
+                x1 = img_w - crop_w_req
                 
+            cropped_img_rect = img[y1:y2, x1:x2]
+            
+            # 2. Pad thành vuông 1600 x 1600
+            square_size = 1600
+            square_crop = np.zeros((square_size, square_size, 3), dtype=np.uint8)
+            pad_top = (square_size - crop_h_req) // 2
+            square_crop[pad_top:pad_top+crop_h_req, :] = cropped_img_rect
+            
             cropped_img = square_crop
-            crop_w = max_side
-            crop_h = max_side
-            x1 = new_x
-            y1 = new_y
             
             # Save raw cropped image (not resized)
             img_filename = os.path.basename(img_path)
@@ -113,9 +108,9 @@ def main():
             cv2.imwrite(raw_crop_path, cropped_img)
             
             crop_h_actual, crop_w_actual = cropped_img.shape[:2]
-            print(f"    [DEBUG] {img_filename} | Original: {img_w}x{img_h} | Cropped: {crop_w_actual}x{crop_h_actual}", end=" | ")
+            print(f"    [DEBUG] {img_filename} | Original: {img_w}x{img_h} | RectCrop: {crop_w_req}x{crop_h_req} | PaddedSquare: {crop_w_actual}x{crop_h_actual}", end=" | ")
             
-            # Resize image to 640x640
+            # 3. Resize về 640 x 640
             resized_img = cv2.resize(cropped_img, (640, 640))
             res_h, res_w = resized_img.shape[:2]
             print(f"Resized size: {res_w}x{res_h}")
@@ -151,17 +146,17 @@ def main():
                         box_x2 = abs_cx + abs_bw / 2
                         box_y2 = abs_cy + abs_bh / 2
                         
-                        # Map to cropped image coordinates
+                        # Map to cropped and padded image coordinates
                         new_x1 = box_x1 - x1
-                        new_y1 = box_y1 - y1
+                        new_y1 = box_y1 - y1 + pad_top
                         new_x2 = box_x2 - x1
-                        new_y2 = box_y2 - y1
+                        new_y2 = box_y2 - y1 + pad_top
                         
-                        # Clip bounding box to cropped image boundaries
+                        # Clip bounding box to the padded square image boundaries
                         new_x1 = max(0, new_x1)
                         new_y1 = max(0, new_y1)
-                        new_x2 = min(crop_w, new_x2)
-                        new_y2 = min(crop_h, new_y2)
+                        new_x2 = min(square_size, new_x2)
+                        new_y2 = min(square_size, new_y2)
                         
                         # Calculate new width and height
                         new_bw = new_x2 - new_x1
@@ -173,12 +168,10 @@ def main():
                             new_cy = new_y1 + new_bh / 2
                             
                             # Normalize by cropped image dimensions
-                            # Since resize to 640x640 doesn't change aspect ratio of the bounding boxes relatively,
-                            # these normalized coordinates remain valid for the resized 640x640 image!
-                            out_cx = new_cx / crop_w
-                            out_cy = new_cy / crop_h
-                            out_bw = new_bw / crop_w
-                            out_bh = new_bh / crop_h
+                            out_cx = new_cx / square_size
+                            out_cy = new_cy / square_size
+                            out_bw = new_bw / square_size
+                            out_bh = new_bh / square_size
                             
                             new_label_lines.append(f"{class_id} {out_cx:.6f} {out_cy:.6f} {out_bw:.6f} {out_bh:.6f}\n")
                             
@@ -190,7 +183,7 @@ def main():
                     
             image_count += 1
             
-        print(f"  -> Cropped, resized to 640x640, adjusted labels, and saved {image_count} images to {session_crop_dir}")
+        print(f"  -> Cropped to 1600x1440, Padded to 1600x1600, Resized to 640x640, adjusted labels, and saved {image_count} images to {session_crop_dir}")
 
     print("\nCropping and label adjustment process completed!")
 

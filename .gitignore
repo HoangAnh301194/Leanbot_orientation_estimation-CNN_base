@@ -36,6 +36,9 @@ __pycache__/
 260507/raw_image/
 260507/tool1_output/
 260507/datasets/
+260508/raw_image/
+260508/tool1_output/
+260508/datasets/
 
 
 # Keep only labels and folder structure

@@ -5,6 +5,7 @@
 - Training và đánh giá kết quả Model sau train.
 - Đã thu thập đủ dataset để huấn luyện, đảm bảo cấu trúc thư mục và quy tắc đặt tên (`deg_[góc]_[stt].jpg`).
 - Kiểm thư tập data `degree_45_test` cho dữ liệu test sau huấn luyện với các góc xéo (45, -45, 135, -135).
+
 ---
 
 ### 1. Danh sách file Raw đã chụp

@@ -40,7 +40,7 @@ __pycache__/
 260508/tool1_output/
 260508/datasets/
 260508/crop_images/
-
+260508/degree_45_test
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep
 !260420/output/datasets/labels/

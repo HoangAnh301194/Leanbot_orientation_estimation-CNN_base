@@ -7,11 +7,11 @@
 - **Bước 1:** Đọc 4 điểm Mask Roi có sẵn trong folder `tool1_output` của mỗi session
 - **Bước 2:** Lấy cạnh dưới của mask sa bàn làm chuẩn, cắt lấy 1600 pixel của cạnh dưới, chấp nhận mất 2 góc dưới sa bàn , thêm padding đen để ảnh thành hình vuông 1600x1600
 
-    ![alt text](image-7.png)
+    ![alt text](images/crop_padding.png)
 
 - **Bước 3:** Resize ảnh về kích thước 640x640. 
 
-    ![alt text](image-8.png)
+    ![alt text](images/resize_padded_640.png)
 - Log debug kích thước ảnh tại các bước như sau :
 ```
 Processing session: session_20260508_150734

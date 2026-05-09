@@ -27,10 +27,10 @@
 - Luồng hoạt động như sau :
     - Đọc config.npy
     - Crop ảnh hình vuông tính theo Mask ROI cạnh dưới của Sa bàn
-    ![alt text](image-4.png)
+    ![alt text](images/crop_square.png)
 
     - Resize ảnh
-    ![alt text](image-5.png)
+    ![alt text](images/resize_640.png)
 
     - Debug kích thước ảnh sau khi crop và resize:
     ``` 
@@ -59,9 +59,9 @@
 - Theo thư viện Ultralytic của YOLO thì Mosaic Augmentation sẽ ghép 4 ảnh trong `n-10` epoch đầu tiên, sau đó sẽ không thực hiện trong 10 epoch cuối. 
 - Kết quả các batch sau khi Augmentation như sau :
     - Batch trong khoảng `n-10` epoch:
-        ![Batch trong khoảng n-10 epoch](image.png)
+        ![Batch trong khoảng n-10 epoch](images/batch_early.png)
     - Batch trong khoảng `10` epoch cuối:
-        ![Batch trong khoảng 10 epoch cuối](image-1.png)
+        ![Batch trong khoảng 10 epoch cuối](images/batch_late.png)
 - Khi tạo Mosaic:
     - Thuật toán mặc định sẽ chọn ngẫu nhiên một điểm tâm chữ thập (center_x, center_y) bất kỳ trên ảnh. Sau đó nó chèn 4 bức ảnh vào 4 góc của điểm chữ thập này. Bởi vì điểm tâm này là ngẫu nhiên -> ảnh có thể lệch tâm,
     - Các bức ảnh con có thể bị thu nhỏ lại (Scale), nên chúng không thể lấp đầy hoàn toàn không gian 640x640 của bức ảnh tổng.

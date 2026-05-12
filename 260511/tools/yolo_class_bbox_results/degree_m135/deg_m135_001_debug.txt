@@ -1,0 +1,81 @@
+Image: deg_m135_001.jpg
+Path: D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260511\degree_45_test\degree_m135\deg_m135_001.jpg
+Relative dir: degree_m135
+------------------------------------------------------------
+
+Object 0 | Best: Leanbot_front (Conf: 0.9610)
+Bbox (xyxy): (1321.0, 990.0, 1540.0, 1210.0) | Match: return_idxs
+  0 - Leanbot_front: 0.9610 <-- BEST
+  1 - Leanbot_back: 0.0052 
+  2 - Leanbot_left: 0.0016 
+  3 - Leanbot_right: 0.0031 
+
+Object 1 | Best: Leanbot_front (Conf: 0.9304)
+Bbox (xyxy): (1806.0, 1000.0, 2044.0, 1219.0) | Match: return_idxs
+  0 - Leanbot_front: 0.9304 <-- BEST
+  1 - Leanbot_back: 0.0084 
+  2 - Leanbot_left: 0.0059 
+  3 - Leanbot_right: 0.0021 
+
+Object 2 | Best: Leanbot_front (Conf: 0.8840)
+Bbox (xyxy): (913.0, 650.0, 1114.0, 805.0) | Match: return_idxs
+  0 - Leanbot_front: 0.8840 <-- BEST
+  1 - Leanbot_back: 0.0031 
+  2 - Leanbot_left: 0.0025 
+  3 - Leanbot_right: 0.0005 
+
+Object 3 | Best: Leanbot_front (Conf: 0.8796)
+Bbox (xyxy): (1303.0, 651.0, 1494.0, 805.0) | Match: return_idxs
+  0 - Leanbot_front: 0.8796 <-- BEST
+  1 - Leanbot_back: 0.0012 
+  2 - Leanbot_left: 0.0037 
+  3 - Leanbot_right: 0.0005 
+
+Object 4 | Best: Leanbot_front (Conf: 0.8601)
+Bbox (xyxy): (1721.0, 648.0, 1902.0, 788.0) | Match: return_idxs
+  0 - Leanbot_front: 0.8601 <-- BEST
+  1 - Leanbot_back: 0.0055 
+  2 - Leanbot_left: 0.0089 
+  3 - Leanbot_right: 0.0008 
+
+Object 5 | Best: Leanbot_left (Conf: 0.8092)
+Bbox (xyxy): (974.0, 426.0, 1141.0, 540.0) | Match: return_idxs
+  0 - Leanbot_front: 0.0041 
+  1 - Leanbot_back: 0.0008 
+  2 - Leanbot_left: 0.8092 <-- BEST
+  3 - Leanbot_right: 0.0088 
+
+Object 6 | Best: Leanbot_front (Conf: 0.8056)
+Bbox (xyxy): (1649.0, 409.0, 1809.0, 530.0) | Match: return_idxs
+  0 - Leanbot_front: 0.8056 <-- BEST
+  1 - Leanbot_back: 0.0092 
+  2 - Leanbot_left: 0.0109 
+  3 - Leanbot_right: 0.0018 
+
+Object 7 | Best: Leanbot_front (Conf: 0.6922)
+Bbox (xyxy): (829.0, 976.0, 1073.0, 1185.0) | Match: return_idxs
+  0 - Leanbot_front: 0.6922 <-- BEST
+  1 - Leanbot_back: 0.0015 
+  2 - Leanbot_left: 0.0285 
+  3 - Leanbot_right: 0.0051 
+
+Object 8 | Best: Leanbot_front (Conf: 0.5020)
+Bbox (xyxy): (1312.0, 425.0, 1472.0, 537.0) | Match: return_idxs
+  0 - Leanbot_front: 0.5020 <-- BEST
+  1 - Leanbot_back: 0.0026 
+  2 - Leanbot_left: 0.1015 
+  3 - Leanbot_right: 0.0014 
+
+Object 9 | Best: Leanbot_left (Conf: 0.2234)
+Bbox (xyxy): (1312.0, 425.0, 1474.0, 538.0) | Match: return_idxs
+  0 - Leanbot_front: 0.1320 
+  1 - Leanbot_back: 0.0010 
+  2 - Leanbot_left: 0.2234 <-- BEST
+  3 - Leanbot_right: 0.0088 
+
+Object 10 | Best: Leanbot_front (Conf: 0.0574)
+Bbox (xyxy): (975.0, 427.0, 1139.0, 539.0) | Match: return_idxs
+  0 - Leanbot_front: 0.0574 <-- BEST
+  1 - Leanbot_back: 0.0012 
+  2 - Leanbot_left: 0.0354 
+  3 - Leanbot_right: 0.0018 

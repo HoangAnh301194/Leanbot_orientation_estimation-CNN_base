@@ -18,7 +18,8 @@
   - **Bước 4 - Lọc và khớp object sau NMS**: loại bỏ các bbox trùng lặp, sau đó khớp lại từng bbox cuối cùng với prediction gốc để giữ lại vector confidence đầy đủ cho từng object.
   - **Bước 5 - Trực quan hóa confidence theo từng class**: vẽ bbox cho từng class quanh cùng object, gắn nhãn class và confidence để so sánh mức độ tin cậy trực tiếp trên ảnh.
   - **Bước 6 - Lưu kết quả kiểm tra**: xuất ảnh debug và file text log theo từng ảnh đầu vào vào đúng thư mục con trong `yolo_class_bbox_results`.
-> Vì các BBox đều trùng hết với nhau và không có sự khác biệt, nên em đã dãn khoảng các các BBox để dễ quan sát ạ.Thực tế là các BBox trùng hết với nhau ạ. 
+> Vì các BBox đều trùng hết với nhau và không có sự khác biệt, nên em đã dãn khoảng các các BBox để dễ quan sát ạ.Thực tế là các BBox trùng hết với nhau ạ.
+
 ### 2. Kết quả đầu ra trong `yolo_class_bbox_results`
 - Thư mục output hiện có đủ 20 ảnh debug, chia theo 4 góc chụp: `degree_m135`, `degree_m45`, `degree_45`, `degree_135`.
 - Mỗi ảnh debug đi kèm một file text log cùng tên để kiểm tra chi tiết confidence của từng class.

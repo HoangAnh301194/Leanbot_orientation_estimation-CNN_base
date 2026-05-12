@@ -24,132 +24,40 @@
 - Mỗi ảnh debug đi kèm một file text log cùng tên để kiểm tra chi tiết confidence của từng class.
 
 #### `degree_45`
-<table>
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Ảnh kết quả</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">000</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_45/debug_deg_p45_000.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">001</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_45/debug_deg_p45_001.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">002</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_45/debug_deg_p45_002.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">003</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_45/debug_deg_p45_003.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">004</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_45/debug_deg_p45_004.jpg" width="420"></td>
-    </tr>
-  </tbody>
-</table>
+| STT | Ảnh kết quả |
+| --- | --- |
+| 000 | ![](./yolo_class_bbox_results/degree_45/debug_deg_p45_000.jpg) |
+| 001 | ![](./yolo_class_bbox_results/degree_45/debug_deg_p45_001.jpg) |
+| 002 | ![](./yolo_class_bbox_results/degree_45/debug_deg_p45_002.jpg) |
+| 003 | ![](./yolo_class_bbox_results/degree_45/debug_deg_p45_003.jpg) |
+| 004 | ![](./yolo_class_bbox_results/degree_45/debug_deg_p45_004.jpg) |
 
 #### `degree_135`
-<table>
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Ảnh kết quả</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">000</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_135/debug_deg_p135_000.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">001</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_135/debug_deg_p135_001.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">002</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_135/debug_deg_p135_002.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">003</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_135/debug_deg_p135_003.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">004</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_135/debug_deg_p135_004.jpg" width="420"></td>
-    </tr>
-  </tbody>
-</table>
+| STT | Ảnh kết quả |
+| --- | --- |
+| 000 | ![](./yolo_class_bbox_results/degree_135/debug_deg_p135_000.jpg) |
+| 001 | ![](./yolo_class_bbox_results/degree_135/debug_deg_p135_001.jpg) |
+| 002 | ![](./yolo_class_bbox_results/degree_135/debug_deg_p135_002.jpg) |
+| 003 | ![](./yolo_class_bbox_results/degree_135/debug_deg_p135_003.jpg) |
+| 004 | ![](./yolo_class_bbox_results/degree_135/debug_deg_p135_004.jpg) |
 
 #### `degree_m45`
-<table>
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Ảnh kết quả</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">000</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m45/debug_deg_m45_000.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">001</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m45/debug_deg_m45_001.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">002</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m45/debug_deg_m45_002.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">003</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m45/debug_deg_m45_003.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">004</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m45/debug_deg_m45_004.jpg" width="420"></td>
-    </tr>
-  </tbody>
-</table>
+| STT | Ảnh kết quả |
+| --- | --- |
+| 000 | ![](./yolo_class_bbox_results/degree_m45/debug_deg_m45_000.jpg) |
+| 001 | ![](./yolo_class_bbox_results/degree_m45/debug_deg_m45_001.jpg) |
+| 002 | ![](./yolo_class_bbox_results/degree_m45/debug_deg_m45_002.jpg) |
+| 003 | ![](./yolo_class_bbox_results/degree_m45/debug_deg_m45_003.jpg) |
+| 004 | ![](./yolo_class_bbox_results/degree_m45/debug_deg_m45_004.jpg) |
 
 #### `degree_m135`
-<table>
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Ảnh kết quả</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">000</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m135/debug_deg_m135_000.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">001</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m135/debug_deg_m135_001.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">002</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m135/debug_deg_m135_002.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">003</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m135/debug_deg_m135_003.jpg" width="420"></td>
-    </tr>
-    <tr>
-      <td align="center">004</td>
-      <td align="center"><img src="yolo_class_bbox_results/degree_m135/debug_deg_m135_004.jpg" width="420"></td>
-    </tr>
-  </tbody>
-</table>
+| STT | Ảnh kết quả |
+| --- | --- |
+| 000 | ![](./yolo_class_bbox_results/degree_m135/debug_deg_m135_000.jpg) |
+| 001 | ![](./yolo_class_bbox_results/degree_m135/debug_deg_m135_001.jpg) |
+| 002 | ![](./yolo_class_bbox_results/degree_m135/debug_deg_m135_002.jpg) |
+| 003 | ![](./yolo_class_bbox_results/degree_m135/debug_deg_m135_003.jpg) |
+| 004 | ![](./yolo_class_bbox_results/degree_m135/debug_deg_m135_004.jpg) |
 
 ### 3. Đánh giá khách quan kết quả
 - Công cụ đã xử lý đủ 20 ảnh test và sinh ra đầy đủ cặp file `debug_*.jpg` và `*_debug.txt`, toàn bộ được lưu trong thư mục `yolo_class_bbox_results` theo từng góc chụp.

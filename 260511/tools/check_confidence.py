@@ -87,13 +87,15 @@ def draw_label(img, text, x, y, bg_color):
 
 def draw_bboxes(img, x1, y1, x2, y2, class_scores, obj_id, names):
     img_h, img_w = img.shape[:2]
+    xc1, yc1 = max(0, int(x1)), max(0, int(y1))
+    xc2, yc2 = min(img_w - 1, int(x2)), min(img_h - 1, int(y2))
+
     for cls_id, score in enumerate(map(float, class_scores)):
         if score < CLASS_DRAW_THRES: continue
         color = CLASS_COLOR_PALETTE[cls_id % len(CLASS_COLOR_PALETTE)]
-        offset = cls_id * 6
-        xc1, yc1 = max(0, int(x1) + offset), max(0, int(y1) + offset)
-        xc2, yc2 = min(img_w - 1, int(x2) - offset), min(img_h - 1, int(y2) - offset)
-        
+
+        # All class boxes use the same matched bbox so any visible mismatch
+        # comes from the model output, not from visualization offsets.
         if xc2 > xc1 + 5 and yc2 > yc1 + 5:
             cv2.rectangle(img, (xc1, yc1), (xc2, yc2), color, 2)
             label_y = yc1 - 6 - cls_id * 20

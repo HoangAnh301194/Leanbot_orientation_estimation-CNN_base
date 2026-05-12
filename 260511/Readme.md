@@ -154,10 +154,10 @@
 ### 3. Đánh giá khách quan kết quả
 - Công cụ đã xử lý đủ 20 ảnh test và sinh ra đầy đủ cặp file `debug_*.jpg` và `*_debug.txt`, toàn bộ được lưu trong thư mục `yolo_class_bbox_results` theo từng góc chụp.
 - Ngưỡng confidence được đặt ở mức `0.05` để giữ lại toàn bộ score của các class, do đó số lượng detection tăng và bao gồm cả các detection không tương ứng với Leanbot trong thực tế.
-- Nhóm `degree_135` cho kết quả ổn định nhất: tổng 57 detection, confidence trung bình khoảng `0.735`, trong đó có 32 detection đạt từ `0.8` trở lên; class tốt nhất chủ yếu là `Leanbot_back` với `44/57` detection.
-- Nhóm `degree_45` và `degree_m45` vẫn ghi nhận được hướng chính trong phần lớn detection, tuy nhiên còn xuất hiện hiện tượng chồng lấn giữa các cặp class gần nhau như `back/right` hoặc `front/right`; riêng `degree_45` có 22 detection dưới `0.5`, cho thấy khả năng tách class tại góc này còn biến động.
-- Nhóm `degree_m135` có độ phân tán kết quả cao hơn: confidence trung bình khoảng `0.605`, có 20 detection dưới `0.5`, và kết quả phân bố giữa `Leanbot_left` (`37` detection) và `Leanbot_front` (`26` detection), phản ánh hiện tượng nhầm hướng trên một số object.
-- Một số detection rất thấp nằm sát ngưỡng `0.05` và xuất hiện ở mép ảnh, ví dụ trong `deg_m45_000`, `deg_m135_004`, `deg_p135_004`; đây là dấu hiệu cho thấy vẫn còn nhiễu hoặc false positive ở vùng biên ảnh khi giữ ngưỡng confidence thấp để lấy đủ raw score.
+- Nhóm `degree_135` cho kết quả ổn định: tổng 57 detection, confidence trung bình khoảng `0.735`, trong đó có 32 detection đạt từ `0.8` trở lên; class tốt nhất chủ yếu là `Leanbot_back` với `44/57` detection.
+- Nhóm `degree_45` và `degree_m45` có xác định được hướng chính trong phần lớn detection, tuy nhiên còn xuất hiện hiện tượng chồng lấn giữa các cặp class gần nhau như `back/right` hoặc `front/right`; riêng `degree_45` có 22 detection dưới `0.5`, cho thấy khả năng tách class tại góc này còn chưa ổn định.
+- Nhóm `degree_m135` có độ phân bố không đều: confidence trung bình khoảng `0.605`, có 20 detection dưới `0.5`, và kết quả phân bố giữa `Leanbot_left` (`37` detection) và `Leanbot_front` (`26` detection) --> nhầm lẫn giữa các class với nhau nhiều.
+- Một số detection rất thấp nằm sát ngưỡng `0.05`, ví dụ trong `deg_m45_000`, `deg_m135_004`, `deg_p135_004`. --> Vì khi lọc với confidence rât thấp thì cả những vật thể xugn quang cũng có thể tính là Object Leanbot, tuy nhiên với confidence của các detection này là rất thấp nên không ảnh hưởng nhiều đến bài toán.
 
 ## B. Khó khăn
 - Khi kiểm tra confidence giữa các class, phương pháp dùng YOLO để phân biệt các hướng của Leanbot vẫn cần được đánh giá thêm về độ ổn định, đặc biệt tại các góc trung gian hoặc các góc có khả năng gây nhầm lẫn giữa các class.

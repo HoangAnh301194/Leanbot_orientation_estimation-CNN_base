@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 12/05/2026
+# Báo cáo công việc ngày 11/05/2026
 
 ## A. Công việc đã làm
 - Xây dựng và chạy `check_confidence.py` để kiểm tra đầy đủ confidence của từng class và bbox tương ứng trên cùng một object Leanbot.

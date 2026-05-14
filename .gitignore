@@ -47,6 +47,10 @@ __pycache__/
 260512/raw_image
 260512/degree_45_test_result
 260512/yolo_class_bbox_results/
+260514/raw_image
+260514/tool1_output
+260514/crop_images
+260514/datasets
 
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep

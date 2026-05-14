@@ -1,6 +1,6 @@
 # Báo cáo công việc ngày 14/05/2026
 ## A. Công việc đã làm
-- Chụp data cho 8 class Leanbot ở các góc 0, +-45, +_90, +-135, 180 độ 
+- Chụp data cho 8 class Leanbot ở các góc 0, +-45, +-90, +-135, 180 độ 
 - Chỉnh sửa code Colab để train 8 class
 - Tiến hành train và đánh giá kết quả training Model cho 8 class
 - Thực nghiệm model trên thực tế và đánh giá một số trường hợp hạn chế 

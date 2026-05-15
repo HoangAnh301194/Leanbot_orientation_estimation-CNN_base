@@ -26,7 +26,7 @@ IMG_SIZE = 640
 CONF_THRES = 0.05
 IOU_THRES = 0.7
 MAX_DET = 300
-CLASS_DRAW_THRES = 0.0
+CLASS_DRAW_THRES = 0.05
 DRAW_MAIN_NMS_BBOX = False
 
 device = "cuda" if torch.cuda.is_available() else "cpu"

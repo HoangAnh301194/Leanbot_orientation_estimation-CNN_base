@@ -206,12 +206,12 @@ def generate_detailed_analysis(model, frame, args):
     return img_canvas, detection_data
 
 
-def format_debug_text(detection_data, names_list, img_name="webcam_capture"):
+def format_debug_text(detection_data, names_list, img_name="webcam_capture", rel_dir="error_image"):
     """Format detection data into debug text file (same format as check_confidence.py)."""
     lines = []
     lines.append(f"Image: {img_name}")
-    lines.append(f"Path: error_image/{img_name}")
-    lines.append(f"Relative dir: error_image")
+    lines.append(f"Path: {rel_dir}/{img_name}")
+    lines.append(f"Relative dir: {rel_dir}")
     lines.append("-" * 60)
     
     if not detection_data:
@@ -249,7 +249,13 @@ def run_opencv_window(model, cap: cv2.VideoCapture, args: argparse.Namespace) ->
         elif key == ord("c"):
             error_dir.mkdir(exist_ok=True)
             timestamp = time.strftime("%Y%m%d_%H%M%S")
-            prefix = error_dir / f"error_{timestamp}"
+            folder_name = f"error_{timestamp}"
+            
+            # Tạo thư mục con cho lần chụp này
+            sub_dir = error_dir / folder_name
+            sub_dir.mkdir(exist_ok=True)
+            
+            prefix = sub_dir / folder_name
             
             # 1. Save raw image (no annotations)
             cv2.imwrite(str(prefix) + "_raw.jpg", frame)
@@ -262,12 +268,13 @@ def run_opencv_window(model, cap: cv2.VideoCapture, args: argparse.Namespace) ->
             cv2.imwrite(str(prefix) + "_conf.jpg", detailed_img)
             
             # 4. Save debug text with per-class confidence
-            img_name = f"error_{timestamp}"
-            debug_text = format_debug_text(detection_data, names_list, img_name)
+            img_name = folder_name
+            rel_dir = f"error_image/{folder_name}"
+            debug_text = format_debug_text(detection_data, names_list, img_name, rel_dir)
             with open(str(prefix) + "_debug.txt", "w", encoding="utf-8") as f:
                 f.write(debug_text)
             
-            print(f"[CAPTURE] Da luu 3 anh + debug text vao: {error_dir} ({len(detection_data)} detections)")
+            print(f"[CAPTURE] Da luu 3 anh + debug text vao: {sub_dir} ({len(detection_data)} detections)")
 
     cv2.destroyAllWindows()
 

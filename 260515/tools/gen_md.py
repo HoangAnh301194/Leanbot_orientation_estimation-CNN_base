@@ -79,10 +79,8 @@ def parse_debug_file(txt_path):
 
 
 def format_score(score):
-    """Format a confidence score for markdown."""
-    if score < CONF_THRESHOLD:
-        return "< 0.05"
-    return f"**{score:.4f}**"
+    """Format a confidence score for markdown (exact value as requested by Supervisor)."""
+    return f"{score:.4f}"
 
 
 def gen_summary_table(parsed_files):
@@ -120,23 +118,32 @@ def gen_detailed_table(pf):
     # Get class names from first object
     class_names = list(objects[0]["class_scores"].keys())
 
-    lines = []
-    header = "| Vị trí | BBox (x1, y1, x2, y2) | " + " | ".join(class_names) + " | Best Class |"
-    sep = "|---|---|" + "|".join(["---"] * len(class_names)) + "|---|"
-    lines.append(header)
-    lines.append(sep)
+    # Thay vì in bảng Markdown, in ra text format theo yêu cầu Thầy
+    lines.append("**Chi tiết Confidence từng Object:**\n")
 
     for obj in objects:
         bbox = obj["bbox"]
-        bbox_str = f"({bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]})" if bbox else "N/A"
+        if bbox:
+            x1, y1, x2, y2 = bbox
+            w, h = x2 - x1, y2 - y1
+            bbox_str = f"{x1}, {y1}, {w}, {h}"
+        else:
+            bbox_str = "N/A"
 
-        score_cells = []
+        # Tên các class theo thứ tự để in ra (tùy chỉnh cho 8 classes)
+        # Leanbot_0, Leanbot_p45, Leanbot_m45, Leanbot_p90, Leanbot_m90, Leanbot_p135, Leanbot_m135, Leanbot_180
+        score_strs = []
         for cn in class_names:
             score = obj["class_scores"].get(cn, 0.0)
-            score_cells.append(format_score(score))
+            score_strs.append(f"{score:.4f}")
 
-        best_str = f"`{obj['best_cls']}` ({obj['best_conf']:.4f})"
-        lines.append(f"| #{obj['obj_id']} | {bbox_str} | " + " | ".join(score_cells) + f" | {best_str} |")
+        scores_joined = "  ".join(score_strs)
+        best_conf = obj['best_conf']
+        
+        # In đúng format Thầy yêu cầu
+        lines.append(f"`[ {bbox_str} | {best_conf:.4f} | {scores_joined} ]`")
+        lines.append(f"> (Các class tương ứng: {'  '.join(class_names)})")
+        lines.append("")
 
     # Summary/nhận xét
     class_counts = {}
@@ -184,9 +191,12 @@ def gen_webcam_report(parsed_files, detailed=False):
         ts = ts_match.group(1) if ts_match else pf["img_name"]
         full_ts = ts_match.group(0) if ts_match else pf["img_name"]
 
+        # Use rel_dir from debug text (e.g. error_image/error_20260515_132748)
+        rel_dir = pf.get("rel_dir", "error_image")
+        
         # Image row
-        md.append(f"| ![BBox {ts}](./error_image/{full_ts}_bbox.jpg) "
-                  f"| ![Conf {ts}](./error_image/{full_ts}_conf.jpg) |")
+        md.append(f"| ![BBox {ts}](./{rel_dir}/{full_ts}_bbox.jpg) "
+                  f"| ![Conf {ts}](./{rel_dir}/{full_ts}_conf.jpg) |")
 
         if detailed:
             md.append("")

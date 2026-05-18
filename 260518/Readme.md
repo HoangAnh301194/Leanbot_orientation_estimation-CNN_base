@@ -45,7 +45,7 @@ root_images/
 ### 2. Thử nghiệm model và lọc các trường hợp nhiễu.
 
 - Mục tiêu của đánh giá là phân tích mức độ nhầm lẫn label để tính toán góc thực tế: 
-- ví dự: 
+- ví dụ: 
     - Label 0 độ  có confidence = 0.81
     - Label 45 độ  có confidence = 0.43
     ==> **Góc thực tế (Góc ước lượng)** được tính như sau:
@@ -124,10 +124,10 @@ root_images/
 | #9 | (1638, 887, 1889, 1046) | **0.7756** | 0.0001 | 0.0029 | 0.0000 | 0.0005 | 0.0002 | 0.0001 | 0.0014 | `Leanbot_0` (0.7756) | -0.2° |
 
 
-##### `angle_m30_000` (9 vị trí Leanbot)
+##### `angle_m60_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m30_000 bbox](./infer_output/angle_m30_000_bbox.jpg) | ![angle_m30_000 conf](./infer_output/angle_m30_000_conf.jpg) |
+| ![angle_m60_000 bbox](./infer_output/angle_m30_000_bbox.jpg) | ![angle_m60_000 conf](./infer_output/angle_m30_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -142,10 +142,10 @@ root_images/
 | #9 | (1677, 872, 1937, 1076) | 0.0015 | 0.0000 | **0.8514** | 0.0000 | 0.0008 | 0.0041 | 0.0007 | 0.0004 | `Leanbot_m45` (0.8514) | -44.1° |
 
 
-##### `angle_m60_000` (9 vị trí Leanbot)
+##### `angle_m30_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m60_000 bbox](./infer_output/angle_m60_000_bbox.jpg) | ![angle_m60_000 conf](./infer_output/angle_m60_000_conf.jpg) |
+| ![angle_m30_000 bbox](./infer_output/angle_m60_000_bbox.jpg) | ![angle_m30_000 conf](./infer_output/angle_m60_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|

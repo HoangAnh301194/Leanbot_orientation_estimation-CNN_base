@@ -44,13 +44,14 @@ root_images/
 
 ### 2. Thử nghiệm model và lọc các trường hợp nhiễu.
 
-- Mục tiêu của đánh giá là phân tích mức độ nhầm lẫn label để tính toán góc thực tế: 
-- ví dụ: 
-    - Label 0 độ  có confidence = 0.81
-    - Label 45 độ  có confidence = 0.43
+- Mục tiêu của đánh giá là phân tích mức độ nhầm lẫn label để tính toán góc thực tế.
+- **Lưu ý:** Em chỉ thực hiện test và phân tích với các góc lẻ, dễ bị nhầm lẫn (ví dụ: 15°, 30°, 65°, 75°, 105°...). Các góc chẵn cơ bản như 0°, 45°, 90°, 180°... không được đưa vào bảng vì model đã nhận diện rất rõ ràng và không xảy ra nhầm lẫn đáng kể.
+- Ví dụ: 
+    - Label 0 độ có confidence = 0.81
+    - Label 45 độ có confidence = 0.43
     ==> **Góc thực tế (Góc ước lượng)** được tính như sau:
 
-    Angle = [(0.81 * 0°) + (0.43 * 45°)] / (0.81 + 0.43) ≈ 15.6°
+    `Angle = [(0.81 * 0°) + (0.43 * 45°)] / (0.81 + 0.43) ≈ 15.6°`
 
 ##### `angle_m75_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |

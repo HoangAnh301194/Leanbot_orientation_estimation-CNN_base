@@ -44,24 +44,20 @@ root_images/
 
 ### 2. Thử nghiệm model và lọc các trường hợp nhiễu.
 
-> **Mục tiêu của phần đánh giá:**  
-> Phân tích mức độ phân bố (nhầm lẫn) giữa 2 class có confidence cao nhất nhằm nội suy ra góc thực tế của vật thể thông qua trung bình có trọng số.
-> 
-> **Ví dụ minh họa:**
-> Giả sử mô hình dự đoán ra 2 class cao nhất là:
-> - Class **`0°`** đạt `confidence = 0.81`
-> - Class **`45°`** đạt `confidence = 0.43`
->
-> 📌 **Góc thực tế (Góc ước lượng)** được tính như sau:
-> 
-> $$ \text{Angle} = \frac{(0.81 \times 0^\circ) + (0.43 \times 45^\circ)}{0.81 + 0.43} \approx 15.6^\circ $$
+- Mục tiêu của đánh giá là phân tích mức độ nhầm lẫn label để tính toán góc thực tế: 
+- ví dự: 
+    - Label 0 độ  có confidence = 0.81
+    - Label 45 độ  có confidence = 0.43
+    ==> **Góc thực tế (Góc ước lượng)** được tính như sau:
 
-##### `angle_m_000` (9 vị trí Leanbot)
+    Angle = [(0.81 * 0°) + (0.43 * 45°)] / (0.81 + 0.43) ≈ 15.6°
+
+##### `angle_m75_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m105_000 bbox](./infer_output/angle_m105_000_bbox.jpg) | ![angle_m105_000 conf](./infer_output/angle_m105_000_conf.jpg) |
+| ![angle_m75_000 bbox](./infer_output/angle_m105_000_bbox.jpg) | ![angle_m75_000 conf](./infer_output/angle_m105_000_conf.jpg) |
 
-| Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
+| Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng | 
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | #1 | (1560, 361, 1699, 492) | 0.0010 | 0.0001 | 0.0069 | 0.0044 | **0.9905** | 0.0000 | 0.0019 | 0.0007 | `Leanbot_m90` (0.9905) | -89.7° |
 | #2 | (762, 870, 941, 1080) | 0.0001 | 0.0001 | 0.0004 | 0.0002 | **0.9655** | 0.0001 | 0.0013 | 0.0000 | `Leanbot_m90` (0.9655) | -90.1° |
@@ -110,10 +106,10 @@ root_images/
 | #9 | (590, 940, 842, 1173) | 0.0001 | 0.0001 | 0.0001 | 0.0019 | 0.0008 | 0.0012 | **0.8326** | 0.0004 | `Leanbot_m135` (0.8326) | -135.3° |
 
 
-##### `angle_m15_000` (9 vị trí Leanbot)
+##### `angle_p15_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m15_000 bbox](./infer_output/angle_m15_000_bbox.jpg) | ![angle_m15_000 conf](./infer_output/angle_m15_000_conf.jpg) |
+| ![angle_p15_000 bbox](./infer_output/angle_m15_000_bbox.jpg) | ![angle_p15_000 conf](./infer_output/angle_m15_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -164,10 +160,10 @@ root_images/
 | #9 | (1557, 360, 1738, 465) | 0.0007 | 0.0203 | **0.6934** | 0.0004 | 0.0000 | 0.0579 | 0.0009 | 0.0116 | `Leanbot_m45` (0.6934) | -31.1° |
 
 
-##### `angle_m75_000` (9 vị trí Leanbot)
+##### `angle_m105_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m75_000 bbox](./infer_output/angle_m75_000_bbox.jpg) | ![angle_m75_000 conf](./infer_output/angle_m75_000_conf.jpg) |
+| ![angle_m105_000 bbox](./infer_output/angle_m75_000_bbox.jpg) | ![angle_m105_000 conf](./infer_output/angle_m75_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -182,10 +178,10 @@ root_images/
 | #9 | (1607, 573, 1756, 715) | 0.0008 | 0.0001 | 0.0056 | 0.0011 | **0.9083** | 0.0000 | 0.0038 | 0.0006 | `Leanbot_m90` (0.9083) | -89.7° |
 
 
-##### `angle_p105_000` (9 vị trí Leanbot)
+##### `angle_p75_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p105_000 bbox](./infer_output/angle_p105_000_bbox.jpg) | ![angle_p105_000 conf](./infer_output/angle_p105_000_conf.jpg) |
+| ![angle_p75_000 bbox](./infer_output/angle_p105_000_bbox.jpg) | ![angle_p75_000 conf](./infer_output/angle_p105_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -236,10 +232,10 @@ root_images/
 | #9 | (1665, 865, 1895, 1088) | 0.0006 | 0.0002 | 0.0017 | 0.0000 | 0.0003 | **0.9165** | 0.0000 | 0.0002 | `Leanbot_p135` (0.9165) | 134.7° |
 
 
-##### `angle_p15_000` (9 vị trí Leanbot)
+##### `angle_m15_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p15_000 bbox](./infer_output/angle_p15_000_bbox.jpg) | ![angle_p15_000 conf](./infer_output/angle_p15_000_conf.jpg) |
+| ![angle_m15_000 bbox](./infer_output/angle_p15_000_bbox.jpg) | ![angle_m15_000 conf](./infer_output/angle_p15_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -254,10 +250,10 @@ root_images/
 | #9 | (1232, 381, 1406, 482) | **0.7287** | 0.0003 | 0.0268 | 0.0003 | 0.0003 | 0.0007 | 0.0003 | 0.0839 | `Leanbot_0` (0.7287) | 18.6° |
 
 
-##### `angle_p165_000` (9 vị trí Leanbot)
+##### `angle_m165_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p165_000 bbox](./infer_output/angle_p165_000_bbox.jpg) | ![angle_p165_000 conf](./infer_output/angle_p165_000_conf.jpg) |
+| ![angle_m165_000 bbox](./infer_output/angle_p165_000_bbox.jpg) | ![angle_m165_000 conf](./infer_output/angle_p165_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -290,10 +286,10 @@ root_images/
 | #9 | (1189, 898, 1420, 1059) | 0.0030 | 0.0008 | 0.0019 | 0.0057 | 0.0003 | 0.0001 | 0.0018 | **0.9189** | `Leanbot_180` (0.9189) | 179.4° |
 
 
-##### `angle_p30_000` (9 vị trí Leanbot)
+##### `angle_p65_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p30_000 bbox](./infer_output/angle_p30_000_bbox.jpg) | ![angle_p30_000 conf](./infer_output/angle_p30_000_conf.jpg) |
+| ![angle_65_000 bbox](./infer_output/angle_p30_000_bbox.jpg) | ![angle_p65_000 conf](./infer_output/angle_p30_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -308,10 +304,10 @@ root_images/
 | #9 | (1731, 865, 1925, 1086) | 0.0002 | **0.6927** | 0.0007 | 0.0007 | 0.0006 | 0.0037 | 0.0000 | 0.0005 | `Leanbot_p45` (0.6927) | 45.5° |
 
 
-##### `angle_p60_000` (9 vị trí Leanbot)
+##### `angle_p30_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p60_000 bbox](./infer_output/angle_p60_000_bbox.jpg) | ![angle_p60_000 conf](./infer_output/angle_p60_000_conf.jpg) |
+| ![angle_p30_000 bbox](./infer_output/angle_p60_000_bbox.jpg) | ![angle_p30_000 conf](./infer_output/angle_p60_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -326,10 +322,10 @@ root_images/
 | #9 | (783, 859, 1017, 1027) | 0.0001 | **0.7597** | 0.0006 | 0.0016 | 0.0000 | 0.0004 | 0.0003 | 0.0002 | `Leanbot_p45` (0.7597) | 45.1° |
 
 
-##### `angle_p75_000` (9 vị trí Leanbot)
+##### `angle_p105_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_p75_000 bbox](./infer_output/angle_p75_000_bbox.jpg) | ![angle_p75_000 conf](./infer_output/angle_p75_000_conf.jpg) |
+| ![angle_p105_000 bbox](./infer_output/angle_p75_000_bbox.jpg) | ![angle_p105_000 conf](./infer_output/angle_p75_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -346,6 +342,8 @@ root_images/
 
 
 ## B. Khó khăn
-
+- Vì khi em chụp ảnh trước đó, thì lưu tên không theo góc thực tế mà lưu theo kiểu `tên class_góc lệch_ stt .jpg ` ví dụ `Leanbot_45_m15_000.jpg` nên việc lọc ra theo đúng tên hơi mất thời gian ạ. 
+- Hiện tại em lấy ra từ các ảnh cũ thì mỗi góc thực tế chỉ có khoảng 5 ảnh ạ, vì các buổi báo cáo đểu tái sử dụng data cũ nên em không lấy thêm ảnh cũ trước đó nữa vì sợ trùng data ạ.
+- Em cũng không chắc chắn việc thu thập data có chính xác hay không vì em đặt Leanbot đều là ước lượng góc bằng mắt chứ không dùng thước để đo góc ạ.
 ## C. Công việc tiếp theo
-
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.

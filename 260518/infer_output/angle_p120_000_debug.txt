@@ -1,0 +1,103 @@
+Image: angle_p120_000.jpg
+Path: D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260518\root_images_test\angle_p120_000.jpg
+Relative dir: .
+------------------------------------------------------------
+
+Object 0 | Best: Leanbot_p135 (Conf: 0.9948)
+Bbox (xyxy): (1566.0, 352.0, 1735.0, 466.0) | Match: low_level
+  Leanbot_0: 0.0016
+  Leanbot_p45: 0.0009
+  Leanbot_m45: 0.0035
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0001
+  Leanbot_p135: 0.9948 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0114
+
+Object 1 | Best: Leanbot_p135 (Conf: 0.9904)
+Bbox (xyxy): (1226.0, 575.0, 1415.0, 711.0) | Match: low_level
+  Leanbot_0: 0.0007
+  Leanbot_p45: 0.0025
+  Leanbot_m45: 0.0011
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0003
+  Leanbot_p135: 0.9904 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0004
+
+Object 2 | Best: Leanbot_p135 (Conf: 0.9902)
+Bbox (xyxy): (1665.0, 861.0, 1935.0, 1057.0) | Match: low_level
+  Leanbot_0: 0.0006
+  Leanbot_p45: 0.0001
+  Leanbot_m45: 0.0026
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0013
+  Leanbot_p135: 0.9902 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0008
+
+Object 3 | Best: Leanbot_p135 (Conf: 0.9887)
+Bbox (xyxy): (1215.0, 873.0, 1438.0, 1053.0) | Match: low_level
+  Leanbot_0: 0.0004
+  Leanbot_p45: 0.0005
+  Leanbot_m45: 0.0008
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0003
+  Leanbot_p135: 0.9887 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0002
+
+Object 4 | Best: Leanbot_p135 (Conf: 0.9878)
+Bbox (xyxy): (853.0, 576.0, 1040.0, 714.0) | Match: low_level
+  Leanbot_0: 0.0012
+  Leanbot_p45: 0.0016
+  Leanbot_m45: 0.0011
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0001
+  Leanbot_p135: 0.9878 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0015
+
+Object 5 | Best: Leanbot_p135 (Conf: 0.9852)
+Bbox (xyxy): (922.0, 369.0, 1073.0, 477.0) | Match: low_level
+  Leanbot_0: 0.0076
+  Leanbot_p45: 0.0046
+  Leanbot_m45: 0.0030
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0000
+  Leanbot_p135: 0.9852 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0081
+
+Object 6 | Best: Leanbot_p135 (Conf: 0.9785)
+Bbox (xyxy): (772.0, 876.0, 974.0, 1053.0) | Match: low_level
+  Leanbot_0: 0.0003
+  Leanbot_p45: 0.0008
+  Leanbot_m45: 0.0016
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0003
+  Leanbot_p135: 0.9785 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0001
+
+Object 7 | Best: Leanbot_p135 (Conf: 0.9685)
+Bbox (xyxy): (1611.0, 562.0, 1808.0, 705.0) | Match: low_level
+  Leanbot_0: 0.0005
+  Leanbot_p45: 0.0006
+  Leanbot_m45: 0.0016
+  Leanbot_p90: 0.0000
+  Leanbot_m90: 0.0001
+  Leanbot_p135: 0.9685 <-- BEST
+  Leanbot_m135: 0.0001
+  Leanbot_180: 0.0008
+
+Object 8 | Best: Leanbot_p135 (Conf: 0.9454)
+Bbox (xyxy): (1238.0, 368.0, 1399.0, 475.0) | Match: low_level
+  Leanbot_0: 0.0028
+  Leanbot_p45: 0.0029
+  Leanbot_m45: 0.0021
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0000
+  Leanbot_p135: 0.9454 <-- BEST
+  Leanbot_m135: 0.0000
+  Leanbot_180: 0.0044

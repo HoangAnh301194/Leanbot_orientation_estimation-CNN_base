@@ -70,10 +70,10 @@ root_images/
 | #9 | (1651, 881, 1857, 1103) | 0.0001 | 0.0000 | 0.0016 | 0.0000 | **0.9044** | 0.0010 | 0.0000 | 0.0001 | `Leanbot_m90` (0.9044) | -89.9° |
 
 
-##### `angle_m120_000` (9 vị trí Leanbot)
+##### `angle_m150_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m120_000 bbox](./infer_output/angle_m120_000_bbox.jpg) | ![angle_m120_000 conf](./infer_output/angle_m120_000_conf.jpg) |
+| ![angle_m150_000 bbox](./infer_output/angle_m120_000_bbox.jpg) | ![angle_m150_000 conf](./infer_output/angle_m120_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -88,10 +88,10 @@ root_images/
 | #9 | (1228, 592, 1414, 722) | 0.0005 | 0.0001 | 0.0026 | 0.0017 | 0.0002 | 0.0009 | **0.8997** | 0.0091 | `Leanbot_m135` (0.8997) | -135.5° |
 
 
-##### `angle_m150_000` (9 vị trí Leanbot)
+##### `angle_m120_000` (9 vị trí Leanbot)
 | Ảnh BBox | Ảnh Confidence |
 | :---: | :---: |
-| ![angle_m150_000 bbox](./infer_output/angle_m150_000_bbox.jpg) | ![angle_m150_000 conf](./infer_output/angle_m150_000_conf.jpg) |
+| ![angle_m120_000 bbox](./infer_output/angle_m150_000_bbox.jpg) | ![angle_m120_000 conf](./infer_output/angle_m150_000_conf.jpg) |
 
 | Vị trí | BBox (x1, y1, x2, y2) | 0 | p45 | m45 | p90 | m90 | p135 | m135 | 180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|

@@ -9,7 +9,7 @@
 Dựa theo ví dụ tính góc tương đối của Thầy, thì góc ước lượng được tính bằng phương pháp trung bình có trọng số (weighted average) của 2 class có độ tin cậy (confidence) cao nhất:
 
 <p align="center">
-  <img src="https://latex.codecogs.com/svg.image?\text{G%C3%B3c%20%C6%AF%E1%BB%9Bc%20L%C6%B0%E1%BB%A3ng}%20=%20\frac{\theta_1%20\cdot%20C_1%20+%20\theta_2%20\cdot%20C_2}{C_1%20+%20C_2}" title="\text{Góc Ước Lượng} = \frac{\theta_1 \cdot C_1 + \theta_2 \cdot C_2}{C_1 + C_2}" />
+  <img src="https://latex.codecogs.com/svg.image?\text{Goc%20Uoc%20Luong}%20=%20\frac{\theta_1%20\cdot%20C_1%20+%20\theta_2%20\cdot%20C_2}{C_1%20+%20C_2}" title="\text{Góc Ước Lượng} = \frac{\theta_1 \cdot C_1 + \theta_2 \cdot C_2}{C_1 + C_2}" />
 </p>
 
 **Trong đó:**

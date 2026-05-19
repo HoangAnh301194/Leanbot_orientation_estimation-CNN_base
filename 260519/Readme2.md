@@ -248,6 +248,7 @@ Mỗi class: Total=5, Train=3, Val=1, Test=1
 
 
 ## B. Khó khăn
-- Không.
+- Hiện tại em chưa có kiến thức nền về ML/DL nên cần tìm hiểu lại một số vấn đề cơ bản để hiểu được các kiến thức về Loss Function ạ. 
+- Em xin phép xin thêm chút thời gian để tìm hiểu thêm ạ.
 ## C. Công việc tiếp theo.
 - Tìm hiểu Cross Entropy (CE) và Binary Cross Entropy (BCE) và cách chỉnh sửa trong YOLO.

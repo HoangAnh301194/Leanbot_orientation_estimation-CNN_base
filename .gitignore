@@ -60,7 +60,7 @@ __pycache__/
 260518/raw_image
 260518/root_images
 260518/root_images_test
-
+260518/datasets
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep
 !260420/output/datasets/labels/

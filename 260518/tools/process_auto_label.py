@@ -56,6 +56,18 @@ def build_parser():
         action="store_true",
         help="Keep preview windows open at the end until a key is pressed.",
     )
+    parser.add_argument(
+        "--raw_dir",
+        type=str,
+        default=None,
+        help="Đường dẫn thư mục chứa ảnh gốc (Thay thế cho raw_image mặc định).",
+    )
+    parser.add_argument(
+        "--out_dir",
+        type=str,
+        default=None,
+        help="Đường dẫn thư mục lưu kết quả (Thay thế cho tool1_output mặc định).",
+    )
     add_processing_arguments(parser)
     return parser
 
@@ -247,6 +259,12 @@ def build_shared_config(args, sessions_processed: list[str], total: dict) -> dic
 def main(argv=None):
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    import auto_label_core
+    if args.raw_dir:
+        auto_label_core.RAW_IMAGE_ROOT = Path(args.raw_dir).resolve()
+    if args.out_dir:
+        auto_label_core.TOOL1_OUTPUT_ROOT = Path(args.out_dir).resolve()
 
     ensure_process_root()
     sessions = resolve_capture_session(args.session)

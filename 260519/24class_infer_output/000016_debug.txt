@@ -1,0 +1,247 @@
+Image: 000016.jpg
+Path: D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260519\24class_test_images\000016.jpg
+Relative dir: .
+------------------------------------------------------------
+
+Object 0 | Best: Leanbot_m150 (Conf: 0.5836)
+Bbox (xyxy): (1812.0, 979.0, 2054.0, 1207.0) | Match: low_level
+  Leanbot_0: 0.0003
+  Leanbot_p15: 0.0006
+  Leanbot_m15: 0.0078
+  Leanbot_p30: 0.0076
+  Leanbot_m30: 0.0045
+  Leanbot_p45: 0.0000
+  Leanbot_m45: 0.0026
+  Leanbot_p60: 0.0001
+  Leanbot_m60: 0.0001
+  Leanbot_p75: 0.0000
+  Leanbot_m75: 0.0000
+  Leanbot_p90: 0.0003
+  Leanbot_m90: 0.0001
+  Leanbot_p105: 0.0007
+  Leanbot_m105: 0.0007
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.0553
+  Leanbot_p135: 0.0085
+  Leanbot_m135: 0.1353
+  Leanbot_p150: 0.0002
+  Leanbot_m150: 0.5836 <-- BEST
+  Leanbot_p165: 0.0025
+  Leanbot_p180: 0.0002
+  Leanbot_p195: 0.0001
+
+Object 1 | Best: Leanbot_m150 (Conf: 0.5801)
+Bbox (xyxy): (877.0, 958.0, 1111.0, 1162.0) | Match: low_level
+  Leanbot_0: 0.0004
+  Leanbot_p15: 0.0005
+  Leanbot_m15: 0.0079
+  Leanbot_p30: 0.0089
+  Leanbot_m30: 0.0006
+  Leanbot_p45: 0.0000
+  Leanbot_m45: 0.0005
+  Leanbot_p60: 0.0002
+  Leanbot_m60: 0.0001
+  Leanbot_p75: 0.0000
+  Leanbot_m75: 0.0001
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0001
+  Leanbot_p105: 0.0004
+  Leanbot_m105: 0.0007
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.0848
+  Leanbot_p135: 0.0027
+  Leanbot_m135: 0.1042
+  Leanbot_p150: 0.0001
+  Leanbot_m150: 0.5801 <-- BEST
+  Leanbot_p165: 0.0024
+  Leanbot_p180: 0.0002
+  Leanbot_p195: 0.0000
+
+Object 2 | Best: Leanbot_m135 (Conf: 0.4487)
+Bbox (xyxy): (1330.0, 966.0, 1563.0, 1179.0) | Match: low_level
+  Leanbot_0: 0.0003
+  Leanbot_p15: 0.0007
+  Leanbot_m15: 0.0017
+  Leanbot_p30: 0.0014
+  Leanbot_m30: 0.0009
+  Leanbot_p45: 0.0006
+  Leanbot_m45: 0.0000
+  Leanbot_p60: 0.0002
+  Leanbot_m60: 0.0006
+  Leanbot_p75: 0.0003
+  Leanbot_m75: 0.0007
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0004
+  Leanbot_p105: 0.0016
+  Leanbot_m105: 0.0008
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.0357
+  Leanbot_p135: 0.0005
+  Leanbot_m135: 0.4487 <-- BEST
+  Leanbot_p150: 0.0009
+  Leanbot_m150: 0.0016
+  Leanbot_p165: 0.0002
+  Leanbot_p180: 0.0008
+  Leanbot_p195: 0.0078
+
+Object 3 | Best: Leanbot_m150 (Conf: 0.4114)
+Bbox (xyxy): (1330.0, 975.0, 1558.0, 1179.0) | Match: low_level
+  Leanbot_0: 0.0014
+  Leanbot_p15: 0.0003
+  Leanbot_m15: 0.0161
+  Leanbot_p30: 0.0111
+  Leanbot_m30: 0.0039
+  Leanbot_p45: 0.0000
+  Leanbot_m45: 0.0074
+  Leanbot_p60: 0.0001
+  Leanbot_m60: 0.0002
+  Leanbot_p75: 0.0000
+  Leanbot_m75: 0.0000
+  Leanbot_p90: 0.0010
+  Leanbot_m90: 0.0000
+  Leanbot_p105: 0.0015
+  Leanbot_m105: 0.0005
+  Leanbot_p120: 0.0003
+  Leanbot_m120: 0.0640
+  Leanbot_p135: 0.0089
+  Leanbot_m135: 0.1380
+  Leanbot_p150: 0.0010
+  Leanbot_m150: 0.4114 <-- BEST
+  Leanbot_p165: 0.0053
+  Leanbot_p180: 0.0003
+  Leanbot_p195: 0.0002
+
+Object 4 | Best: Leanbot_m120 (Conf: 0.3884)
+Bbox (xyxy): (1317.0, 426.0, 1483.0, 529.0) | Match: low_level
+  Leanbot_0: 0.0025
+  Leanbot_p15: 0.0022
+  Leanbot_m15: 0.0225
+  Leanbot_p30: 0.0099
+  Leanbot_m30: 0.0031
+  Leanbot_p45: 0.0000
+  Leanbot_m45: 0.0006
+  Leanbot_p60: 0.0001
+  Leanbot_m60: 0.0015
+  Leanbot_p75: 0.0001
+  Leanbot_m75: 0.0003
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0001
+  Leanbot_p105: 0.0007
+  Leanbot_m105: 0.0039
+  Leanbot_p120: 0.0002
+  Leanbot_m120: 0.3884 <-- BEST
+  Leanbot_p135: 0.0036
+  Leanbot_m135: 0.2387
+  Leanbot_p150: 0.0002
+  Leanbot_m150: 0.0695
+  Leanbot_p165: 0.0333
+  Leanbot_p180: 0.0003
+  Leanbot_p195: 0.0014
+
+Object 5 | Best: Leanbot_m135 (Conf: 0.3724)
+Bbox (xyxy): (878.0, 953.0, 1122.0, 1163.0) | Match: low_level
+  Leanbot_0: 0.0004
+  Leanbot_p15: 0.0011
+  Leanbot_m15: 0.0018
+  Leanbot_p30: 0.0013
+  Leanbot_m30: 0.0009
+  Leanbot_p45: 0.0004
+  Leanbot_m45: 0.0000
+  Leanbot_p60: 0.0003
+  Leanbot_m60: 0.0013
+  Leanbot_p75: 0.0004
+  Leanbot_m75: 0.0008
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0006
+  Leanbot_p105: 0.0013
+  Leanbot_m105: 0.0006
+  Leanbot_p120: 0.0002
+  Leanbot_m120: 0.0515
+  Leanbot_p135: 0.0008
+  Leanbot_m135: 0.3724 <-- BEST
+  Leanbot_p150: 0.0009
+  Leanbot_m150: 0.0021
+  Leanbot_p165: 0.0001
+  Leanbot_p180: 0.0011
+  Leanbot_p195: 0.0085
+
+Object 6 | Best: Leanbot_m120 (Conf: 0.3691)
+Bbox (xyxy): (921.0, 651.0, 1127.0, 782.0) | Match: low_level
+  Leanbot_0: 0.0024
+  Leanbot_p15: 0.0015
+  Leanbot_m15: 0.0141
+  Leanbot_p30: 0.0071
+  Leanbot_m30: 0.0014
+  Leanbot_p45: 0.0000
+  Leanbot_m45: 0.0007
+  Leanbot_p60: 0.0001
+  Leanbot_m60: 0.0004
+  Leanbot_p75: 0.0000
+  Leanbot_m75: 0.0005
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0001
+  Leanbot_p105: 0.0002
+  Leanbot_m105: 0.0015
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.3691 <-- BEST
+  Leanbot_p135: 0.0042
+  Leanbot_m135: 0.2722
+  Leanbot_p150: 0.0004
+  Leanbot_m150: 0.0374
+  Leanbot_p165: 0.0274
+  Leanbot_p180: 0.0004
+  Leanbot_p195: 0.0012
+
+Object 7 | Best: Leanbot_m135 (Conf: 0.3182)
+Bbox (xyxy): (1676.0, 403.0, 1833.0, 533.0) | Match: low_level
+  Leanbot_0: 0.0001
+  Leanbot_p15: 0.0001
+  Leanbot_m15: 0.0018
+  Leanbot_p30: 0.0003
+  Leanbot_m30: 0.0017
+  Leanbot_p45: 0.0017
+  Leanbot_m45: 0.0082
+  Leanbot_p60: 0.0015
+  Leanbot_m60: 0.0039
+  Leanbot_p75: 0.0004
+  Leanbot_m75: 0.0138
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0003
+  Leanbot_p105: 0.0001
+  Leanbot_m105: 0.0002
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.0008
+  Leanbot_p135: 0.0002
+  Leanbot_m135: 0.3182 <-- BEST
+  Leanbot_p150: 0.0000
+  Leanbot_m150: 0.0811
+  Leanbot_p165: 0.0000
+  Leanbot_p180: 0.0003
+  Leanbot_p195: 0.0015
+
+Object 8 | Best: Leanbot_m150 (Conf: 0.3177)
+Bbox (xyxy): (1677.0, 402.0, 1833.0, 533.0) | Match: low_level
+  Leanbot_0: 0.0000
+  Leanbot_p15: 0.0003
+  Leanbot_m15: 0.0052
+  Leanbot_p30: 0.0001
+  Leanbot_m30: 0.0041
+  Leanbot_p45: 0.0002
+  Leanbot_m45: 0.0048
+  Leanbot_p60: 0.0040
+  Leanbot_m60: 0.0156
+  Leanbot_p75: 0.0003
+  Leanbot_m75: 0.0047
+  Leanbot_p90: 0.0001
+  Leanbot_m90: 0.0003
+  Leanbot_p105: 0.0007
+  Leanbot_m105: 0.0003
+  Leanbot_p120: 0.0001
+  Leanbot_m120: 0.0020
+  Leanbot_p135: 0.0004
+  Leanbot_m135: 0.0225
+  Leanbot_p150: 0.0000
+  Leanbot_m150: 0.3177 <-- BEST
+  Leanbot_p165: 0.0000
+  Leanbot_p180: 0.0000
+  Leanbot_p195: 0.0006

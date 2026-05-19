@@ -13,10 +13,10 @@ Dựa theo ví dụ tính góc tương đối của Thầy, thì góc ước lư
 </p>
 
 **Trong đó:**
-- $\theta_1$: Góc của Class có confidence cao nhất (Top 1)
-- $C_1$: Giá trị confidence của Class Top 1
-- $\theta_2$: Góc của Class có confidence cao thứ hai (Top 2)
-- $C_2$: Giá trị confidence của Class Top 2
+- **θ₁**: Góc của Class có confidence cao nhất (Top 1)
+- **C₁**: Giá trị confidence của Class Top 1
+- **θ₂**: Góc của Class có confidence cao thứ hai (Top 2)
+- **C₂**: Giá trị confidence của Class Top 2
 
 
 > **Note:** Em đã đưa công thức tính toán và hướng xử lý này cho AI, sau đó yêu cầu AI viết script tự động duyệt qua log dữ liệu thu thập được để tính toán kết quả. Em có cần tích hợp công thức vào Code hiển thị giao diện detection của Model không ạ (webcam_infer.py) ? 

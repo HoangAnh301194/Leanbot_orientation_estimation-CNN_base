@@ -8,7 +8,9 @@
 
 Dựa theo ví dụ tính góc tương đối của Thầy, thì góc ước lượng được tính bằng phương pháp trung bình có trọng số (weighted average) của 2 class có độ tin cậy (confidence) cao nhất:
 
-$$ \text{Góc Ước Lượng} = \frac{\theta_1 \cdot C_1 + \theta_2 \cdot C_2}{C_1 + C_2} $$
+$$
+\text{Góc Ước Lượng} = \frac{\theta_1 \cdot C_1 + \theta_2 \cdot C_2}{C_1 + C_2}
+$$
 
 **Trong đó:**
 - $\theta_1$: Góc của Class có confidence cao nhất (Top 1)

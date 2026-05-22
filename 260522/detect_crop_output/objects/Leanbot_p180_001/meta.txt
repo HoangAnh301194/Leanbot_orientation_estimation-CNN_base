@@ -1,0 +1,10 @@
+source=D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260522\24class_test_images\002.jpg
+source_relative=002.jpg
+bbox_image=D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260522\detect_crop_output\bbox_images\002_bbox.jpg
+class_name=Leanbot_p180
+confidence=0.466098
+bbox_xyxy=(1862, 1001, 2151, 1214)
+expand_0=bounds(1862, 1001, 2152, 1215),size=290x214
+expand_1=bounds(1861, 1000, 2153, 1216),size=292x216
+expand_2=bounds(1860, 999, 2154, 1217),size=294x218
+expand_3=bounds(1859, 998, 2155, 1218),size=296x220

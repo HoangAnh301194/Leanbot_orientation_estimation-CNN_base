@@ -184,9 +184,7 @@ Các bước tính `Góc ước lượng`:
 
 Công thức tổng quát:
 
-```math
-\hat{\theta} = \frac{\sum_i (s_i \cdot \theta_{i, \text{adj}})}{\sum_i s_i}
-```
+![math](https://latex.codecogs.com/svg.image?\bg_white\space %5Chat%7B%5Ctheta%7D%20%3D%20%5Cfrac%7B%5Csum_i%20%28s_i%20%5Ccdot%20%5Ctheta_%7Bi%2C%20%5Ctext%7Badj%7D%7D%29%7D%7B%5Csum_i%20s_i%7D)
 
 
 Ký hiệu sử dụng:
@@ -201,10 +199,7 @@ Ký hiệu sử dụng:
 
 Quan hệ giữa các biến:
 
-```math
-\theta_{i, \text{adj}} = \text{unwrap}(\theta_i, \theta_{\text{anchor}}) \\
-\theta_{\text{anchor}} = \text{angle\_of\_highest\_score\_class}
-```
+![math](https://latex.codecogs.com/svg.image?\bg_white\space %5Ctheta_%7Bi%2C%20%5Ctext%7Badj%7D%7D%20%3D%20%5Ctext%7Bunwrap%7D%28%5Ctheta_i%2C%20%5Ctheta_%7B%5Ctext%7Banchor%7D%7D%29%20%5C%5C%20%5Ctheta_%7B%5Ctext%7Banchor%7D%7D%20%3D%20%5Ctext%7Bangle%5C_of%5C_highest%5C_score%5C_class%7D)
 
 #### 4.2. Đoạn code tính góc trong `export_markdown_report.py`
 

@@ -29,8 +29,21 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-TOOL1_OUTPUT = PROJECT_ROOT / "crop_images"
+TOOL1_OUTPUT = PROJECT_ROOT / "tool1_output"
 DATASET_ROOT = PROJECT_ROOT / "datasets"
+
+
+def resolve_cli_dir(raw_value: str, *, must_exist: bool, label: str) -> Path:
+    """Resolve a CLI path relative to the repo root unless it is absolute."""
+    raw_path = Path(raw_value).expanduser()
+    if raw_path.is_absolute():
+        resolved = raw_path.resolve()
+    else:
+        resolved = (PROJECT_ROOT / raw_path).resolve()
+
+    if must_exist and not resolved.exists():
+        raise SystemExit(f"[ERROR] {label} not found: {resolved}")
+    return resolved
 
 
 def collect_pairs(tool1_dir: Path, skip_empty: bool = True):
@@ -71,10 +84,15 @@ def build_dataset(
     dry_run: bool = False,
 ):
     """Copy ảnh và label vào datasets/, đánh số lại từ 000000."""
+    if not tool1_dir.exists():
+        print(f"[WARN] Input directory does not exist: {tool1_dir}")
+        return
+
     pairs = collect_pairs(tool1_dir, skip_empty=skip_empty)
 
     if not pairs:
-        print("[WARN] No image-label pairs found in tool1_output.")
+        print(f"[WARN] No image-label pairs found in: {tool1_dir}")
+        print("[WARN] Expected subfolders like <class>/aligned_images and <class>/labels.")
         return
 
     images_dir = dataset_dir / "images"
@@ -177,9 +195,15 @@ def main():
     )
     args = parser.parse_args()
 
+    input_dir = resolve_cli_dir(args.input, must_exist=True, label="Input dir")
+    output_dir = resolve_cli_dir(args.output, must_exist=False, label="Output dir")
+
+    print(f"[INFO] Input root : {input_dir}")
+    print(f"[INFO] Output root: {output_dir}")
+
     build_dataset(
-        tool1_dir=Path(args.input),
-        dataset_dir=Path(args.output),
+        tool1_dir=input_dir,
+        dataset_dir=output_dir,
         skip_empty=not args.include_empty,
         dry_run=args.dry_run,
     )

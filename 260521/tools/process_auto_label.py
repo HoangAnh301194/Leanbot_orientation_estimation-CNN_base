@@ -31,6 +31,26 @@ from auto_label_core import (
 from alignment import ImageAligner
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+def resolve_cli_dir(raw_value: str, *, must_exist: bool, label: str) -> Path:
+    """Resolve a CLI path relative to the repo root for repo workflows.
+
+    This lets users run the script either from the repo root or from tools/
+    without having to rewrite arguments like `datasets/24class/raw_image`.
+    """
+    raw_path = Path(raw_value).expanduser()
+    if raw_path.is_absolute():
+        resolved = raw_path.resolve()
+    else:
+        resolved = (PROJECT_ROOT / raw_path).resolve()
+
+    if must_exist and not resolved.exists():
+        raise SystemExit(f"[ERROR] {label} not found: {resolved}")
+    return resolved
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         description="Read raw_image/session_X and export auto-label results using Mask-Based Merging."
@@ -263,14 +283,26 @@ def main(argv=None):
 
     import auto_label_core
     if args.raw_dir:
-        auto_label_core.RAW_IMAGE_ROOT = Path(args.raw_dir).resolve()
+        auto_label_core.RAW_IMAGE_ROOT = resolve_cli_dir(
+            args.raw_dir,
+            must_exist=True,
+            label="Raw dir",
+        )
     if args.out_dir:
-        auto_label_core.TOOL1_OUTPUT_ROOT = Path(args.out_dir).resolve()
+        auto_label_core.TOOL1_OUTPUT_ROOT = resolve_cli_dir(
+            args.out_dir,
+            must_exist=False,
+            label="Output dir",
+        )
 
     ensure_process_root()
+    print(f"[INFO] Raw root   : {auto_label_core.RAW_IMAGE_ROOT}")
+    print(f"[INFO] Output root: {auto_label_core.TOOL1_OUTPUT_ROOT}")
+
     sessions = resolve_capture_session(args.session)
     if not sessions:
-        print("[INFO] No sessions found in raw_image.")
+        print(f"[INFO] No session/class folders found in: {auto_label_core.RAW_IMAGE_ROOT}")
+        print("[INFO] Expected each subfolder to contain raw_images/ and backgrounds/.")
         return 0
 
     print_processing_configuration(args)

@@ -43,8 +43,9 @@ def main():
     backgrounds_dir.mkdir(parents=True, exist_ok=True)
 
     copied_images = []
+    background_files = []
     
-    # Copy toàn bộ ảnh từ các thư mục góc đã chọn
+    # Copy toàn bộ ảnh + background từ các thư mục góc đã chọn
     print(f"[*] Đang xử lý tạo class '{args.class_name}' (ID: {args.class_id})...")
     for folder_name in args.folders:
         src_folder = root_images_dir / folder_name
@@ -52,20 +53,37 @@ def main():
             print(f"    [CẢNH BÁO] Không tìm thấy thư mục: {src_folder}")
             continue
             
+        # Copy ảnh Leanbot (*.jpg ở root của folder)
         for img_path in src_folder.glob("*.jpg"):
             dst_path = raw_images_dir / img_path.name
             shutil.copy2(img_path, dst_path)
             copied_images.append(img_path.name)
-            
-    copied_images.sort()
 
-    background_files = []
-    # Xử lý background nếu được truyền vào
+        # Tự động copy background từ subfolder background/ của mỗi angle
+        bg_subfolder = src_folder / "background"
+        if bg_subfolder.exists() and bg_subfolder.is_dir():
+            for bg_path in sorted(bg_subfolder.iterdir()):
+                if bg_path.suffix.lower() in (".jpg", ".jpeg", ".png", ".bmp"):
+                    # Thêm prefix tên folder để tránh trùng tên khi gom nhiều góc
+                    bg_dst_name = f"{folder_name}_{bg_path.name}"
+                    bg_dst = backgrounds_dir / bg_dst_name
+                    shutil.copy2(bg_path, bg_dst)
+                    background_files.append(bg_dst_name)
+                    print(f"    [BG] {folder_name}/background/{bg_path.name} -> {bg_dst_name}")
+        else:
+            print(f"    [LƯU Ý] Không tìm thấy folder background/ trong {src_folder}")
+
+    copied_images.sort()
+    background_files.sort()
+
+    # Fallback: nếu truyền --bg_path thủ công, copy thêm vào
     if args.bg_path and Path(args.bg_path).exists():
         bg_src = Path(args.bg_path)
         bg_dst = backgrounds_dir / bg_src.name
         shutil.copy2(bg_src, bg_dst)
-        background_files.append(bg_src.name)
+        if bg_src.name not in background_files:
+            background_files.append(bg_src.name)
+            print(f"    [BG] Thêm background thủ công: {bg_src.name}")
 
     # Sinh file cấu hình session_metadata.json
     metadata = {
@@ -90,7 +108,7 @@ def main():
         f.write("\n")
 
     print(f"[THÀNH CÔNG] Dataset class lưu tại: {session_dir}")
-    print(f"             Đã copy {len(copied_images)} ảnh từ {len(args.folders)} góc.")
+    print(f"             Đã copy {len(copied_images)} ảnh + {len(background_files)} background từ {len(args.folders)} góc.")
     if not background_files:
         print(f"             [LƯU Ý] Thư mục backgrounds/ đang trống. Hãy copy 1 ảnh background vào đây để tool tự động gán nhãn có thể hoạt động!")
 

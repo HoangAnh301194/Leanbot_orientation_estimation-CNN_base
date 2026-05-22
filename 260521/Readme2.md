@@ -172,24 +172,22 @@ python tools/export_markdown_report.py `
 
 #### 4.1. Công thức tính góc
 
-Tool tính `Góc ước lượng` theo quy trình:
+Các bước tính `Góc ước lượng`:
 
-1. Tách góc từ tên class:
-- `Leanbot_p45` -> `45`
-- `Leanbot_m15` -> `-15`
-- `Leanbot_0` -> `0`
+| Bước | Nội dung |
+|---|---|
+| 1 | Tách góc từ tên class: `Leanbot_p45 -> 45`, `Leanbot_m15 -> -15`, `Leanbot_0 -> 0` |
+| 2 | Bỏ qua các class có `score <= angle_score_threshold`. |
+| 3 | Sắp xếp score giảm dần và giữ lại top-`k` class góc theo `angle_top_k`. |
+| 4 | Chọn class có score cao nhất làm `anchor`, rồi unwrap các góc còn lại quanh `anchor` để tránh nhảy sai ở biên `-180/180`. |
+| 5 | Tính góc cuối cùng theo weighted average. |
 
-2. Bỏ qua các class có score `<= angle_score_threshold`.
+Công thức tổng quát:
 
-3. Sắp xếp score giảm dần và giữ lại top-`k` class góc theo `angle_top_k`.
-
-4. Lấy class có score cao nhất làm `anchor`, sau đó unwrap các góc còn lại quanh `anchor` để tránh nhảy sai khi đi qua biên `-180/180`.
-
-5. Tính góc cuối cùng theo weighted average:
-
-```text
-theta_hat = sum_i(s_i * theta_i_adj) / sum_i(s_i)
+```math
+\hat{\theta} = \frac{\sum_i s_i \cdot \theta_i^{adj}}{\sum_i s_i}
 ```
+
 
 Ký hiệu sử dụng:
 
@@ -203,9 +201,12 @@ Ký hiệu sử dụng:
 
 Quan hệ giữa các biến:
 
-```text
-theta_i_adj = unwrap(theta_i, theta_anchor)
-theta_anchor = angle_of_highest_score_class
+```math
+\theta_i^{adj} = \operatorname{unwrap}(\theta_i, \theta_{anchor})
+```
+
+```math
+\theta_{anchor} = \text{angle of highest-score class}
 ```
 
 #### 4.2. Đoạn code tính góc trong `export_markdown_report.py`

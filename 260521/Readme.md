@@ -1,4 +1,4 @@
-﻿# Báo cáo công việc ngày 21/05/2026
+# Báo cáo công việc ngày 21/05/2026
 
 ## A. Công việc đã làm
 - Tìm hiểu về loss function: Cross Entropy và Binary Cross Entropy

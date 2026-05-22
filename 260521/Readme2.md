@@ -138,14 +138,10 @@ names:
 - `--model`: đường dẫn model `.pt` nếu muốn chỉ định thủ công.
 - `--output-dir`: thư mục lưu kết quả.
 - `--report-name`: tên file Markdown đầu ra.
-- `--conf`, `--imgsz`, `--max-objects`: các tham số điều khiển quá trình suy luận.
-- `--display-groups`, `--group-reducer`: cho phép gộp hoặc chọn các cột class cần hiển thị trong bảng confidence.
-- `--angle-top-k`, `--angle-score-threshold`: dùng để ước lượng góc Leanbot từ các class có confidence cao.
 
 - Quy trình hoạt động chính của tool:
 - Thu thập toàn bộ ảnh hợp lệ từ `source`.
 - Chạy YOLO để phát hiện Leanbot trên từng ảnh.
-- Sort detection theo `best_conf` giảm dần và chỉ giữ top-`9` object mặc định. Nếu cần, có thể đổi bằng `--max-objects`.
 - Sinh ra `1` ảnh kết quả cho mỗi ảnh đầu vào:
 - ảnh `*_bbox.jpg`: ảnh có khung bbox, chỉ vẽ các object được giữ lại sau khi lọc top confidence.
 - Bảng Markdown không hiển thị toàn bộ `24` cột class nữa, mà chỉ giữ `8` cột confidence mạnh nhất cho từng ảnh để bảng gọn hơn.
@@ -173,12 +169,6 @@ python tools/export_markdown_report.py `
   --output-dir 24class_test_images_markdown_report_top9_cols8
 ```
 
-- Kết quả mới của tool:
-- không tạo `*_conf.jpg` nữa.
-- chỉ giữ top-`9` object có `best_conf` cao nhất trên mỗi ảnh.
-- mỗi bảng chỉ hiển thị `8` cột confidence mạnh nhất của ảnh đó.
-- report được lưu tại `24class_test_images_markdown_report_top9_cols8/report.md`.
-- Ba bảng dưới đây được chép lại từ report mới nhất để đưa thẳng vào báo cáo công việc.
 
 #### 4.1. Công thức tính góc
 
@@ -198,14 +188,24 @@ Tool tính `Góc ước lượng` theo quy trình:
 5. Tính góc cuối cùng theo weighted average:
 
 ```text
-theta_hat = (s1 * theta1_adj + s2 * theta2_adj + ... + sn * thetan_adj) / (s1 + s2 + ... + sn)
+theta_hat = sum_i(s_i * theta_i_adj) / sum_i(s_i)
 ```
 
-Trong đó:
+Ký hiệu sử dụng:
+
+| Ký hiệu | Ý nghĩa |
+|---|---|
+| `s_i` | score của class góc thứ `i` sau khi lọc |
+| `theta_i` | góc gốc lấy từ tên class thứ `i` |
+| `theta_anchor` | góc của class có score cao nhất |
+| `theta_i_adj` | góc `theta_i` sau khi unwrap quanh `theta_anchor` |
+| `theta_hat` | góc ước lượng cuối cùng |
+
+Quan hệ giữa các biến:
 
 ```text
 theta_i_adj = unwrap(theta_i, theta_anchor)
-theta_anchor = góc của class có score cao nhất
+theta_anchor = angle_of_highest_score_class
 ```
 
 #### 4.2. Đoạn code tính góc trong `export_markdown_report.py`

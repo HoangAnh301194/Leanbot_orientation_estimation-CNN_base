@@ -63,24 +63,14 @@ Bảng so sánh 4 mức crop:
 
 ### 2. Đánh giá thử 1 ảnh crop (object `Leanbot_p180_001`)
 
-Sau khi crop các mức mở rộng `0, 1, 2, 3` từ ảnh `002.jpg`, chúng ta đưa 4 ảnh crop này chạy lại qua model `best.pt` bằng công cụ `export_markdown_report.py` (với `--conf 0.01` để lấy được hết các confidence) và `check_confidence.py`.
-
-**Hình ảnh nhận diện trên các mức crop:**
-
-Ảnh toàn cảnh (debug object bbox):
+**Ảnh toàn cảnh (debug object bbox):**
 ![debug object bbox](evaluate_crop_results/debug_object_bbox.jpg)
 
-| `0` pixel | `1` pixel |
-| --- | --- |
-| ![debug expand 0](evaluate_crop_results/debug_expand_0.jpg) | ![debug expand 1](evaluate_crop_results/debug_expand_1.jpg) |
-
-| `2` pixel | `3` pixel |
-| --- | --- |
-| ![debug expand 2](evaluate_crop_results/debug_expand_2.jpg) | ![debug expand 3](evaluate_crop_results/debug_expand_3.jpg) |
-
-**Bảng số liệu Confidence chi tiết:**
+**Bảng số liệu Confidence chi tiết trên các mức crop:**
 
 ##### `expand_0.jpg` (9 vi tri Leanbot)
+![debug expand 0](evaluate_crop_results/debug_expand_0.jpg)
+
 | Vị trí | BBox (Xc, Yc, W, H) | p90 | m15 | 0 | p45 | p135 | p15 | m60 | p180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | #1 | (237, 59.5, 22, 17) | **0.0764** | 0.0029 | 0.0082 | 0.0006 | 0.0024 | 0.0019 | 0.0017 | 0.0050 | `Leanbot_p90` (0.0764) | 92.0° |
@@ -94,6 +84,8 @@ Sau khi crop các mức mở rộng `0, 1, 2, 3` từ ảnh `002.jpg`, chúng ta
 | #9 | (246.5, 73, 43, 44) | 0.0003 | 0.0002 | 0.0030 | 0.0005 | 0.0002 | 0.0004 | **0.0206** | 0.0000 | `Leanbot_m60` (0.0206) | -65.5° |
 
 ##### `expand_1.jpg` (9 vi tri Leanbot)
+![debug expand 1](evaluate_crop_results/debug_expand_1.jpg)
+
 | Vị trí | BBox (Xc, Yc, W, H) | p90 | p45 | 0 | p15 | m15 | p30 | p135 | p195 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | #1 | (238, 60, 24, 18) | **0.0958** | 0.0006 | **0.0146** | 0.0022 | 0.0040 | 0.0025 | 0.0029 | 0.0144 | `Leanbot_p90` (0.0958) | 78.1° |
@@ -107,6 +99,8 @@ Sau khi crop các mức mở rộng `0, 1, 2, 3` từ ảnh `002.jpg`, chúng ta
 | #9 | (193, 175, 26, 20) | 0.0011 | **0.0279** | 0.0014 | 0.0001 | 0.0018 | **0.0127** | 0.0094 | 0.0009 | `Leanbot_p45` (0.0279) | 40.3° |
 
 ##### `expand_2.jpg` (9 vi tri Leanbot)
+![debug expand 2](evaluate_crop_results/debug_expand_2.jpg)
+
 | Vị trí | BBox (Xc, Yc, W, H) | 0 | p45 | p15 | p90 | p165 | p30 | m45 | p180 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | #1 | (262, 39, 10, 8) | **0.1089** | 0.0097 | 0.0116 | 0.0005 | 0.0104 | 0.0079 | 0.0109 | 0.0004 | `Leanbot_0` (0.1089) | -33.0° |
@@ -120,6 +114,8 @@ Sau khi crop các mức mở rộng `0, 1, 2, 3` từ ảnh `002.jpg`, chúng ta
 | #9 | (66.5, 45, 35, 38) | 0.0013 | 0.0021 | 0.0005 | **0.0341** | 0.0006 | 0.0009 | 0.0003 | 0.0015 | `Leanbot_p90` (0.0341) | 41.0° |
 
 ##### `expand_3.jpg` (9 vi tri Leanbot)
+![debug expand 3](evaluate_crop_results/debug_expand_3.jpg)
+
 | Vị trí | BBox (Xc, Yc, W, H) | 0 | p45 | p90 | p15 | p135 | m45 | p30 | p195 | Best Class | Góc ước lượng |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | #1 | (263, 40, 10, 8) | **0.1264** | 0.0079 | 0.0005 | 0.0097 | 0.0008 | 0.0087 | 0.0078 | **0.0234** | `Leanbot_0` (0.1264) | -25.8° |
@@ -129,6 +125,8 @@ Sau khi crop các mức mở rộng `0, 1, 2, 3` từ ảnh `002.jpg`, chúng ta
 | #5 | (133.5, 25.5, 39, 31) | 0.0028 | **0.0221** | 0.0027 | 0.0003 | **0.0301** | 0.0009 | 0.0079 | 0.0035 | `Leanbot_p135` (0.0301) | 96.9° |
 | #6 | (67.5, 46, 35, 38) | 0.0012 | 0.0009 | 0.0008 | 0.0011 | 0.0004 | **0.0292** | 0.0003 | 0.0017 | `Leanbot_m45` (0.0292) | -50.9° |
 | #7 | (243.5, 90, 53, 34) | 0.0161 | **0.0262** | 0.0000 | **0.0284** | 0.0002 | 0.0003 | 0.0240 | 0.0076 | `Leanbot_p15` (0.0284) | 29.4° |
+| #8 | (193, 180, 28, 26) | 0.0008 | **0.0262** | 0.0004 | 0.0001 | 0.0039 | 0.0007 | **0.0095** | 0.0007 | `Leanbot_p45` (0.0262) | 41.0° |
+| #9 | (240.5, 62, 23, 18) | 0.0000 | 0.0004 | 0.0001 | 0.0000 | 0.0002 | 0.0000 | 0.0001 | 0.0009 | `Leanbot_m15` (0.0232) | -50.8° |.0000 | **0.0284** | 0.0002 | 0.0003 | 0.0240 | 0.0076 | `Leanbot_p15` (0.0284) | 29.4° |
 | #8 | (193, 180, 28, 26) | 0.0008 | **0.0262** | 0.0004 | 0.0001 | 0.0039 | 0.0007 | **0.0095** | 0.0007 | `Leanbot_p45` (0.0262) | 41.0° |
 | #9 | (240.5, 62, 23, 18) | 0.0000 | 0.0004 | 0.0001 | 0.0000 | 0.0002 | 0.0000 | 0.0001 | 0.0009 | `Leanbot_m15` (0.0232) | -50.8° |
 

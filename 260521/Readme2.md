@@ -184,8 +184,8 @@ Các bước tính `Góc ước lượng`:
 
 Công thức tổng quát:
 
-```text
-theta_hat = sum_i(s_i * theta_i_adj) / sum_i(s_i)
+```math
+\hat{\theta} = \frac{\sum_i (s_i \cdot \theta_{i, \text{adj}})}{\sum_i s_i}
 ```
 
 
@@ -201,9 +201,9 @@ Ký hiệu sử dụng:
 
 Quan hệ giữa các biến:
 
-```text
-theta_i_adj = unwrap(theta_i, theta_anchor)
-theta_anchor = angle_of_highest_score_class
+```math
+\theta_{i, \text{adj}} = \text{unwrap}(\theta_i, \theta_{\text{anchor}}) \\
+\theta_{\text{anchor}} = \text{angle\_of\_highest\_score\_class}
 ```
 
 #### 4.2. Đoạn code tính góc trong `export_markdown_report.py`

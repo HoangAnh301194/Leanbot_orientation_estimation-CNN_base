@@ -204,14 +204,6 @@ def parse_angle_from_class_name(class_name: str) -> float | None:
     return value if match.group("sign") == "p" else -value
 
 
-def unwrap_angle_near_anchor(angle: float, anchor: float) -> float:
-    while angle - anchor > 180.0:
-        angle -= 360.0
-    while angle - anchor < -180.0:
-        angle += 360.0
-    return angle
-
-
 def estimate_angle_from_scores(
     class_scores: dict[str, float],
     angle_top_k: int,
@@ -231,18 +223,26 @@ def estimate_angle_from_scores(
     if angle_top_k > 0:
         angle_entries = angle_entries[:angle_top_k]
 
-    anchor = angle_entries[0][2]
-    adjusted = []
-    for class_name, score, angle in angle_entries:
-        adjusted.append((class_name, score, unwrap_angle_near_anchor(angle, anchor)))
+    sum_x = 0.0
+    sum_y = 0.0
+    sum_w = 0.0
+    used_classes = []
 
-    weight_sum = sum(score for _, score, _ in adjusted)
-    if weight_sum <= 0:
+    for class_name, score, angle in angle_entries:
+        theta_rad = math.radians(angle)
+        sum_x += score * math.cos(theta_rad)
+        sum_y += score * math.sin(theta_rad)
+        sum_w += score
+        used_classes.append(class_name)
+
+    if sum_w <= 0:
         return None, []
 
-    angle = sum(score * angle_value for _, score, angle_value in adjusted) / weight_sum
-    used_classes = [class_name for class_name, _, _ in adjusted]
-    return angle, used_classes
+    avg_x = sum_x / sum_w
+    avg_y = sum_y / sum_w
+    result_rad = math.atan2(avg_y, avg_x)
+
+    return math.degrees(result_rad), used_classes
 
 
 def group_score(class_scores: dict[str, float], group: DisplayGroup, reducer: str) -> float:

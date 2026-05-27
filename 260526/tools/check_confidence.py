@@ -230,3 +230,41 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def training_style_crop_pad(img_bgr):
+    import cv2
+    import numpy as np
+    img_h, img_w = img_bgr.shape[:2]
+    crop_w = int(img_w * 0.625)
+    crop_h = img_h
+    start_x = (img_w - crop_w) // 2
+    cropped = img_bgr[0:crop_h, start_x:start_x + crop_w]
+    
+    square_size = crop_w
+    padded = np.zeros((square_size, square_size, 3), dtype=np.uint8)
+    pad_top = (square_size - crop_h) // 2
+    padded[pad_top:pad_top + crop_h, :] = cropped
+    
+    resized = cv2.resize(padded, (640, 640))
+    
+    params = {
+        'start_x': start_x,
+        'pad_top': pad_top,
+        'crop_w': crop_w,
+        'scale': 640.0 / square_size
+    }
+    return resized, params
+
+def restore_boxes_from_training_style(boxes_640, transform_params):
+    scale = transform_params['scale']
+    start_x = transform_params['start_x']
+    pad_top = transform_params['pad_top']
+    
+    boxes_square = boxes_640 / scale
+    boxes_square[:, 1] -= pad_top
+    boxes_square[:, 3] -= pad_top
+    boxes_square[:, 0] += start_x
+    boxes_square[:, 2] += start_x
+    
+    return boxes_square
+

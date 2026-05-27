@@ -144,8 +144,35 @@ def run_inference(model, frame, args: argparse.Namespace):
     if args.mirror:
         frame = cv2.flip(frame, 1)
         
-    result = model.predict(frame, conf=args.conf, imgsz=args.imgsz, verbose=False)[0]
-    return result.plot()
+    img640, params = check_confidence.training_style_crop_pad(frame)
+    result = model.predict(img640, conf=args.conf, imgsz=640, verbose=False)[0]
+    
+    boxes = result.boxes.xyxy.cpu().numpy()
+    classes = result.boxes.cls.cpu().numpy()
+    confs = result.boxes.conf.cpu().numpy()
+    
+    annotated = frame.copy()
+    
+    if len(boxes) > 0:
+        original_boxes = check_confidence.restore_boxes_from_training_style(boxes, params)
+        for i in range(len(boxes)):
+            x1, y1, x2, y2 = original_boxes[i]
+            cls_id = int(classes[i])
+            conf = confs[i]
+            label = f"{model.names[cls_id]} {conf:.2f}"
+            
+            # draw box
+            cv2.rectangle(annotated, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            cv2.putText(annotated, label, (int(x1), int(y1)-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            
+    # Draw the crop region for visualization
+    h, w = frame.shape[:2]
+    crop_w = int(w * 0.625)
+    start_x = (w - crop_w) // 2
+    cv2.rectangle(annotated, (start_x, 0), (start_x + crop_w, h), (255, 0, 0), 2)
+    cv2.putText(annotated, "Training Crop Region", (start_x + 5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    
+    return annotated
 
 
 def generate_detailed_analysis(model, frame, args):
@@ -161,8 +188,11 @@ def generate_detailed_analysis(model, frame, args):
     nc = len(names)
     detection_data = []
     
-    # 1. Preprocess
-    img_tensor = check_confidence.preprocess_image(frame, args.imgsz)
+    # 1. Preprocess using training_style crop
+    img640, params = check_confidence.training_style_crop_pad(frame)
+    img_tensor = img640[:, :, ::-1].transpose(2, 0, 1)  # BGR -> RGB, HWC -> CHW
+    img_tensor = torch.from_numpy(np.ascontiguousarray(img_tensor)).to(model.device).float() / 255.0
+    img_tensor = img_tensor.unsqueeze(0)
     
     # 2. Inference (Low level to get raw scores)
     with torch.no_grad():
@@ -176,9 +206,12 @@ def generate_detailed_analysis(model, frame, args):
         raw_class_scores = raw_pred[0, 4:4+nc, :].T
         
         detections_scaled = detections.clone()
-        detections_scaled[:, :4] = scale_boxes(img_tensor.shape[2:], detections_scaled[:, :4], frame.shape).round()
+        raw_boxes_xyxy_scaled = xywh2xyxy(raw_boxes_xywh.clone()).cpu().numpy()
         
-        raw_boxes_xyxy_scaled = scale_boxes(img_tensor.shape[2:], xywh2xyxy(raw_boxes_xywh.clone()), frame.shape).cpu().numpy()
+        original_det_boxes = check_confidence.restore_boxes_from_training_style(detections_scaled[:, :4].cpu().numpy(), params)
+        detections_scaled[:, :4] = torch.from_numpy(original_det_boxes).to(detections_scaled.device)
+        
+        raw_original_boxes = check_confidence.restore_boxes_from_training_style(raw_boxes_xyxy_scaled, params)
         
         for obj_id, det in enumerate(detections_scaled):
             x1, y1, x2, y2, best_conf, best_cls = map(float, det.cpu().numpy())
@@ -187,7 +220,7 @@ def generate_detailed_analysis(model, frame, args):
             if kept_idxs is not None:
                 raw_idx = int(kept_idxs[obj_id])
             else:
-                ious = check_confidence.box_iou_numpy(np.array([x1, y1, x2, y2]), raw_boxes_xyxy_scaled)
+                ious = check_confidence.box_iou_numpy(np.array([x1, y1, x2, y2]), raw_original_boxes)
                 raw_idx = int(np.argmax(ious)) if len(ious) > 0 else 0
                 
             class_scores = raw_class_scores[raw_idx].cpu().numpy()

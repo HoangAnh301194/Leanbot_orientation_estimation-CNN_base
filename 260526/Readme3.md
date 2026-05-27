@@ -2,7 +2,10 @@
 
 ## A. Công việc đã làm
 - Giải thích lí do kích thước ảnh Input là 640x640
-- 
+- Chỉnh sửa tools `check_confidence.py` để tạo ra fiel CSV chứa dữ liệu đánh giá của 200 anchors có confidence cao nhất sau khi đi qua mô hình YOLO v8 mà chưa qua xử lí NMS
+- Chỉnh sửa tool `export_markdown_report.py` để in ra bảng Markdown chứa toàn bộ confidence của 24 class. 
+- Tạo tools đánh giá trên ảnh cỡ 640x640 mà chưa rescale về 2560x1440. 
+
 ### 1. Lý do về kích thước Input
 - **Về kích thước 640x640:** Việc cấu hình mô hình nhận đầu vào là tensor `640x640` xuất phát từ các lý do kỹ thuật sau:
   - **Kiến trúc tiêu chuẩn của YOLO:** `640x640` là kích thước đầu vào (baseline) mặc định và tối ưu nhất của các dòng YOLO hiện đại. Các lớp tích chập (convolutional layers) và cấu trúc mạng được thiết kế tối ưu với kích thước này 

@@ -44,7 +44,7 @@
 ```
 
 - **Kết quả chạy code trên ảnh `002.jpg` trong thư mục `24class_test_images`:**
-  - **Link thư mục chứa CSV:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/yolo_class_bbox_results](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/yolo_class_bbox_results) 
+  - **Link thư mục chứa CSV:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/yolo_class_bbox_results](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/tree/master/260526/yolo_class_bbox_results)
   - **Ví dụ một đoạn file CSV:**
 ```csv
 x_center,y_center,width,height,Leanbot_0,Leanbot_p15,Leanbot_p30,Leanbot_p45,Leanbot_p60,Leanbot_p75,Leanbot_p90,Leanbot_p105,Leanbot_p120,Leanbot_p135,Leanbot_p150,Leanbot_p165,Leanbot_p180,Leanbot_p195,Leanbot_m150,Leanbot_m135,Leanbot_m120,Leanbot_m105,Leanbot_m90,Leanbot_m75,Leanbot_m60,Leanbot_m45,Leanbot_m30,Leanbot_m15

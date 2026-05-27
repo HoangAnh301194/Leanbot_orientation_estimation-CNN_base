@@ -135,7 +135,9 @@ def main():
     print(f"Device: {device} | Classes: {names}")
     
     exts = ("*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG")
-    image_paths = sorted([p for ext in exts for p in glob.glob(os.path.join(test_image_dir, "**", ext), recursive=True)])
+    all_paths = [p for ext in exts for p in glob.glob(os.path.join(test_image_dir, "**", ext), recursive=True)]
+    # Bỏ qua các ảnh nằm trong thư mục báo cáo (vd: 002_markdown_report) để tránh quét nhầm output
+    image_paths = sorted([p for p in all_paths if "report" not in p.lower() and "yolo_class" not in p.lower()])
     
     if not image_paths:
         print(f"Không tìm thấy ảnh nào trong {test_image_dir}.")
@@ -148,8 +150,13 @@ def main():
         img0 = cv2.imread(img_path)
         if img0 is None: continue
         
-        # Yêu cầu: Bóp méo trực tiếp về 640x640 không dùng padding
-        img0 = cv2.resize(img0, (IMG_SIZE, IMG_SIZE))
+        # Yêu cầu MỚI: crop vuông rồi mới resize ==> Giữ nguyên tỉ lệ X Y
+        h_orig, w_orig = img0.shape[:2]
+        size = min(h_orig, w_orig)
+        crop_y = (h_orig - size) // 2
+        crop_x = (w_orig - size) // 2
+        cropped_img = img0[crop_y:crop_y+size, crop_x:crop_x+size]
+        img0 = cv2.resize(cropped_img, (IMG_SIZE, IMG_SIZE))
         
         print(f"\n{'='*80}\nIMAGE: {img_path}\n{'='*80}")
 
@@ -213,13 +220,14 @@ def main():
 
         top_boxes = raw_boxes_xywh[topk_indices].cpu().numpy()
         top_scores = raw_class_scores[topk_indices].cpu().numpy()
+        top_max_scores = max_scores[topk_indices].cpu().numpy()
 
         csv_data = []
         for i in range(topk):
-            row = top_boxes[i].tolist() + top_scores[i].tolist()
+            row = [float(top_max_scores[i])] + top_boxes[i].tolist() + top_scores[i].tolist()
             csv_data.append(row)
 
-        header = ["x_center", "y_center", "width", "height"] + [names[j] for j in range(nc)]
+        header = ["confidence", "x_center", "y_center", "width", "height"] + [names[j] for j in range(nc)]
         df = pd.DataFrame(csv_data, columns=header)
         csv_path = os.path.join(out_subdir, f"{os.path.splitext(img_name)[0]}_top200.csv")
         df.to_csv(csv_path, index=False)

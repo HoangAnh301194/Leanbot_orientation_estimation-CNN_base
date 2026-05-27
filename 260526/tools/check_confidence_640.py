@@ -148,9 +148,8 @@ def main():
         img0 = cv2.imread(img_path)
         if img0 is None: continue
         
-        # Dùng LetterBox để đưa ảnh về 640x640 (thêm padding) thay vì crop để giữ nguyên đủ 9 objects
-        from ultralytics.data.augment import LetterBox
-        img0 = LetterBox(IMG_SIZE, auto=False, stride=32)(image=img0)
+        # Yêu cầu: Bóp méo trực tiếp về 640x640 không dùng padding
+        img0 = cv2.resize(img0, (IMG_SIZE, IMG_SIZE))
         
         print(f"\n{'='*80}\nIMAGE: {img_path}\n{'='*80}")
 

@@ -294,10 +294,14 @@ def format_bbox_xywh(bbox_xyxy: tuple[int, int, int, int]) -> str:
     return f"({fmt_num(xc)}, {fmt_num(yc)}, {fmt_num(width)}, {fmt_num(height)})"
 
 
-def render_webcam_style_bbox_image(model, frame: np.ndarray, args: argparse.Namespace) -> np.ndarray:
-    # Keep the same drawing style as webcam_infer.py for saved *_bbox.jpg assets.
-    result = model.predict(frame, conf=args.conf, imgsz=args.imgsz, verbose=False)[0]
-    return result.plot()
+def render_webcam_style_bbox_image(frame: np.ndarray, detections: list[dict]) -> np.ndarray:
+    img = frame.copy()
+    for idx, det in enumerate(detections):
+        x1, y1, x2, y2 = det["bbox_xyxy"]
+        conf = det["best_conf"]
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(img, f"#{idx+1} ({conf:.2f})", (x1, max(10, y1 - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+    return img
 
 
 def run_low_level_inference(model, frame: np.ndarray, args: argparse.Namespace) -> list[dict]:
@@ -477,12 +481,18 @@ def main() -> None:
             print(f"[SKIP] Khong doc duoc anh: {image_path}")
             continue
             
-        # Dùng LetterBox để đưa ảnh về 640x640 (thêm padding) thay vì crop để giữ nguyên đủ 9 objects
-        from ultralytics.data.augment import LetterBox
-        frame = LetterBox(args.imgsz, auto=False, stride=32)(image=frame)
+        # Yêu cầu: bóp méo (squish) ảnh về 640x640 trực tiếp, không crop, không padding
+        frame = cv2.resize(frame, (args.imgsz, args.imgsz))
 
-        bbox_image = render_webcam_style_bbox_image(model, frame, args)
+        # Yêu cầu: không lọc xem có phải leanbot hay không -> set threshold cực thấp
+        original_conf = args.conf
+        args.conf = 0.0001
+        
         detections = run_low_level_inference(model, frame, args)
+        
+        args.conf = original_conf # restore
+        
+        bbox_image = render_webcam_style_bbox_image(frame, detections)
 
         if source_path.is_dir():
             relative_image = image_path.relative_to(source_path)

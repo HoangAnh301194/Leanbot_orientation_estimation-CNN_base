@@ -477,13 +477,9 @@ def main() -> None:
             print(f"[SKIP] Khong doc duoc anh: {image_path}")
             continue
             
-        # Crop ảnh ở giữa thành hình vuông trước rồi mới resize để không bị méo (squash) hình
-        h, w = frame.shape[:2]
-        min_dim = min(h, w)
-        start_x = w // 2 - min_dim // 2
-        start_y = h // 2 - min_dim // 2
-        frame = frame[start_y:start_y+min_dim, start_x:start_x+min_dim]
-        frame = cv2.resize(frame, (args.imgsz, args.imgsz))
+        # Dùng LetterBox để đưa ảnh về 640x640 (thêm padding) thay vì crop để giữ nguyên đủ 9 objects
+        from ultralytics.data.augment import LetterBox
+        frame = LetterBox(args.imgsz, auto=False, stride=32)(image=frame)
 
         bbox_image = render_webcam_style_bbox_image(model, frame, args)
         detections = run_low_level_inference(model, frame, args)

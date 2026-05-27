@@ -148,13 +148,9 @@ def main():
         img0 = cv2.imread(img_path)
         if img0 is None: continue
         
-        # Crop ảnh ở giữa thành hình vuông trước rồi mới resize để không bị méo (squash) hình
-        h, w = img0.shape[:2]
-        min_dim = min(h, w)
-        start_x = w // 2 - min_dim // 2
-        start_y = h // 2 - min_dim // 2
-        img0 = img0[start_y:start_y+min_dim, start_x:start_x+min_dim]
-        img0 = cv2.resize(img0, (IMG_SIZE, IMG_SIZE))
+        # Dùng LetterBox để đưa ảnh về 640x640 (thêm padding) thay vì crop để giữ nguyên đủ 9 objects
+        from ultralytics.data.augment import LetterBox
+        img0 = LetterBox(IMG_SIZE, auto=False, stride=32)(image=img0)
         
         print(f"\n{'='*80}\nIMAGE: {img_path}\n{'='*80}")
 

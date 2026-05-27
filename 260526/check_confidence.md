@@ -61,10 +61,9 @@ def preprocess_image(img_bgr, imgsz=640):
     return img_tensor.unsqueeze(0)
 ```
 
-
+|Input|Output|
 |---|---|
-| **Input** | Ảnh BGR với kích thước bất kỳ (H, W, 3) |
-| **Output** | Tensor PyTorch [1, 3, 640, 640] trên GPU |
+| Ảnh BGR với kích thước bất kỳ (H, W, 3) | Tensor PyTorch [1, 3, 640, 640] trên GPU |
 | **Ý nghĩa** | Input tensor đã chuẩn hóa sẵn sàng cho forward pass |
 
 ---
@@ -83,10 +82,9 @@ with torch.no_grad():
     raw_pred = normalize_raw_pred_shape(raw_pred, nc)
 ```
 
-
+|Input|Output|
 |---|---|
-| **Input** | Tensor [1, 3, 640, 640] từ bước 1 |
-| **Output** | Tensor [1, 25200, 12] (1 batch, 25200 proposals, 4+8 channels) |
+| Tensor [1, 3, 640, 640] từ bước 1 | Tensor [1, 25200, 12] (1 batch, 25200 proposals, 4+8 channels) |
 | **Ý nghĩa** | Raw predictions chứa tất cả candidate boxes + class scores cho mỗi box |
 
 **Giải thích các dimension:**
@@ -110,12 +108,9 @@ raw_boxes_xywh = raw_pred[0, :4, :].T           # Shape: [num_proposals, 4]
 raw_class_scores = raw_pred[0, 4:4+nc, :].T    # Shape: [num_proposals, 8]
 ```
 
-
-|---|---|
-| **Input** | Tensor raw_pred [1, 25200, 12] |
-| **Output 1** | raw_boxes_xywh [25200, 4] - tọa độ tất cả proposals |
-| **Output 2** | raw_class_scores [25200, nc] - class scores tất cả proposals (nc = 24) |
-| **Ý nghĩa** | Tách biệt dữ liệu tọa độ và class scores để xử lý riêng |
+|Input|Output 1|Output 2|Ý nghĩa|
+|---|---|---|---|
+| Tensor raw_pred [1, 25200, 12] | raw_boxes_xywh [25200, 4] - tọa độ tất cả proposals | raw_class_scores [25200, nc] - class scores tất cả proposals (nc = 24) | Tách biệt dữ liệu tọa độ và class scores để xử lý riêng |
 
 **Giải thích chi tiết:**
 - `raw_boxes_xywh[i]` chứa 4 giá trị: [x_center, y_center, width, height] của proposal thứ i
@@ -147,12 +142,9 @@ def run_nms(raw_pred, nc):
     return detections, kept_idxs
 ```
 
-
-|---|---|
-| **Input** | raw_pred [1, 25200, 4+nc] và raw_class_scores [25200, nc] (nc=24) |
-| **Output 1** | detections [num_kept, 6] - boxes sau lọc với format (x1, y1, x2, y2, best_conf, best_cls) |
-| **Output 2** | kept_idxs [num_kept] - index để map mỗi detection về raw predictions |
-| **Ý nghĩa** | Số lượng boxes giảm từ 25200 xuống 0-300, loại bỏ các predictions yếu |
+|Input|Output 1|Output 2|Ý nghĩa|
+|---|---|---|---|
+| raw_pred [1, 25200, 4+nc] và raw_class_scores [25200, nc] (nc=24) | detections [num_kept, 6] - boxes sau lọc với format (x1, y1, x2, y2, best_conf, best_cls) | kept_idxs [num_kept] - index để map mỗi detection về raw predictions | Số lượng boxes giảm từ 25200 xuống 0-300, loại bỏ các predictions yếu |
 
 **Giải thích thêm:**
 - Điểm quan trọng: `return_idxs=True` giúp ta biết proposal nào (từ 25200 proposals) được giữ lại
@@ -186,12 +178,9 @@ for obj_id, det in enumerate(detections_scaled):
     class_scores = raw_class_scores[raw_idx].cpu().numpy()  # Shape: [8]
 ```
 
-
-|---|---|
-| **Input** | detections [num_kept, 6], kept_idxs [num_kept], raw_class_scores [25200, 8] |
-| **Process** | Với mỗi detection, lấy index từ kept_idxs rồi index vào raw_class_scores |
-| **Output** | class_scores [8] - confidence của 8 classes cho detection này |
-| **Ý nghĩa** | Giờ ta có toàn bộ class scores (không chỉ best class) của mỗi detection |
+|Input|Process|Output|Ý nghĩa|
+|---|---|---|---|
+| detections [num_kept, 6], kept_idxs [num_kept], raw_class_scores [25200, 8] | Với mỗi detection, lấy index từ kept_idxs rồi index vào raw_class_scores | class_scores [8] - confidence của 8 classes cho detection này | Giờ ta có toàn bộ class scores (không chỉ best class) của mỗi detection |
 
 **Giải thích chi tiết:**
 - `raw_idx` cho biết proposal thứ mấy (từ 25200) được giữ lại là detection này
@@ -239,12 +228,9 @@ csv_path = os.path.join(out_subdir, f"{img_name}_top200.csv")
 df.to_csv(csv_path, index=False)
 ```
 
-
-|---|---|
-| **Input** | raw_boxes_xywh [25200, 4], raw_class_scores [25200, nc] (nc=24) |
-| **Process** | Lấy max confidence, top-k, tạo DataFrame |
-| **Output** | File CSV {img_name}_top200.csv với 200 dòng, (4+nc) columns |
-| **Ý nghĩa** | Báo cáo các proposals tốt nhất cho phân tích chi tiết |
+|Input|Process|Output|Ý nghĩa|
+|---|---|---|---|
+| raw_boxes_xywh [25200, 4], raw_class_scores [25200, nc] (nc=24) | Lấy max confidence, top-k, tạo DataFrame | File CSV {img_name}_top200.csv với 200 dòng, (4+nc) columns | Báo cáo các proposals tốt nhất cho phân tích chi tiết |
 
 **Giải thích chi tiết:**
 - `max_scores` là 1D array [25200] chứa giá trị max của 8 class scores cho mỗi proposal
@@ -296,13 +282,9 @@ with open(os.path.join(out_subdir, f"{img_name}_debug.txt"), "w") as f:
     f.write("\n".join(debug_lines))
 ```
 
-
-|---|---|
-| **Input** | detections_scaled, class_scores, ảnh gốc, top 200 data từ bước 6 |
-| **Process** | Loop qua mỗi detection, visualization, tạo CSV, lưu files |
-| **Output 1** | Ảnh debug_{img_name} với bbox + labels |
-| **Output 2** | Text file {img_name}_debug.txt với chi tiết từng detection |
-| **Output 3** | CSV file {img_name}_top200.csv với 200 proposals tốt nhất |
+|Input|Process|Output 1|Output 2|Output 3|
+|---|---|---|---|---|
+| detections_scaled, class_scores, ảnh gốc, top 200 data từ bước 6 | Loop qua mỗi detection, visualization, tạo CSV, lưu files | Ảnh debug_{img_name} với bbox + labels | Text file {img_name}_debug.txt với chi tiết từng detection | CSV file {img_name}_top200.csv với 200 proposals tốt nhất |
 | **Ý nghĩa** | Lưu lại toàn bộ kết quả: visualization + detections chi tiết + top anchors report |
 
 **Giải thích thêm:**

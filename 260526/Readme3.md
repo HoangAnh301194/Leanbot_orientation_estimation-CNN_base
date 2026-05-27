@@ -63,7 +63,7 @@ x_center,y_center,width,height,Leanbot_0,Leanbot_p15,Leanbot_p30,Leanbot_p45,Lea
 
 - **Kết quả chạy test trên ảnh `002.jpg` thuộc thư mục `24class_test_images`:**
   - Lệnh chạy: `python tools/export_markdown_report.py --source 24class_test_images/002.jpg`
-  - **Link thư mục báo cáo Markdown:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_markdown_report](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_markdown_report) 
+  - **Link thư mục báo cáo Markdown:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_markdown_report/report.md](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_markdown_report/report.md) 
   - **Báo cáo bảng Markdown kèm ảnh BBox sinh ra từ file `report.md`:**
 
 | Ảnh BBox |
@@ -100,7 +100,7 @@ x_center,y_center,width,height,Leanbot_0,Leanbot_p15,Leanbot_p30,Leanbot_p45,Lea
 - **Kết quả chạy test trên ảnh crop 640x640 từ `002.jpg`:**
   - Lệnh chạy: `python tools/export_markdown_report_640.py --source 24class_test_images/002.jpg --output-dir 24class_test_images/002_640_markdown_report`
 
-  - **Link thư mục báo cáo Markdown:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_640_markdown_report](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_640_markdown_report) 
+  - **Link thư mục báo cáo Markdown:** [https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_640_markdown_report/report.md](https://git.pythaverse.space/thomha/Nguyen_Huu_Hoang_Anh/blob/master/260526/24class_test_images/002_640_markdown_report/report.md) 
   - **Báo cáo bảng Markdown và ảnh BBox sinh ra từ file `report.md`:**
 
 | Ảnh BBox |

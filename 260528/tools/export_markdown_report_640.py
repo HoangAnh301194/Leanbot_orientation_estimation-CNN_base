@@ -8,6 +8,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import pandas as pd
 import torch
 
 try:
@@ -304,7 +305,7 @@ def render_webcam_style_bbox_image(frame: np.ndarray, detections: list[dict]) ->
     return img
 
 
-def run_low_level_inference(model, frame: np.ndarray, args: argparse.Namespace) -> list[dict]:
+def run_low_level_inference(model, frame: np.ndarray, args: argparse.Namespace) -> tuple[list[dict], torch.Tensor, torch.Tensor]:
     check_confidence.CONF_THRES = args.conf
 
     names_map = model.names
@@ -317,11 +318,12 @@ def run_low_level_inference(model, frame: np.ndarray, args: argparse.Namespace) 
         raw_pred = check_confidence.normalize_raw_pred_shape(model.model(img_tensor), nc)
 
     detections, kept_idxs = check_confidence.run_nms(raw_pred, nc)
-    if detections is None or len(detections) == 0:
-        return detection_data
-
+    
     raw_boxes_xywh = raw_pred[0, :4, :].T
     raw_class_scores = raw_pred[0, 4:4 + nc, :].T
+
+    if detections is None or len(detections) == 0:
+        return detection_data, raw_boxes_xywh, raw_class_scores
     # KHÔNG RESCALE: giữ nguyên trên hệ tọa độ 640x640
     raw_boxes_xyxy = xywh2xyxy(raw_boxes_xywh.clone()).cpu().numpy()
 
@@ -362,7 +364,7 @@ def run_low_level_inference(model, frame: np.ndarray, args: argparse.Namespace) 
             }
         )
 
-    return detection_data
+    return detection_data, raw_boxes_xywh, raw_class_scores
 
 
 def relative_asset_path(report_path: Path, asset_path: Path) -> str:
@@ -395,7 +397,11 @@ def write_markdown_report(
         image_name = image_report["image_name"]
         image_label = image_report["display_name"]
         detections = image_report["detections"]
+        orig_rel = relative_asset_path(report_path, image_report["original_path"])
+        resized_rel = relative_asset_path(report_path, image_report["resized_path"])
         bbox_rel = relative_asset_path(report_path, image_report["bbox_path"])
+        csv_rel = relative_asset_path(report_path, image_report["csv_path"])
+
         image_display_groups = select_top_display_groups(
             detections,
             display_groups,
@@ -403,9 +409,17 @@ def write_markdown_report(
         )
 
         lines.append(f"##### `{image_label}` ({len(detections)} vi tri Leanbot)")
-        lines.append("| Anh BBox |")
-        lines.append("| :---: |")
-        lines.append(f"| ![{image_name} bbox]({bbox_rel}) |")
+        w, h, size, crop_x, crop_y = image_report["crop_info"]
+        lines.append("**Các bước xử lý ảnh gốc về 640x640:**")
+        lines.append(f"1. **Ảnh gốc:** Kích thước {w}x{h} (rộng x cao)")
+        lines.append(f"2. **Crop vuông (Center Crop):** Lấy phần trung tâm kích thước {size}x{size} (từ tọa độ x={crop_x}, y={crop_y}) ==> Giữ nguyên tỉ lệ X Y")
+        lines.append(f"3. **Resize:** Thu phóng phần đã crop về 640x640 để đưa vào YOLO")
+        lines.append("")
+        lines.append(f"[Tải file CSV Top 200 Anchors (Ví dụ)]({csv_rel})")
+        lines.append("")
+        lines.append("| Ảnh Gốc | Ảnh Sau Khi Crop + Resize (640x640) | Ảnh BBox (640x640) |")
+        lines.append("| :---: | :---: | :---: |")
+        lines.append(f"| ![{image_name} original]({orig_rel}) | ![{image_name} resized]({resized_rel}) | ![{image_name} bbox]({bbox_rel}) |")
         lines.append("")
 
         if not detections:
@@ -481,18 +495,23 @@ def main() -> None:
             print(f"[SKIP] Khong doc duoc anh: {image_path}")
             continue
             
-        # Yêu cầu: bóp méo (squish) ảnh về 640x640 trực tiếp, không crop, không padding
-        frame = cv2.resize(frame, (args.imgsz, args.imgsz))
+        # Yêu cầu MỚI: crop vuông rồi mới resize ==> Giữ nguyên tỉ lệ X Y
+        h, w = frame.shape[:2]
+        size = min(h, w)
+        crop_y = (h - size) // 2
+        crop_x = (w - size) // 2
+        cropped_frame = frame[crop_y:crop_y+size, crop_x:crop_x+size]
+        resized_frame = cv2.resize(cropped_frame, (args.imgsz, args.imgsz))
 
         # Yêu cầu: không lọc xem có phải leanbot hay không -> set threshold cực thấp
         original_conf = args.conf
         args.conf = 0.0001
         
-        detections = run_low_level_inference(model, frame, args)
+        detections, raw_boxes, raw_scores = run_low_level_inference(model, resized_frame, args)
         
         args.conf = original_conf # restore
         
-        bbox_image = render_webcam_style_bbox_image(frame, detections)
+        bbox_image = render_webcam_style_bbox_image(resized_frame, detections)
 
         if source_path.is_dir():
             relative_image = image_path.relative_to(source_path)
@@ -503,16 +522,46 @@ def main() -> None:
         out_subdir.mkdir(parents=True, exist_ok=True)
 
         stem = relative_image.stem
+        
+        original_path = out_subdir / f"{stem}_original.jpg"
+        cv2.imwrite(str(original_path), frame)
+        
+        resized_path = out_subdir / f"{stem}_resized.jpg"
+        cv2.imwrite(str(resized_path), resized_frame)
+        
         bbox_path = out_subdir / f"{stem}_bbox.jpg"
         cv2.imwrite(str(bbox_path), bbox_image)
+
+        # Lưu CSV Top 200 Anchors
+        max_scores, _ = raw_scores.max(dim=1)
+        topk = min(200, max_scores.shape[0])
+        _, topk_indices = torch.topk(max_scores, topk)
+
+        top_boxes = raw_boxes[topk_indices].cpu().numpy()
+        top_scores_np = raw_scores[topk_indices].cpu().numpy()
+        top_max_scores = max_scores[topk_indices].cpu().numpy()
+
+        csv_data = []
+        for i in range(topk):
+            row = [float(top_max_scores[i])] + top_boxes[i].tolist() + top_scores_np[i].tolist()
+            csv_data.append(row)
+            
+        header = ["confidence", "x_center", "y_center", "width", "height"] + model_names
+        df = pd.DataFrame(csv_data, columns=header)
+        csv_path = out_subdir / f"{stem}_top200.csv"
+        df.to_csv(csv_path, index=False)
 
         display_name = relative_image.as_posix() if multiple_images else image_path.name
         image_reports.append(
             {
                 "image_name": stem,
                 "display_name": display_name,
+                "original_path": original_path,
+                "resized_path": resized_path,
                 "bbox_path": bbox_path,
+                "csv_path": csv_path,
                 "detections": detections,
+                "crop_info": (w, h, size, crop_x, crop_y),
             }
         )
         print(f"[OK] {image_path.name}: {len(detections)} detections")

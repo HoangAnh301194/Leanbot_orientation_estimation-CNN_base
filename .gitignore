@@ -86,10 +86,10 @@ __pycache__/
 260526/train_result
 260526/detect_crop_output
 
-260527/datasets
-260527/root_images
-260527/train_result
-260527/detect_crop_output
+260528/datasets
+260528/root_images
+260528/train_result
+260528/detect_crop_output
 
 
 # Keep only labels and folder structure

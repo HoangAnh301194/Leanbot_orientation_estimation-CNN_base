@@ -1,6 +1,8 @@
 # Báo cáo công việc ngày 28/05/2026
 
-# Báo cáo: Phân tích và định hướng chỉnh sửa loss cho YOLOv8 Detection trong bài toán Leanbot 24 class góc
+## A.  Công việc đã làm
+
+- Phân tích và định hướng chỉnh sửa loss cho YOLOv8 Detection trong bài toán Leanbot 24 class góc
 
 ## 1. Cấu hình training model hiện tại.
 
@@ -676,3 +678,8 @@ cls_loss_new = positive_soft_label_cross_entropy
              + negative_bce_background
 ```
 
+## B. Khó khăn
+- Không
+## C. Công việc tiếp theo 
+- Chờ xác nhận của Thầy về hướng áp dụng Soft label CE .
+- Triển khai train lại model và đánh giá các metrics so sánh kết quả với cấu hình train mặc định

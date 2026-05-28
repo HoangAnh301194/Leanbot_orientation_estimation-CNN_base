@@ -218,7 +218,7 @@ def main():
         header = ["x_center", "y_center", "width", "height"] + [names[j] for j in range(nc)]
         df = pd.DataFrame(csv_data, columns=header)
         csv_path = os.path.join(out_subdir, f"{os.path.splitext(img_name)[0]}_top200.csv")
-        df.to_csv(csv_path, index=False)
+        df.to_csv(csv_path, index=False, float_format="%.2f")
 
         cv2.imwrite(os.path.join(out_subdir, f"debug_{img_name}"), img0)
         with open(os.path.join(out_subdir, f"{os.path.splitext(img_name)[0]}_debug.txt"), "w", encoding="utf-8") as f:

@@ -323,7 +323,7 @@ Do đó:
   - Giữ `target_scores` gốc cho `box_loss` và `dfl_loss`.
   - Tạo biến mới, ví dụ `soft_cls_targets`, chỉ dùng cho `cls_loss`.
 
-### 4.6. Kết 
+### 4.6. Kết luận
 
 - Không nên thay toàn bộ BCE bằng CE một cách trực tiếp.
 

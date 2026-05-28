@@ -4,10 +4,15 @@ import numpy as np
 import glob
 
 def main():
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    tool1_output_dir = os.path.join(base_dir, "tool1_output")
+    import argparse
+    parser = argparse.ArgumentParser(description="Crop and resize images based on config.npy")
+    parser.add_argument("--input", type=str, required=True, help="Input directory containing session folders")
+    parser.add_argument("--output", type=str, required=True, help="Output directory to save cropped images")
+    args = parser.parse_args()
+
+    tool1_output_dir = args.input
+    crop_images_dir = args.output
     
-    crop_images_dir = os.path.join(base_dir, "crop_images")
     os.makedirs(crop_images_dir, exist_ok=True)
     
     if not os.path.exists(tool1_output_dir):
@@ -17,7 +22,7 @@ def main():
     for session_folder in os.listdir(tool1_output_dir):
         session_path = os.path.join(tool1_output_dir, session_folder)
         
-        if not os.path.isdir(session_path) or not session_folder.startswith('session_'):
+        if not os.path.isdir(session_path):
             continue
             
         print(f"\nProcessing session: {session_folder}")

@@ -145,7 +145,6 @@ Hai model được thử nghiệm trên cùng ảnh `24class_test_images/002.jpg
 
 #### 3.1. Model Default BCE
 
-- Model: [best_24Class_Default_BCE.pt](tools/best_24Class_Default_BCE.pt)
 - Report markdown: [test_results/default_bce_report_640/report.md](test_results/default_bce_report_640/report.md)
 - CSV top 200 anchors: [test_results/default_bce_report_640/002_top200.csv](test_results/default_bce_report_640/002_top200.csv)
 - Grouped anchors CSV: [test_results/default_bce_report_640/002_grouped.csv](test_results/default_bce_report_640/002_grouped.csv)
@@ -173,7 +172,6 @@ Trích report markdown 640:
 
 #### 3.2. Model Soft Angular BCE
 
-- Model: [best_24Class_Soft_Angular_BCE.pt](tools/best_24Class_Soft_Angular_BCE.pt)
 - Report markdown: [test_results/soft_bce_report_640/report.md](test_results/soft_bce_report_640/report.md)
 - CSV top 200 anchors: [test_results/soft_bce_report_640/002_top200.csv](test_results/soft_bce_report_640/002_top200.csv)
 - Grouped anchors CSV: [test_results/soft_bce_report_640/002_grouped.csv](test_results/soft_bce_report_640/002_grouped.csv)

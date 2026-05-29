@@ -91,6 +91,8 @@ __pycache__/
 260528/train_result
 260528/detect_crop_output
 
+260529/datasets
+260529/root_images
 
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep

@@ -118,9 +118,26 @@ Nhận xét: các loss train/val giảm mạnh ở giai đoạn đầu và ổn 
 
 Nhận xét: bản chuẩn hóa giúp so sánh tỷ lệ đúng/sai giữa các class; các ô ngoài đường chéo thể hiện các cặp góc còn bị nhầm nhiều hơn tương đối.
 
-![Validation predictions](24Class_soft_angular_bce_result/val_batch0_pred.jpg)
+![Labels distribution](24Class_soft_angular_bce_result/labels.jpg)
 
-Nhận xét: ảnh validation prediction cho thấy model phát hiện góc Leanbot bị nhiễu, có sự phân vân giữa các góc. 
+Nhận xét: Ảnh tổng hợp phân bố dữ liệu (labels) cho thấy số lượng mẫu tương đối đồng đều ở các class góc. Các vị trí bounding box chủ yếu tập trung quanh trung tâm bức ảnh, phù hợp với đặc thù lấy góc nghiêng của Leanbot.
+
+![Box P curve](24Class_soft_angular_bce_result/BoxP_curve.png)
+
+Nhận xét: Biểu đồ Precision-Confidence cho thấy xu hướng Precision tăng dần khi ngưỡng Confidence tăng. Với confidence > 0.8, độ chính xác gần như đạt mức 1.0 ở hầu hết các class.
+
+![Box R curve](24Class_soft_angular_bce_result/BoxR_curve.png)
+
+Nhận xét: Biểu đồ Recall-Confidence ngược lại với Precision, Recall giảm khi yêu cầu ngưỡng Confidence khắt khe hơn. Ở mức confidence thấp, model dễ dàng nhận diện ra các Leanbot (Recall ~ 1.0).
+
+![Box PR curve](24Class_soft_angular_bce_result/BoxPR_curve.png)
+
+Nhận xét: Biểu đồ Precision-Recall cho thấy diện tích dưới đường cong lớn, chứng tỏ model duy trì được độ chính xác (Precision) tương đối tốt ngay cả ở mức Recall cao. Mức mAP@0.5 tổng thể khá ổn định.
+
+![Box F1 curve](24Class_soft_angular_bce_result/BoxF1_curve.png)
+
+Nhận xét: Biểu đồ F1-Confidence cho thấy điểm cân bằng tốt nhất (F1 cao nhất) giữa Precision và Recall thường nằm ở ngưỡng confidence dao động quanh mức 0.3 - 0.4.
+
 
 ### 3. So sánh với model cũ trên cùng ảnh test
 

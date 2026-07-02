@@ -94,6 +94,13 @@ __pycache__/
 260529/datasets
 260529/root_images
 
+# 260620
+260620/24class_test_images
+
+# 260701
+260701/tools/*.ipynb
+260701/24class_test_images/
+
 # Keep only labels and folder structure
 !260420/output/datasets/images/.gitkeep
 !260420/output/datasets/labels/

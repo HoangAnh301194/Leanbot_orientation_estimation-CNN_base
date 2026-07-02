@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 01/07/2026
+# Báo cáo công việc ngày 02/07/2026
 
 ## A. Công việc đã làm
 
@@ -142,8 +142,8 @@ group_id,vector_magnitude,estimated_angle,x_center,y_center,width,height,group_x
 
 | Cách tính | Input | Kết quả |
 |:---|:---|:---:|
-| **Script cũ** (260620) | `estimated_angle` của từng anchor (tính bằng Top-K 2 class) | **`-60.37°`** ❌ |
-| **Script mới** (260701) | `score_i × cos(θ_i)` trực tiếp từ 24 class scores thô | **`-166.83°`** ✅ |
+| **Script cũ** (260620) | `estimated_angle` của từng anchor (tính bằng Top-K 2 class) | **`-60.37°`** |
+| **Script mới** (260701) | `score_i × cos(θ_i)` trực tiếp từ 24 class scores thô | **`-166.83°`**  |
 
 **Vết tính script cũ – 22 anchors tại Group 6 (trích từ `002_grouped.csv` / 260620):**
 
@@ -309,6 +309,8 @@ runs/image_name/
 python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/002
 ```
 
+![`002.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/002/detected_groups.jpg)
+
 | group_id | Số Anchor | vector_magnitude | x_center | y_center | width | height | angle |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | 2 | 22 | **15.34** | 569.02 | 328.25 | 101.05 | 60.62 | **`-169.34°`** |
@@ -321,8 +323,6 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 | 9 | 19 | **9.74** | 611.56 | 493.01 | 56.81 | 95.68 | **`-166.83°`** |
 | 4 | 24 | **8.93** | 381.71 | 215.92 | 80.71 | 49.45 | **`-174.33°`** |
 
-![`002.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/002/detected_groups.jpg)
-
 > Nhận xét: 9 group chính đều hội tụ về vùng **`-166°` đến `-176°`**. Group có magnitude cao nhất là **15.34**, model rất tự tin khi nhiều anchor cùng dự đoán về hướng đó.
 
 ---
@@ -330,6 +330,8 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 #### 5.2. `000021.jpg` – Leanbot góc khoảng 0° đến +15°
 
 **Link code:** [`tools/analyze_image.py`](tools/analyze_image.py) | **Output:** [`runs/000021/`](runs/000021/) | **CSV:** [`vector_summary.csv`](runs/000021/vector_summary.csv)
+
+![`000021.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000021/detected_groups.jpg)
 
 | group_id | Số Anchor | vector_magnitude | x_center | y_center | width | height | angle |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -343,8 +345,6 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 | 9 | 19 | **9.05** | 534.52 | 251.12 | 90.27 | 58.33 | **`+8.53°`** |
 | 8 | 19 | **8.65** | 506.36 | 156.68 | 79.65 | 49.09 | **`+9.33°`** |
 
-![`000021.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000021/detected_groups.jpg)
-
 > Nhận xét: 9 group chính đều hội tụ về vùng **`+4°` đến `+14°`**, phù hợp với góc gần 0° (hoặc ~+15°) của Leanbot. Top Magnitude = **14.58** (Group 3).
 
 ---
@@ -352,6 +352,8 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 #### 5.3. `000034.jpg` – Leanbot góc khoảng -45° đến -60°
 
 **Link code:** [`tools/analyze_image.py`](tools/analyze_image.py) | **Output:** [`runs/000034/`](runs/000034/) | **CSV:** [`vector_summary.csv`](runs/000034/vector_summary.csv)
+
+![`000034.jpg` – BBox đại diện của 13 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000034/detected_groups.jpg)
 
 | group_id | Số Anchor | vector_magnitude | x_center | y_center | width | height | angle |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -365,8 +367,6 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 | 7 | 25 | **14.22** | 184.26 | 474.73 | 83.56 | 97.90 | **`-66.64°`** |
 | 4 | 29 | **12.99** | 608.34 | 493.33 | 63.56 | 107.27 | **`-50.59°`** |
 
-![`000034.jpg` – BBox đại diện của 13 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000034/detected_groups.jpg)
-
 > Nhận xét: 9 group chính đều hội tụ về vùng **`-47°` đến `-67°`**. Magnitude cao nhất trong cả 4 ảnh test (**22.73**), thể hiện model rất tự tin với góc ~-50°.
 
 ---
@@ -374,6 +374,8 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 #### 5.4. `000070.jpg` – Leanbot góc khoảng -10° đến -15°
 
 **Link code:** [`tools/analyze_image.py`](tools/analyze_image.py) | **Output:** [`runs/000070/`](runs/000070/) | **CSV:** [`vector_summary.csv`](runs/000070/vector_summary.csv)
+
+![`000070.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000070/detected_groups.jpg)
 
 | group_id | Số Anchor | vector_magnitude | x_center | y_center | width | height | angle |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -386,8 +388,6 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
 | 4 | 21 | **11.92** | 337.75 | 192.24 | 77.53 | 48.20 | **`-15.35°`** |
 | 5 | 18 | **11.74** | 200.75 | 192.48 | 79.12 | 49.27 | **`-9.62°`** |
 | 9 | 25 | **9.79** | 541.26 | 438.52 | 114.43 | 77.21 | **`-15.56°`** |
-
-![`000070.jpg` – BBox đại diện của 12 group | nhãn: G{id} {angle}deg m={magnitude}](runs/000070/detected_groups.jpg)
 
 > Nhận xét: 9 group chính đều hội tụ về vùng **`-9°` đến `-16°`**. Model nhận diện nhất quán góc xoay nhỏ âm của Leanbot. Top Magnitude = **15.08** (Group 3).
 

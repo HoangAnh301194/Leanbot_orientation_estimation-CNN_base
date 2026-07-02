@@ -420,13 +420,14 @@ python tools/analyze_image.py --input 24class_test_images/002.jpg --output runs/
     - Script cũ (260620): tính `estimated_angle` của **từng anchor riêng lẻ** qua `atan2` trước, rồi biến đổi ngược về `(Vx, Vy)` để cộng dồn cấp group --> áp dụng `atan2` **hai lần**, khiến thông tin phân phối gốc của 24 class scores bị nén và mất đi, dẫn đến sai góc. 
     - Script mới (260701): lưu `(vector_x, vector_y)` thô của từng anchor, cộng dồn trực tiếp và chỉ dùng `atan2` **một lần duy nhất** ở cấp group --> cho kết quả tốt hơn so với script cũ.
 
-  | Tiêu chí | Script cũ (260620) | Script mới (260701) |
-  |:---|:---:|:---:|
-  | Số lần `atan2` | **2 lần** | **1 lần** |
-  | Input cộng dồn group | `(mag, estimated_angle)` đã nén | `(vector_x, vector_y)` thô |
-  | Class dùng để tính góc | Top-K (2 class) | Đủ 24 class |
-  | Kết quả Group 6 | `-60.37°`  | `-166.83°`  |
-  | Kết quả Group 9 | `+174.47°`  | `-176.04°`  |
+
+| Tiêu chí | Script cũ (260620) | Script mới (260701) |
+|:---|:---:|:---:|
+| Số lần `atan2` | **2 lần** | **1 lần** |
+| Input cộng dồn group | `(mag, estimated_angle)` đã nén | `(vector_x, vector_y)` thô |
+| Class dùng để tính góc | Top-K (2 class) | Đủ 24 class |
+| Kết quả Group 6 | `-60.37°`  | `-166.83°`  |
+| Kết quả Group 9 | `+174.47°`  | `-176.04°`  |
 
 
 

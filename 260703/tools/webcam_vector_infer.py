@@ -263,7 +263,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
             c = colors[(gid - 1) % len(colors)]
             cv2.rectangle(annotated, (x1, y1), (x2, y2), c, 2)
             
-            label = f"G{gid} {ang:.1f}deg m={mag:.2f}"
+            label = f"Leanbot {gid} {ang:.1f}deg m={mag:.2f}"
             font, scale, thick = cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1
             (tw, th), _ = cv2.getTextSize(label, font, scale, thick)
             lx = max(0, x1)
@@ -354,11 +354,14 @@ def main():
                     # Bắt đầu record
                     timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
                     csv_path = run_dir / f"webcam_vector_log_{timestamp_str}.csv"
+                    img_path = run_dir / f"webcam_vector_log_{timestamp_str}.jpg"
+                    cv2.imwrite(str(img_path), annotated) # Lưu ảnh mẫu đầu tiên
                     f_csv = open(csv_path, mode="w", newline="", encoding="utf-8")
                     writer = csv.writer(f_csv)
                     writer.writerow(["timestamp", "frame_id", "group_id", "num_anchors", "magnitude", "x_center", "y_center", "width", "height", "angle"])
                     is_recording = True
                     print(f"\n[RECORDING START] Dang luu log vao: {csv_path}")
+                    print(f"[CAPTURE] Da luu anh mau vao: {img_path}")
                 else:
                     # Dừng record
                     is_recording = False

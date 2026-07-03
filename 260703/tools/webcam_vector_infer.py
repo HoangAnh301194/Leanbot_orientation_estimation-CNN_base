@@ -168,16 +168,19 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
         
     # Preprocess (Full Frame Letterbox)
     from ultralytics.data.augment import LetterBox
+    _t_pre0 = time.perf_counter()
     letterbox = LetterBox(new_shape=(640, 640), auto=False, stride=32)
     img640 = letterbox(image=frame)
     img_tensor = img640[:, :, ::-1].transpose(2, 0, 1)
     img_tensor = torch.from_numpy(np.ascontiguousarray(img_tensor)).to(model.device).float() / 255.0
     img_tensor = img_tensor.unsqueeze(0)
+    _t_pre1 = time.perf_counter()
     
     # Inference without NMS
-    t0 = time.time()
+    t0 = time.perf_counter()
     with torch.no_grad():
         raw_pred = model.model(img_tensor)
+    _t_infer = time.perf_counter()
         
     raw_pred = raw_pred[0] if isinstance(raw_pred, (tuple, list)) else raw_pred
     if raw_pred.shape[1] != 4 + nc and raw_pred.shape[2] == 4 + nc:
@@ -198,7 +201,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
     total_anchors = len(filtered_scores)
     
     if total_anchors == 0:
-        t1 = time.time()
+        t1 = time.perf_counter()
         print(f"\n--- Frame {frame_id} | Time: {timestamp} | Calc Time: {(t1 - t0) * 1000:.1f}ms ---")
         print(" No objects detected (filtered by conf).")
         return annotated
@@ -209,6 +212,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
     
     top_boxes = raw_boxes_xywh[topk_idx].cpu().numpy()
     top_scores = raw_class_scores[topk_idx].cpu().numpy()
+    _t_filter = time.perf_counter()
     
     # 2. Map boxes back to original image coordinates
     from ultralytics.utils.ops import xywh2xyxy, xyxy2xywh, scale_boxes
@@ -225,9 +229,11 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
         
     col_names = ["vector_magnitude", "estimated_angle", "x_center", "y_center", "width", "height"]
     raw_df = pd.DataFrame(raw_rows, columns=col_names)
+    _t_vector = time.perf_counter()
     
     # 4. Group anchors (IoU Greedy)
     groups = group_anchors(raw_df, iou_thres=args.iou)
+    _t_group = time.perf_counter()
     
     # 5. Compute vector for each group
     summary_df = pd.DataFrame()
@@ -236,8 +242,32 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
         if not summary_df.empty:
             summary_df = summary_df[summary_df["vector_magnitude"] >= args.min_mag]
         
-    t1 = time.time()
+    t1 = time.perf_counter()
     calc_time_ms = (t1 - t0) * 1000
+    
+    # Accumulate step timings for profiling (in ms)
+    run_realtime_inference._acc_pre    = getattr(run_realtime_inference, '_acc_pre',    0) + (_t_pre1   - _t_pre0)  * 1000
+    run_realtime_inference._acc_infer  = getattr(run_realtime_inference, '_acc_infer',  0) + (_t_infer  - t0)       * 1000
+    run_realtime_inference._acc_filter = getattr(run_realtime_inference, '_acc_filter', 0) + (_t_filter - _t_infer) * 1000
+    run_realtime_inference._acc_vector = getattr(run_realtime_inference, '_acc_vector', 0) + (_t_vector - _t_filter)* 1000
+    run_realtime_inference._acc_group  = getattr(run_realtime_inference, '_acc_group',  0) + (_t_group  - _t_vector)* 1000
+    run_realtime_inference._acc_n      = getattr(run_realtime_inference, '_acc_n',      0) + 1
+    
+    PROFILE_INTERVAL = 30
+    if run_realtime_inference._acc_n >= PROFILE_INTERVAL:
+        n = run_realtime_inference._acc_n
+        print(f"\n{'='*55}")
+        print(f"  [PROFILE] Trung binh {n} frame gan nhat:")
+        print(f"  Preprocess (LetterBox) : {run_realtime_inference._acc_pre    / n:7.2f} ms")
+        print(f"  YOLO Inference (GPU)   : {run_realtime_inference._acc_infer  / n:7.2f} ms")
+        print(f"  Filter + TopK          : {run_realtime_inference._acc_filter / n:7.2f} ms")
+        print(f"  Vector Computation     : {run_realtime_inference._acc_vector / n:7.2f} ms")
+        print(f"  IoU Grouping           : {run_realtime_inference._acc_group  / n:7.2f} ms")
+        print(f"  TOTAL calc             : {calc_time_ms                           :7.2f} ms")
+        print(f"{'='*55}")
+        run_realtime_inference._acc_pre = run_realtime_inference._acc_infer = 0
+        run_realtime_inference._acc_filter = run_realtime_inference._acc_vector = 0
+        run_realtime_inference._acc_group = run_realtime_inference._acc_n = 0
     
     # In ra terminal
     print(f"\n--- Frame {frame_id} | Time: {timestamp} | Calc Time: {calc_time_ms:.1f}ms ---")

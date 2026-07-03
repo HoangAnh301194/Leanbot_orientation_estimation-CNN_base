@@ -61,7 +61,7 @@
 
 6. **Tính Vector con:** Dùng 24 điểm số của 24 class góc để nhân với `cos/sin` tương ứng, tạo thành cặp vector thành phần $(V_x, V_y)$ cho mỗi điểm ảnh.
 
-7. **Gom cụm (IoU Greedy Grouping):** Gom các anchor chồng lấn lên nhau (vượt ngưỡng `--iou`) thành từng cụm đối tượng đại diện cho xe Leanbot.
+7. **Gom cụm (IoU Greedy Grouping):** Gom các anchor chồng lấn lên nhau (vượt ngưỡng `--iou`) thành từng cụm đối tượng đại diện cho Leanbot.
 
 8. **Tổng hợp Góc (Group Vector):** Cộng dồn các vector $(V_x, V_y)$ trong mỗi cụm. Cụm nào có tổng vector bé hơn `--min-mag` sẽ bị loại. Dùng hàm `atan2` để lấy góc cuối cùng.
 
@@ -91,70 +91,70 @@
 ### 3.1 Trường hợp Leanbot đứng yên tại các vị trí khác nhau.  
 - Mỗi trường hợp đứng yên được record, lấy dữ liệu để lưu vào fiel csv trong khoảng 3 giây .
  
-#### Trường hợp 1 (Góc ~ -12°)
+#### Trường hợp 1
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_105923.csv`](runs/webcam_vector_log_20260703_105923.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_105923.jpg`](runs/webcam_vector_log_20260703_105923.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_105923.png`](runs/webcam_vector_log_20260703_105923.png)
 - **FPS ước tính**: ~6.6 FPS
 - **Kết quả góc trung bình**: **-11.9°**
 
-#### Trường hợp 2 (Góc ~ -83°)
+#### Trường hợp 2
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_105935.csv`](runs/webcam_vector_log_20260703_105935.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_105935.jpg`](runs/webcam_vector_log_20260703_105935.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_105935.png`](runs/webcam_vector_log_20260703_105935.png)
 - **FPS ước tính**: ~6.4 FPS
 - **Kết quả góc trung bình**: **-82.8°**
 
-#### Trường hợp 3 (Góc ~ +51°)
+#### Trường hợp 3
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_105947.csv`](runs/webcam_vector_log_20260703_105947.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_105947.jpg`](runs/webcam_vector_log_20260703_105947.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_105947.png`](runs/webcam_vector_log_20260703_105947.png)
 - **FPS ước tính**: ~6.8 FPS
 - **Kết quả góc trung bình**: **+50.7°**
 
-#### Trường hợp 4 (Góc ~ +139°)
+#### Trường hợp 4
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_105956.csv`](runs/webcam_vector_log_20260703_105956.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_105956.jpg`](runs/webcam_vector_log_20260703_105956.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_105956.png`](runs/webcam_vector_log_20260703_105956.png)
 - **FPS ước tính**: ~6.3 FPS
 - **Kết quả góc trung bình**: **+138.8°**
 
-#### Trường hợp 5 (Góc ~ +96°)
+#### Trường hợp 5
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110005.csv`](runs/webcam_vector_log_20260703_110005.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110005.jpg`](runs/webcam_vector_log_20260703_110005.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110005.png`](runs/webcam_vector_log_20260703_110005.png)
 - **FPS ước tính**: ~6.5 FPS
 - **Kết quả góc trung bình**: **+95.8°**
 
-#### Trường hợp 6 (Góc ~ -150°)
+#### Trường hợp 6 
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110019.csv`](runs/webcam_vector_log_20260703_110019.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110019.jpg`](runs/webcam_vector_log_20260703_110019.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110019.png`](runs/webcam_vector_log_20260703_110019.png)
 - **FPS ước tính**: ~6.3 FPS
 - **Kết quả góc trung bình**: **-150.0°**
 
-#### Trường hợp 7 (Góc ~ -139°)
+#### Trường hợp 7
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110032.csv`](runs/webcam_vector_log_20260703_110032.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110032.jpg`](runs/webcam_vector_log_20260703_110032.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110032.png`](runs/webcam_vector_log_20260703_110032.png)
 - **FPS ước tính**: ~6.8 FPS
 - **Kết quả góc trung bình**: **-139.2°**
 
-#### Trường hợp 8 (Góc ~ -81°)
+#### Trường hợp 8 
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110040.csv`](runs/webcam_vector_log_20260703_110040.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110040.jpg`](runs/webcam_vector_log_20260703_110040.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110040.png`](runs/webcam_vector_log_20260703_110040.png)
 - **FPS ước tính**: ~7.4 FPS
 - **Kết quả góc trung bình**: **-80.5°**
 
-#### Trường hợp 9 (Góc ~ -44°)
+#### Trường hợp 9
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110048.csv`](runs/webcam_vector_log_20260703_110048.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110048.jpg`](runs/webcam_vector_log_20260703_110048.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110048.png`](runs/webcam_vector_log_20260703_110048.png)
 - **FPS ước tính**: ~5.1 FPS
 - **Kết quả góc trung bình**: **-44.1°**
 
-#### Trường hợp 10 (Góc ~ -73°)
+#### Trường hợp 10 
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_110057.csv`](runs/webcam_vector_log_20260703_110057.csv)
 - **Ảnh thực tế**: ![`runs/webcam_vector_log_20260703_110057.jpg`](runs/webcam_vector_log_20260703_110057.jpg)
 - **Đồ thị phân tích**: ![`runs/webcam_vector_log_20260703_110057.png`](runs/webcam_vector_log_20260703_110057.png)

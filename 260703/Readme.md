@@ -21,7 +21,7 @@
 - **Ouput của scripts:**
   - Cửa sổ Video OpenCV hiển thị thời gian thực (BBox, Group ID, góc, magnitude, và FPS).
 
-  ![alt text](image.png)
+  ![Màn hình inference thời gian thực](image.png)
 
   - Bảng log thông số in trực tiếp trên cửa sổ Terminal cho từng khung hình.
   
@@ -65,24 +65,24 @@
 
 8. **Tổng hợp Góc (Group Vector):** Cộng dồn các vector $(V_x, V_y)$ trong mỗi cụm. Cụm nào có tổng vector bé hơn `--min-mag` sẽ bị loại. Dùng hàm `atan2` để lấy góc cuối cùng.
 
-9. **Hiển thị & Ghi Log:** Dùng OpenCV vẽ hộp chữ nhật và chèn thông số. Ghi dòng dữ liệu mới vào tệp `.csv` (nếu đang ở chế độ Record). File CSV debug được lưu vào [runs](/runs). Định dạng tên file csv được lưu theo thời gian thực khi nhấn phím `R` - Record. Ví dụ: `webcam_vector_log_20260703_093723.csv`. 
+9. **Hiển thị & Ghi Log:** Dùng OpenCV vẽ hộp chữ nhật và chèn thông số. Ghi dòng dữ liệu mới vào tệp `.csv` (nếu đang ở chế độ Record). File CSV debug được lưu vào thư mục `runs/`. Định dạng tên file csv được lưu theo thời gian thực khi nhấn phím `R` - Record. Ví dụ: `webcam_vector_log_20260703_093723.csv`. 
 
 
 
 
 ## 2. Vẽ biểu đồ Angle, X-Y_center đánh giá kết quả realtime detection
-- **Link code**: [`tools/plot_spin_log.py`](tools/plot_spin_log.py)
+- **Link code**: [`tools/plot_log.py`](tools/plot_log.py)
 - **Các bước xử lý**: 
-  - Tự động đọc dữ liệu chuỗi thời gian từ file CSV log trong [/runs](/runs)
+  - Tự động đọc dữ liệu chuỗi thời gian từ file CSV log trong thư mục `runs/`.
   - Vẽ đồ thị sự biến thiên của Góc (Angle) từ `-180` đến `+180` độ.
   - Vẽ đồ thị tọa độ Tâm (X_center, Y_center) để đánh giá độ ổn định vị trí trong lúc xoay.
 - **Lệnh chạy**: 
   ```bash
-  python tools/plot_spin_log.py runs/webcam_vector_log_20260703_093723.csv
+  python tools/plot_log.py runs/webcam_vector_log_20260703_093723.csv
   ```
   hoặc :
   ```bash
-  python tools/plot_spin_log.py runs
+  python tools/plot_log.py runs
   ```
   Để chạy toàn bộ log trong thư mục runs. 
 
@@ -161,10 +161,10 @@
 - **FPS ước tính**: ~6.7 FPS
 - **Kết quả góc trung bình**: **-72.8°**
 
-### 3.2 Trường hợp Leanbot xuay tại chỗ 360 độ
-- Vị trí khảo sát :
+### 3.2 Trường hợp Leanbot xuây tại chỗ 360 độ
+- Vị trí khảo sát:
 
-![alt text](image-1.png)
+![Vị trí khảo sát spin](image-1.png)
 
 #### Trường hợp 1. Xoay ngược chiều kim đồng hồ (CCW).
 - **File Log CSV**: [`runs/webcam_vector_log_20260703_112534.csv`](runs/webcam_vector_log_20260703_112534.csv)

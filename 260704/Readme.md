@@ -128,7 +128,7 @@ Tuy nhiên, lượng tử hóa INT8 yêu cầu một calibration dataset đại 
 
 Khối lượng tính toán của CNN phụ thuộc gần đúng vào diện tích tensor đầu vào:
 
-$$ FLOPs_{new} \approx FLOPs_{640} \times \left( \frac{S_{new}}{640} \right)^2 $$
+<p align="center"><img src="https://latex.codecogs.com/svg.image?FLOPs_{new}\approx%20FLOPs_{640}\times\left(\frac{S_{new}}{640}\right)^2" alt="FLOPs formula" /></p>
 
 Với mô hình hiện tại có độ phức tạp 8.2 GFLOPs tại kích thước `640 × 640`, có thể ước lượng:
 

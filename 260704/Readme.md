@@ -299,7 +299,7 @@ openvino_fp16_path = model_pt.export(format="openvino", imgsz=640, half=True)
 > **Kết luận:** Sau khi nén Lượng tử hóa xuống mức FP16, OpenVINO đã cải thiện tốc độ tính toán đáng kể. Thời gian suy luận (Inference) giảm từ 182.25ms (ở bản FP32) xuống chỉ còn **24.77ms**, giúp tăng số Khung hình/giây lên **28.44 FPS** (Nhanh gấp 3.5 lần so với PyTorch gốc). Mặc dù không cần điều chỉnh thuật toán hay dùng Calibration Dataset, phương pháp này đã tận dụng rất tốt phần cứng CPU để tăng tốc độ.
 
 ## B. Khó khăn
-- Không
+
 - Vì phương pháp lượng tử hóa INT8 bắt buộc phải có tập ảnh dataset riêng để thực hiện calibration, mà trước đó thì khi chụp em chỉ lấy tay đặt ước lượng nên góc có thể không đúng hoàn toàn.  Em có cần phải thu thập lại ảnh 24 class và sử dụng thước đo góc để chính xác hơn không ạ ? 
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ .

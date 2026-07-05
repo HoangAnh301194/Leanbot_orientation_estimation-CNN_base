@@ -105,4 +105,11 @@ __pycache__/
 !260420/output/datasets/images/.gitkeep
 !260420/output/datasets/labels/
 !260420/output/datasets/labels/*.txt
- 
+
+# 260704
+260704/runs/
+260704/24class_test_images/
+260704/tools/*.ipynb
+260704/tools/best_24Class_Soft_Angular_BCE_openvino_model/
+260704/tools/quantized_fp16/
+260704/tools/*.onnx

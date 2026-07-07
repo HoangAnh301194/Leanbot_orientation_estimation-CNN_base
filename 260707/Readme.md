@@ -62,10 +62,10 @@ python tools\webcam_vector_infer.py  --source 1 --model models\quantized_models_
 - Từ timestamp trong file CSV suy ra được **FPS** trung bình thực tế là: **26 FPS**
 - Ảnh chạy realtime thực tế :
 
-![runs\webcam_vector_log_20260707_103623.jpg](runs\webcam_vector_log_20260707_103623.jpg)
+![runs\webcam_vector_log_20260707_103623.jpg](runs/webcam_vector_log_20260707_103623.jpg)
 - Đồ thị dữ liệu angle, X-Y_center của bbox khi Leanbot đứng yên . 
 
-![runs\webcam_vector_log_20260707_103623.png](runs\webcam_vector_log_20260707_103623.png) 
+![runs\webcam_vector_log_20260707_103623.png](runs/webcam_vector_log_20260707_103623.png) 
 
 ## 3. Lập trình Leanbot di chuyển vòng tròn và đánh giá đồ thị dữ liệu angle, X-Y_center của bbox. 
  
@@ -133,7 +133,7 @@ Từ đó quy trình unwrap góc là:
 ## 3.2 Đồ thị đánh giá khi Leanbot di chuyển vòng tròn 
 - Đồ thị : 
 ![runs\webcam_vector_log_20260707_104825.png](runs/webcam_vector_log_20260707_104825.png)
-- File CSV : [/runs/webcam_vector_log_20260707_104825.csv](/runs/webcam_vector_log_20260707_104825.csv)
+- File CSV : [/runs/webcam_vector_log_20260707_104825.csv](runs/webcam_vector_log_20260707_104825.csv)
 
 - **Đánh giá** : 
 

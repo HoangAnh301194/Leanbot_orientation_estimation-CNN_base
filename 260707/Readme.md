@@ -155,4 +155,5 @@ Từ đó quy trình unwrap góc là:
 # B. Khó khăn 
 - Không
 # C. Công việc tiếp theo
+- Vì bộ dữ liệu gốc em chụp ban đầu là ước lượng góc bằng mắt nên có thể không chính xác hoàn toàn, em có cần chụp lại dữ liệu gốc và sử dụng thước để chính xác hơn không ạ ?
 - Em xin phép nhận hướng đi đi tiếp theo từ Thầy ạ .

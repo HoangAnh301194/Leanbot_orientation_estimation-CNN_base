@@ -1,7 +1,8 @@
 import os
 import glob
+from pathlib import Path
 
-base_dir = r"D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260511\yolo_class_bbox_results"
+base_dir = Path(__file__).resolve().parents[1] / "yolo_class_bbox_results"
 txt_files = glob.glob(os.path.join(base_dir, "**", "*_debug.txt"), recursive=True)
 
 md_lines = ["| Tên ảnh | Góc độ (Thư mục) | Số object | Nhận diện Top 1 (Class & Conf) |", "|---|---|---|---|"]

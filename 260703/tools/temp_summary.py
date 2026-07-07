@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
-runs_dir = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260703\runs'
+runs_dir = Path(__file__).resolve().parents[1] / 'runs'
 fname = 'webcam_vector_log_20260703_123113.csv'
 fpath = os.path.join(runs_dir, fname)
 df = pd.read_csv(fpath)

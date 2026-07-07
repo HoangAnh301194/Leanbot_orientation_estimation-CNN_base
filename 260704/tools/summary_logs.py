@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
-runs_dir = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260703\runs'
+runs_dir = Path(__file__).resolve().parents[2] / '260703' / 'runs'
 files = sorted([f for f in os.listdir(runs_dir) if f.endswith('.csv')])
 print('Found', len(files), 'CSV files\n')
 for i, fname in enumerate(files):

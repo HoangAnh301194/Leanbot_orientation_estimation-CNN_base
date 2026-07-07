@@ -1,10 +1,11 @@
 import os
 import sys
 import torch
+from pathlib import Path
 from ultralytics import YOLO
 
 def main():
-    model_path = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260403\Leanbot_detection\models\leanbot_colab.pt'
+    model_path = Path(__file__).resolve().parents[2] / '260707' / 'models' / 'best_24Class_Soft_Angular_BCE.pt'
     if not os.path.exists(model_path):
         print(f"Không tìm thấy file: {model_path}")
         return

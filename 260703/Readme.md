@@ -161,7 +161,7 @@
 - **FPS ước tính**: ~6.7 FPS
 - **Kết quả góc trung bình**: **-72.8°**
 
-### 3.2 Trường hợp Leanbot xuây tại chỗ 360 độ
+### 3.2 Trường hợp Leanbot xoay tại chỗ 360 độ
 - Vị trí khảo sát:
 
 ![Vị trí khảo sát spin](image-1.png)

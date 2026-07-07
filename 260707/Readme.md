@@ -15,24 +15,24 @@
 - Chạy mỗi model **30 lần / 1 ảnh**, tính trung bình FPS trên tổng số lượt chạy model trên toàn bộ folde ảnh (4 ảnh * 30 lần = 120 lượt chạy model)
 - Hàm chuyển đổi model lượng tử hóa INT8: 
 ```python
-from ultralytics import YOLO
-from onnxruntime.quantization import quantize_dynamic, QuantType
+    from ultralytics import YOLO
+    from onnxruntime.quantization import quantize_dynamic, QuantType
 
-# Load model gốc cần chuyển đổi 
-model_pt = YOLO('models/best_24Class_Soft_Angular_BCE.pt')
+    # Load model gốc cần chuyển đổi 
+    model_pt = YOLO('models/best_24Class_Soft_Angular_BCE.pt')
 
-# 1. Lượng tử hóa sang định dạng OpenVINO INT8 (bằng thư viện Ultralytics)
-model_pt.export(format='openvino', int8=True, imgsz=640)
+    # 1. Lượng tử hóa sang định dạng OpenVINO INT8 (bằng thư viện Ultralytics)
+    model_pt.export(format='openvino', int8=True, imgsz=640)
 
-# 2. Lượng tử hóa sang định dạng ONNX INT8 (sử dụng thư viện ONNX Runtime)
-# Export file ONNX FP32 gốc trước
-onnx_fp32_path = model_pt.export(format='onnx', half=False, imgsz=640)
-# Nén động các trọng số xuống chuẩn 8-bit (Dynamic Quantization)
-quantize_dynamic(
-    model_input=onnx_fp32_path,
-    model_output='models/best_24Class_Soft_Angular_BCE_int8.onnx',
-    weight_type=QuantType.QUInt8
-)
+    # 2. Lượng tử hóa sang định dạng ONNX INT8 (sử dụng thư viện ONNX Runtime)
+    # Export file ONNX FP32 gốc trước
+    onnx_fp32_path = model_pt.export(format='onnx', half=False, imgsz=640)
+    # Nén động các trọng số xuống chuẩn 8-bit (Dynamic Quantization)
+    quantize_dynamic(
+        model_input=onnx_fp32_path,
+        model_output='models/best_24Class_Soft_Angular_BCE_int8.onnx',
+        weight_type=QuantType.QUInt8
+    )
 ```
 
 - **Bảng kết quả so sánh tốc độ xử lí các Models (FP32 gốc, FP16, INT8 quantization)** 
@@ -55,8 +55,10 @@ quantize_dynamic(
 ## 2. Thử nghiệm Realtime Camera Stream với  Model lượng tử hóa FP16 OpenVINO 
 - Code sử dụng : [tools/webcam_vector_infer.py](tools/webcam_vector_infer.py)
 - Chạy model với đường dẫn model từ model Pytorch gốc thành OpenVINO FP16 Quantization :
+
 ```text
 python tools\webcam_vector_infer.py  --source 1 --model models\quantized_models_full\model_fp16_openvino_model\
+
 ``` 
 - Dữ liệu đánh giá được lưu trong [/runs](runs)
 - Từ timestamp trong file CSV suy ra được **FPS** trung bình thực tế là: **26 FPS**
@@ -71,26 +73,26 @@ python tools\webcam_vector_infer.py  --source 1 --model models\quantized_models_
  
 - Code sử dụng : 
 ```cpp
-#include <Leanbot.h>
+    #include <Leanbot.h>
 
-const int TURN_ANGLE_DEG = 370;
+    const int TURN_ANGLE_DEG = 370;
 
-void setup() {
-  Leanbot.begin();
-  LbMission.begin(TB1A + TB1B);
+    void setup() {
+    Leanbot.begin();
+    LbMission.begin(TB1A + TB1B);
 
-  Leanbot.tone(1500, 200);
-  delay(1000);
-}
-
-void loop() {
-
-    LbMotion.runLR(2000, 1000);
-    LbMotion.waitRotationDeg(TURN_ANGLE_DEG);
-    LbMotion.stopAndWait();
+    Leanbot.tone(1500, 200);
     delay(1000);
-    LbMission.end() ;
-}
+    }
+
+    void loop() {
+
+        LbMotion.runLR(2000, 1000);
+        LbMotion.waitRotationDeg(TURN_ANGLE_DEG);
+        LbMotion.stopAndWait();
+        delay(1000);
+        LbMission.end() ;
+    }
 ```
 - Leanbot chạy trên sa bàn với quỹ đạo là đường tròn với vận tốc 2 bánh là 2000 và 1000. 
 - Code vẽ đồ thị : [tools/plot_log.py](tools/plot_log.py)

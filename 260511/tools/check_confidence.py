@@ -5,6 +5,7 @@ import numpy as np
 import glob
 import os
 import sys
+from pathlib import Path
 
 from ultralytics import YOLO
 from ultralytics.data.augment import LetterBox
@@ -22,9 +23,10 @@ from ultralytics.utils.ops import scale_boxes, xywh2xyxy
 # CSV functionality removed
 def cv2_imshow(img): pass # Prevent UI blocking locally
 
-model_path = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260511\tools\best.pt'
-test_image_dir = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260511\degree_45_test'
-OUTPUT_DIR = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260511\yolo_class_bbox_results'
+REPORT_DIR = Path(__file__).resolve().parents[1]
+model_path = REPORT_DIR / 'tools' / 'best.pt'
+test_image_dir = REPORT_DIR / 'degree_45_test'
+OUTPUT_DIR = REPORT_DIR / 'yolo_class_bbox_results'
 
 IMG_SIZE = 640
 CONF_THRES = 0.05

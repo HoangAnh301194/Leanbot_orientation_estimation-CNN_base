@@ -2,9 +2,10 @@ import os
 import cv2
 import numpy as np
 import glob
+from pathlib import Path
 
 def main():
-    base_dir = r"d:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260508"
+    base_dir = Path(__file__).resolve().parents[2] / "260508"
     tool1_output_dir = os.path.join(base_dir, "tool1_output")
     
     crop_images_dir = os.path.join(base_dir, "crop_images")

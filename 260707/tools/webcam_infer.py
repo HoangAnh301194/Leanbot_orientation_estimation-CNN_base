@@ -16,7 +16,7 @@ import torch
 import check_confidence
 
 
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parent
+DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 
 
 HTML_PAGE = """<!doctype html>

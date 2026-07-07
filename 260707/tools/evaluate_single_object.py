@@ -13,12 +13,12 @@ class DummyArgs:
     max_objects = 1  # Chỉ lấy object bự nhất (chính là cái crop)
 
 def main():
-    model_path = Path("best.pt")
+    model_path = Path(__file__).resolve().parents[1] / "models" / "best_24Class_Soft_Angular_BCE.pt"
     if not model_path.exists():
         print("Không tìm thấy model best.pt")
         return
         
-    obj_dir = Path(r"D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260522\detect_crop_output\objects\Leanbot_p180_001")
+    obj_dir = Path(__file__).resolve().parent.parent / "detect_crop_output" / "objects" / "Leanbot_p180_001"
     if not obj_dir.exists():
         print(f"Không tìm thấy thư mục: {obj_dir}")
         return

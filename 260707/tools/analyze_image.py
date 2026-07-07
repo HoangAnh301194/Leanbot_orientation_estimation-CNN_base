@@ -15,7 +15,7 @@ Quy trình:
 Lệnh mẫu:
     python analyze_image.py --input 24class_test_images/002.jpg \\
                             --output runs/002 \\
-                            --model tools/best_24Class_Soft_Angular_BCE.pt
+                            --model models/best_24Class_Soft_Angular_BCE.pt
 """
 
 import argparse
@@ -355,14 +355,14 @@ def parse_args() -> argparse.Namespace:
 
 def find_default_model() -> Optional[Path]:
     preferred = [
-        SCRIPT_DIR / "tools" / "best_24Class_Soft_Angular_BCE.pt",
-        SCRIPT_DIR / "tools" / "best_24Class_Default_BCE.pt",
-        SCRIPT_DIR / "tools" / "best.pt",
+        SCRIPT_DIR.parent / "models" / "best_24Class_Soft_Angular_BCE.pt",
+        SCRIPT_DIR.parent / "models" / "best_24Class_Default_BCE.pt",
+        SCRIPT_DIR.parent / "models" / "best.pt",
     ]
     for p in preferred:
         if p.exists():
             return p
-    pts = sorted(SCRIPT_DIR.glob("tools/*.pt"), key=lambda f: f.stat().st_mtime, reverse=True)
+    pts = sorted(SCRIPT_DIR.parent.glob("models/*.pt"), key=lambda f: f.stat().st_mtime, reverse=True)
     return pts[0] if pts else None
 
 

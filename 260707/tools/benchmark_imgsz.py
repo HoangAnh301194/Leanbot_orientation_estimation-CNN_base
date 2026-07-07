@@ -6,7 +6,7 @@ from ultralytics import YOLO
 def run_benchmark():
     # Lấy thư mục chứa script hiện tại để làm đường dẫn động
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(current_dir, 'best_24Class_Soft_Angular_BCE.pt')
+    model_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
     
     # Đường dẫn thư mục chứa ảnh test
     test_dir = os.path.join(current_dir, '..', '24class_test_images')

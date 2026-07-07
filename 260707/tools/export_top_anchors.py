@@ -1,6 +1,7 @@
 import os
 import torch
 import pandas as pd
+from pathlib import Path
 from ultralytics import YOLO
 from ultralytics.utils.ops import scale_boxes, xywh2xyxy, xyxy2xywh
 import cv2
@@ -12,7 +13,8 @@ def export_top_anchors(img_path, output_csv, top_k=200):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
     # Load model
-    model = YOLO("best.pt").to(device)
+    model_path = Path(__file__).resolve().parents[1] / "models" / "best_24Class_Soft_Angular_BCE.pt"
+    model = YOLO(str(model_path)).to(device)
     model.model.eval()
     nc = len(model.names) # 24 classes
     

@@ -4,7 +4,7 @@ import torch
 from ultralytics import YOLO
 
 def main():
-    model_path = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260403\Leanbot_detection\models\leanbot_colab.pt'
+    model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'models', 'leanbot_colab.pt')
     if not os.path.exists(model_path):
         print(f"Không tìm thấy file: {model_path}")
         return

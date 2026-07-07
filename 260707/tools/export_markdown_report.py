@@ -21,7 +21,7 @@ import check_confidence
 
 
 IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parent
+DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 PROJECT_ROOT = DEFAULT_MODEL_DIR.parent
 MAX_TABLE_CLASS_COLUMNS = 0
 

@@ -4,9 +4,8 @@ from ultralytics import YOLO
 
 def main():
     # Sử dụng đường dẫn tương đối (để chạy từ trong thư mục tools hoặc thư mục gốc)
-    model_path = 'best_24Class_Soft_Angular_BCE.pt'
-    if not os.path.exists(model_path):
-        model_path = 'tools/best_24Class_Soft_Angular_BCE.pt'
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
 
     print(f"==================================================")
     print(f"    ĐÁNH GIÁ THÔNG TIN CHI TIẾT MÔ HÌNH YOLO      ")

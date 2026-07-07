@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    pt_model_path = os.path.join(current_dir, 'best_24Class_Soft_Angular_BCE.pt')
+    pt_model_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
     test_dir = os.path.join(current_dir, '..', '24class_test_images')
     
     # 1. Tìm toàn bộ ảnh test

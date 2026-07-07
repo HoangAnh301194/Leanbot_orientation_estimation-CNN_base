@@ -16,7 +16,7 @@ import torch
 sys.path.append(str(Path(__file__).resolve().parent))
 import check_confidence
 
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parent
+DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 
 # --- HANG SO & REGEX ---
 IOU_THRES = 0.5
@@ -328,7 +328,25 @@ def main():
         sys.exit("Khong tim thay model .pt")
         
     print(f"Dang dung model: {model_path}")
-    model = YOLO(str(model_path))
+    
+    # Wrapper de tuong thich code inference cu
+    class ModelWrapper:
+        def __init__(self, inf_model, names, dev):
+            self.model = inf_model
+            self.names = names
+            self.device = dev
+
+    is_pt = str(model_path).endswith('.pt')
+    if is_pt:
+        yolo_model = YOLO(str(model_path))
+        dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        yolo_model.to(dev)
+        model = ModelWrapper(yolo_model.model, yolo_model.names, yolo_model.device)
+    else:
+        from ultralytics.nn.autobackend import AutoBackend
+        dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        inf_model = AutoBackend(str(model_path), device=dev, fp16=False)
+        model = ModelWrapper(inf_model, inf_model.names, dev)
     
     source = int(args.source) if args.source.isdigit() else args.source
     cap = cv2.VideoCapture(source)

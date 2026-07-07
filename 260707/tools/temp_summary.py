@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 
-runs_dir = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260703\runs'
+runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'runs')
 fname = 'webcam_vector_log_20260703_123113.csv'
 fpath = os.path.join(runs_dir, fname)
 df = pd.read_csv(fpath)

@@ -112,3 +112,10 @@ __pycache__/
 260704/tools/best_24Class_Soft_Angular_BCE_openvino_model/
 260704/tools/quantized_fp16/
 260704/tools/*.onnx
+
+# 260707
+260707/models/**/*.onnx
+260707/models/quantized_models_full/model_fp32_openvino_model/
+260707/models/quantized_models_full/model_int8_int8_openvino_model/
+260707/models/best_24Class_Soft_Angular_BCE_openvino_model/
+260707/models/quantized_fp16/

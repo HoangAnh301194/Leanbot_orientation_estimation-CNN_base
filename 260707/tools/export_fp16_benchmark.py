@@ -5,11 +5,11 @@ from ultralytics import YOLO
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    original_pt_path = os.path.join(current_dir, 'best_24Class_Soft_Angular_BCE.pt')
+    original_pt_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
     test_dir = os.path.join(current_dir, '..', '24class_test_images')
     
     # TẠO THƯ MỤC CHỨA MODEL LƯỢNG TỬ HÓA
-    quantized_dir = os.path.join(current_dir, 'quantized_fp16')
+    quantized_dir = os.path.join(current_dir, '..', 'models', 'quantized_fp16')
     os.makedirs(quantized_dir, exist_ok=True)
     
     # Mẹo: Copy model gốc sang thư mục quantized_fp16 để Ultralytics tự động xuất file vào chung folder này

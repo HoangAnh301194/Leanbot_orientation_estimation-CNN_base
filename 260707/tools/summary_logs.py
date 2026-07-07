@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 
-runs_dir = r'D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260703\runs'
+runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'runs')
 files = sorted([f for f in os.listdir(runs_dir) if f.endswith('.csv')])
 print('Found', len(files), 'CSV files\n')
 for i, fname in enumerate(files):

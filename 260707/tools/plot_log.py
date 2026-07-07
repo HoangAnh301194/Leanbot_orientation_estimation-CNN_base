@@ -29,19 +29,23 @@ def plot_log(csv_file: str):
     
     # Khởi tạo 2 biểu đồ con (Subplots)
     fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
-    fig.suptitle(f'Báo Cáo Leanbot Spin\n{csv_path.name}', fontsize=16, fontweight='bold')
+    fig.suptitle(f'Leanbot Spin Ploter\n{csv_path.name}', fontsize=16, fontweight='bold')
     
     # ---------------------------------------------------------
-    # 1. Đồ thị Góc (Angle) thay đổi từ -180 đến +180
+    # 1. Đồ thị Góc (Angle) 
     # ---------------------------------------------------------
+    import numpy as np
+    
     ax1 = axes[0]
-    ax1.plot(df_g1['frame_id'], df_g1['angle'], 'b.-', label='Angle (degrees)', linewidth=1.5, markersize=4)
+    # Trải phẳng góc (unwrap) để tránh nhảy đột ngột từ -180 sang +180
+    unwrapped_angle = np.degrees(np.unwrap(np.radians(df_g1['angle'])))
+    
+    ax1.plot(df_g1['frame_id'], unwrapped_angle, 'b.-', label='Angle (degrees)', linewidth=1.5, markersize=4)
     ax1.set_ylabel('Degrees')
-    ax1.set_ylim(-190, 190)
-    ax1.set_yticks(range(-180, 181, 45))
+    # Bỏ cố định trục y để đồ thị tự do vẽ góc vượt quá 180 độ
     ax1.grid(True, linestyle='--', alpha=0.7)
     ax1.legend(loc='upper right')
-    ax1.set_title("Angle")
+    ax1.set_title("Angle (Unwrapped)")
     
     # ---------------------------------------------------------
     # 2. Đồ thị Tọa độ X, Y (Để xem xe có bị trôi khi spin không)

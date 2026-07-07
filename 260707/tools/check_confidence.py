@@ -136,7 +136,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="degree_45_test", help="Input directory")
     parser.add_argument("--output", default="yolo_class_bbox_results", help="Output directory")
-    parser.add_argument("--model", default="best.pt", help="Path to the model .pt file")
+    parser.add_argument("--model", default=None, help="Path to the model .pt file")
     args = parser.parse_args()
 
     # Get the directory of the current script
@@ -145,10 +145,12 @@ def main():
     ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 
     # Resolve model path
-    if os.path.isabs(args.model):
+    if args.model is None:
+        model_path = os.path.join(ROOT_DIR, "models", "best_24Class_Soft_Angular_BCE.pt")
+    elif os.path.isabs(args.model):
         model_path = args.model
     else:
-        model_path = os.path.join(SCRIPT_DIR, args.model)
+        model_path = os.path.join(ROOT_DIR, args.model)
     
     # Resolve input dir
     if os.path.isabs(args.input):

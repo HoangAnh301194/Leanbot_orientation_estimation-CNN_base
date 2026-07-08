@@ -119,3 +119,11 @@ __pycache__/
 260707/models/quantized_models_full/model_int8_int8_openvino_model/
 260707/models/best_24Class_Soft_Angular_BCE_openvino_model/
 260707/models/quantized_fp16/
+
+# 260708
+260708/models/**/*.onnx
+260708/models/**/*.bin
+260708/models/**/*.xml
+260708/24class_test_images/
+260708/runs/
+260708/tools/*.ipynb

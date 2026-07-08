@@ -1,10 +1,10 @@
 # Báo cáo công việc ngày 08/07/2026
 
 ## A. Công việc đã làm
-1. Cấu hình và export model YOLO sang định dạng **OpenVINO FP16 Dynamic Input**.
-2. Triển khai **Pipeline ROI Tracking Realtime** để model tập trugn nhận diện vùng có Leanbot
-3. Giải quyết vấn đề vùng ROI vượt ra ngoài kích thước camera mà không cần sử dụng Letterbox/Padding.
-4. Tạo code thu thập log (Logging) theo từng frame và phân tích (Benchmark) hiệu năng (CPU load, fps, frame size, inference time, total processing time)
+- Cấu hình và export model YOLO sang định dạng **OpenVINO FP16 Dynamic Input**.
+- Triển khai **Pipeline ROI Tracking Realtime** để model tập trugn nhận diện vùng có Leanbot
+- Giải quyết vấn đề vùng ROI vượt ra ngoài kích thước camera mà không cần sử dụng Letterbox/Padding.
+- Tạo code thu thập log (Logging) theo từng frame và phân tích (Benchmark) hiệu năng (CPU load, fps, frame size, inference time, total processing time)
 
 ### 1. Export Model OpenVINO Dynamic Input
 - Kích thước đầu vào chuẩn của mô hình YOLO khi export tĩnh (Static) thường bị cố định ở kích thước `640x640`. Việc đưa ảnh có kích thước bất kỳ vào mạng Static sẽ đòi hỏi bước tiền xử lý ép kiểu (Resize/Padding)

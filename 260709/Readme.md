@@ -98,6 +98,7 @@ python tools/roi_tracking_inference.py --mode baseline --source 1 --log log_base
 python tools/roi_tracking_inference.py --mode roi --source 1 --log log_roi_static.csv --show
 ```
   - Ảnh thực tế ROI tracking:
+  
   ![roi_tracking](images\roi_tracking.png)
 
 #### 2.1. Các bước xử lí trong ROI tracking inference

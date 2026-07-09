@@ -90,7 +90,7 @@ model.export(
   ```
   - Ảnh thực tế baseline full-frame :
 
-    ![basline](images\baseline.png)
+    ![basline](images/baseline.png)
 
 - Lệnh chạy ROI tracking:
 
@@ -99,7 +99,7 @@ model.export(
   ```
   - Ảnh thực tế ROI tracking:
 
-    ![roi_tracking](images\roi_tracking.png)
+    ![roi_tracking](images/roi_tracking.png)
 
 #### 2.1. Các bước xử lí trong ROI tracking inference
 

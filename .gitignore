@@ -127,3 +127,11 @@ __pycache__/
 260708/24class_test_images/
 260708/runs/
 260708/tools/*.ipynb
+
+# 260709
+260709/models/**/*.onnx
+260709/models/**/*.bin
+260709/models/**/*.xml
+260709/24class_test_images/
+260709/runs/
+260708/tools/*.ipynb

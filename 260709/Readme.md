@@ -161,6 +161,15 @@ python tools/compare_experiments.py --baseline-log benchmark/log_baseline_static
 
 ![Đồ thị so sánh inference time](benchmark/static_compare_test/inf_time_comparison.png)
 
+### 3. Thử nghiệm đánh giá với full pipeline 
+- Đánh giá 2 mode Baseline và ROI tracking với toàn bộ Pipeline end to end để trích xuất ra góc từ phân tích đầy đủ anchors, vector, angle,... Và vẽ đồ thị góc và x,y_center để đánh giá.
+
+- Scripts sử dụng : [`tools/roi_tracking_baseline_infer.py`](tools/roi_tracking_baseline_infer.py)
+- Lệnh chạy : 
+```bash
+
+```
+
 ## B. Khó khăn
 
 - Không

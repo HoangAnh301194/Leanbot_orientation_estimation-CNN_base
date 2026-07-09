@@ -85,21 +85,21 @@ model.export(
 - Thử nghiệm với Leanbot di chuyển vòng tròn 360 độ. 
 
 - Lệnh chạy baseline full-frame detection:
-```bash
-python tools/roi_tracking_inference.py --mode baseline --source 1 --log log_baseline_static.csv --show
-```
+  ```bash
+  python tools/roi_tracking_inference.py --mode baseline --source 1 --log log_baseline_static.csv --show
+  ```
   - Ảnh thực tế baseline full-frame :
 
-  ![basline](images\baseline.png)
+    ![basline](images\baseline.png)
 
 - Lệnh chạy ROI tracking:
 
-```bash
-python tools/roi_tracking_inference.py --mode roi --source 1 --log log_roi_static.csv --show
-```
+  ```bash
+  python tools/roi_tracking_inference.py --mode roi --source 1 --log log_roi_static.csv --show
+  ```
   - Ảnh thực tế ROI tracking:
-  
-  ![roi_tracking](images\roi_tracking.png)
+
+    ![roi_tracking](images\roi_tracking.png)
 
 #### 2.1. Các bước xử lí trong ROI tracking inference
 

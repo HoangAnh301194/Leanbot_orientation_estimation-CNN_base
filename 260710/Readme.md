@@ -19,7 +19,7 @@ python tools/roi_tracking_baseline_infer.py --mode baseline --source 1 --width 2
 
 - Ảnh chạy thực tế :
 
-![baseline](baseline.png)
+![baseline](images/baseline.png)
 
 #### 1.2 **ROI Tracking model ( 160x160 )**
 - Link code thực hiện: [tools/roi_tracking_baseline_infer.py](tools/roi_tracking_baseline_infer.py)
@@ -33,11 +33,11 @@ python tools/roi_tracking_baseline_infer.py --mode roi --source 1 --width 2560 -
 - Luồng xử lí: Full model khởi tạo bbox → tính ROI vuông NxN trên ảnh gốc 2560x1440 → crop ROI → resize 160x160 → Tracking model static 160x160 → restore bbox về ảnh gốc → cập nhật ROI mỗi frame.
 - Flowchart chi tiết của ROI tracking:
 
-![ROI Tracking Flowchart](images/roi_tracking_flowchart.svg)
+![ROI Tracking Flowchart](images/roi_tracking_flowchart.png)
   
 - Ảnh chạy thực tế : 
 
-![roi_tracking](roi_tracking.png)
+![roi_tracking](images/roi_tracking.png)
 
 #### 1.3 Benchmark 2 model Baseline Full frame model vs ROI Tracking model
 - Thực hiện đánh giá 2 model với Camera chạy realtime với Leanbot chạy vòng tròn. 

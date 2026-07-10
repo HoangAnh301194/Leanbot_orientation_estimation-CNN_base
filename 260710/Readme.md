@@ -1,4 +1,4 @@
-﻿# Báo cáo công việc ngày 09/07/2026
+﻿# Báo cáo công việc ngày 10/07/2026
 
 ## A. Công việc đã làm
 - Chỉnh sửa lại code, thực hiện đúng pipeline để đánh giá Full frame model và ROI tracking model .

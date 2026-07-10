@@ -65,7 +65,7 @@ Nhận xét: ROI Tracking có CPU load trung bình thấp hơn Baseline do chỉ
 
 ![FPS comparison](benchmark/fps_comparison.png)
 
-Nhận xét: FPS xử lý ước tính của ROI Tracking cao hơn rõ rệt, dao động quanh mức 150-155 FPS so với khoảng 35-40 FPS của Baseline.
+Nhận xét: FPS xử lý ước tính của ROI Tracking cao hơn, dao động quanh mức 150-155 FPS so với khoảng 35-40 FPS của Baseline.
 
 **Đồ thị Inference time**:
 

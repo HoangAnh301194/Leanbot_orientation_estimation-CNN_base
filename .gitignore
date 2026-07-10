@@ -134,4 +134,12 @@ __pycache__/
 260709/models/**/*.xml
 260709/24class_test_images/
 260709/runs/
-260708/tools/*.ipynb
+260710/tools/*.ipynb
+
+
+# 260710
+260710/models/**/*.onnx
+260710/models/**/*.bin
+260710/models/**/*.xml
+260710/tools/*.ipynb
+gmail_mcp/

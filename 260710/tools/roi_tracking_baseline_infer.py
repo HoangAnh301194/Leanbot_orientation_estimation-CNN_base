@@ -1,4 +1,4 @@
-import cv2
+﻿import cv2
 import numpy as np
 import time
 import psutil
@@ -11,8 +11,9 @@ import re
 from pathlib import Path
 from datetime import datetime
 from ultralytics import YOLO
+import openvino as ov
 
-# Thêm đường dẫn để import check_confidence
+# Add tools directory to import check_confidence
 
 
 sys.path.append(str(Path(__file__).resolve().parent))
@@ -36,6 +37,48 @@ def angle_from_detection_class(model, cls_id):
     except Exception:
         return 0.0
 
+def get_vector_from_scores(class_scores, names):
+    sum_x = 0.0
+    sum_y = 0.0
+    for cls_id, score in enumerate(class_scores):
+        class_name = names[int(cls_id)]
+        angle = parse_angle_from_class_name(class_name)
+        theta_rad = math.radians(angle)
+        sum_x += float(score) * math.cos(theta_rad)
+        sum_y += float(score) * math.sin(theta_rad)
+    magnitude = math.hypot(sum_x, sum_y)
+    if magnitude <= 1e-9:
+        return 0.0, 0.0
+    angle = math.degrees(math.atan2(sum_y, sum_x))
+    return magnitude, angle
+
+def infer_openvino_raw(compiled_model, image):
+    input_tensor = image[:, :, ::-1].transpose(2, 0, 1)
+    input_tensor = np.ascontiguousarray(input_tensor, dtype=np.float32) / 255.0
+    input_tensor = input_tensor[None, ...]
+    output = compiled_model([input_tensor])[compiled_model.output(0)]
+    pred = np.asarray(output)[0]
+    if pred.shape[0] < pred.shape[1]:
+        pred = pred.T
+    return pred
+
+def select_best_vector_detection(compiled_model, image, names):
+    pred = infer_openvino_raw(compiled_model, image)
+    boxes_xywh = pred[:, :4]
+    class_scores = pred[:, 4:4 + len(names)]
+    best_scores = class_scores.max(axis=1)
+    best_idx = int(np.argmax(best_scores))
+    best_conf = float(best_scores[best_idx])
+    x_center, y_center, width, height = boxes_xywh[best_idx]
+    box_xyxy = np.array([
+        x_center - width / 2.0,
+        y_center - height / 2.0,
+        x_center + width / 2.0,
+        y_center + height / 2.0,
+    ], dtype=np.float32)
+    vector_magnitude, vector_angle = get_vector_from_scores(class_scores[best_idx], names)
+    return box_xyxy, best_conf, vector_angle, vector_magnitude
+
 def safe_timestamp_for_filename(text: str):
     return text.replace(":", "-").replace(".", "-")
 
@@ -50,15 +93,15 @@ def calculate_roi(bbox, img_w, img_h):
     cx = x1 + w / 2.0
     cy = y1 + h / 2.0
 
-    # ROI hình vuông: cạnh dựa trên max(w, h) * hệ số
+    # ROI hinh vuong: canh dua tren max(w, h) * he so
     side = max(w, h) * 2.0
     side_32 = make_multiple_of_32(side)
-    side_32 = min(side_32, img_w, img_h)  # Không vượt quá kích thước ảnh
+    side_32 = min(side_32, img_w, img_h)  # Khong vuot qua kich thuoc anh
 
     x_min = int(cx - side_32 / 2.0)
     y_min = int(cy - side_32 / 2.0)
 
-    # Clamp để ROI nằm trong khung hình
+    # Clamp de ROI nam trong khung hinh
     if x_min < 0:
         x_min = 0
     elif x_min + side_32 > img_w:
@@ -74,10 +117,12 @@ def calculate_roi(bbox, img_w, img_h):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", default="0", help="Camera index or video path")
-    parser.add_argument("--mode", default="roi", choices=["roi", "baseline"], help="Chế độ chạy: roi hoặc baseline")
-    parser.add_argument("--log", default="", help="Tên file csv để lưu log (mặc định tự tạo theo mode)")
-    parser.add_argument("--no-show", action="store_true", help="Không hiển thị cửa sổ OpenCV (tránh lỗi treo GUI)")
-    parser.add_argument("--show", action="store_true", help="Bật cửa sổ OpenCV nếu môi trường hỗ trợ GUI")
+    parser.add_argument("--mode", default="roi", choices=["roi", "baseline"], help="Che do chay: roi hoac baseline")
+    parser.add_argument("--log", default="", help="Ten file csv de luu log (mac dinh tu tao theo mode)")
+    parser.add_argument("--width", type=int, default=1280, help="Chieu rong camera mong muon")
+    parser.add_argument("--height", type=int, default=720, help="Chieu cao camera mong muon")
+    parser.add_argument("--no-show", action="store_true", help="Khong hien thi cua so OpenCV")
+    parser.add_argument("--show", action="store_true", help="Bat cua so OpenCV neu moi truong ho tro GUI")
     args = parser.parse_args()
     if not args.show:
         args.no_show = True
@@ -91,16 +136,26 @@ def main():
     print(f"[INFO] ROI tracking model: {tracking_model_path}")
     full_model = YOLO(full_model_path, task='detect')
     tracking_model = YOLO(tracking_model_path, task='detect')
+    names = full_model.names
+    ov_core = ov.Core()
+    full_compiled_model = ov_core.compile_model(
+        os.path.join(full_model_path, 'best_24Class_Soft_Angular_BCE.xml'),
+        'AUTO'
+    )
+    tracking_compiled_model = ov_core.compile_model(
+        os.path.join(tracking_model_path, 'best_24Class_Soft_Angular_BCE_static_160.xml'),
+        'AUTO'
+    )
     
     if source.isdigit():
         source = int(source)
     
     cap = cv2.VideoCapture(source)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1440)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, args.width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
     
     if not cap.isOpened():
-        print(f"[ERROR] Không thể mở nguồn video: {source}")
+        print(f"[ERROR] Khong the mo nguon video: {source}")
         return
 
     prev_roi = None
@@ -112,19 +167,19 @@ def main():
     os.makedirs(lost_capture_dir, exist_ok=True)
     
     if args.log:
-        # Nếu user truyền đường dẫn có chứa thư mục rồi thì giữ nguyên, ngược lại nhét vào benchmark/
+        # Neu user truyen duong dan co thu muc thi giu nguyen, nguoc lai dat vao benchmark/
         log_file = args.log if os.path.dirname(args.log) else os.path.join(out_dir, args.log)
     else:
         log_file = os.path.join(out_dir, f"log_{args.mode}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
     
-    # Khởi tạo Process object để đo riêng CPU của script này (tránh nhiễu từ app khác)
+    # Khoi tao Process object de do CPU cua rieng script nay
     current_process = psutil.Process()
-    current_process.cpu_percent() # Lần gọi đầu tiên để khởi tạo mốc thời gian
+    current_process.cpu_percent() # Goi lan dau de khoi tao moc thoi gian
     
     csv_header = [
         "frame_id", "timestamp", "mode", "input_width", "input_height",
         "inf_time_ms", "end_to_end_time_ms", "cpu_load_pct", "end_to_end_cpu_load_pct", "fps",
-        "x_center", "y_center", "width", "height", "angle", "best_conf", "tracking_lost"
+        "x_center", "y_center", "width", "height", "vector_magnitude", "angle", "best_conf", "tracking_lost"
     ]
 
     log_handle = None
@@ -140,7 +195,7 @@ def main():
         writer.writerow(csv_header)
         log_handle.flush()
         recording = True
-        print(f"[INFO] REC ON. Ghi đè log tại: {log_file}")
+        print(f"[INFO] REC ON. Ghi de log tai: {log_file}")
 
     def stop_recording():
         nonlocal log_handle, writer, recording, start_benchmark_time
@@ -151,17 +206,17 @@ def main():
         writer = None
         recording = False
         start_benchmark_time = time.time()
-        print("[INFO] REC OFF. Timeout 30 giây được reset.")
+        print("[INFO] REC OFF. Timeout 30 giay duoc reset.")
 
-    print(f"[INFO] Bắt đầu Inference ({args.mode.upper()} mode).")
+    print(f"[INFO] Bat dau Inference ({args.mode.upper()} mode).")
     if args.no_show:
-        print(f"[INFO] No-show mode: tự ghi log tại {log_file}")
+        print(f"[INFO] No-show mode: tu ghi log tai {log_file}")
         start_recording()
     else:
-        print("[INFO] Phím điều khiển: r = bật/tắt ghi log, q = thoát.")
+        print("[INFO] Phim dieu khien: r = bat/tat ghi log, q = thoat.")
 
     start_benchmark_time = time.time()
-    max_duration = 30.0  # Tự động thoát sau 30 giây
+    max_duration = 30.0  # Tu dong thoat sau 30 giay
 
     try:
         while True:
@@ -174,7 +229,7 @@ def main():
             img_h, img_w = frame.shape[:2]
 
             t0 = time.time()
-            # Đo % CPU CỦA RIÊNG TIẾN TRÌNH NÀY, chia cho số nhân CPU để ra hệ quy chiếu 100%
+            # Do % CPU cua rieng tien trinh nay, chia cho so nhan CPU de quy ve moc 100%
             cpu_load = current_process.cpu_percent() / psutil.cpu_count()
 
             inference_mode = "FULL"
@@ -195,36 +250,24 @@ def main():
                 roi_scale_x = rw / 160.0
                 roi_scale_y = rh / 160.0
                 display_roi = (rx, ry, rw, rh)
-                infer_model = tracking_model
+                infer_model = tracking_compiled_model
             else:
                 inference_input, params = check_confidence.training_style_crop_pad(frame)
                 input_w, input_h = 640, 640
-                infer_model = full_model
+                infer_model = full_compiled_model
 
-            results = infer_model.predict(source=inference_input, imgsz=(input_w, input_h), verbose=False)
-            result = results[0]
+            infer_start = time.time()
+            box, best_conf, angle, vector_magnitude = select_best_vector_detection(infer_model, inference_input, names)
+            total_inf_time = (time.time() - infer_start) * 1000
 
-            speed = result.speed if hasattr(result, 'speed') else {'preprocess': 0, 'inference': 0, 'postprocess': 0}
-            total_inf_time = speed.get('preprocess', 0) + speed.get('inference', 0) + speed.get('postprocess', 0)
+            if inference_mode == "FULL":
+                box = check_confidence.restore_boxes_from_training_style(box.reshape(1, 4), params)[0]
 
-            boxes = result.boxes.xyxy.cpu().numpy()
-            confs = result.boxes.conf.cpu().numpy()
-            classes = result.boxes.cls.cpu().numpy()
-
-            if inference_mode == "FULL" and len(boxes) > 0:
-                boxes = check_confidence.restore_boxes_from_training_style(boxes, params)
-
-            # Angle lấy từ class Leanbot_0 / Leanbot_p15 / Leanbot_m15..., không dùng OBB.
-            angle = 0.0
+            detected = best_conf >= 0.25
 
             cx, cy, bw, bh = 0.0, 0.0, 0.0, 0.0
-            best_conf = 0.0
 
-            if len(boxes) > 0:
-                best_idx = np.argmax(confs)
-                best_conf = float(confs[best_idx])
-                angle = angle_from_detection_class(infer_model, classes[best_idx])
-                box = boxes[best_idx]
+            if detected:
                 if inference_mode == "ROI":
                     box = box.copy()
                     box[[0, 2]] *= roi_scale_x
@@ -242,7 +285,7 @@ def main():
                 cy = orig_y1 + bh / 2.0
 
                 if args.mode == "roi":
-                    # Cập nhật ROI ngay sau mỗi frame detect thành công
+                    # Cap nhat ROI ngay sau moi frame detect thanh cong
                     prev_roi = calculate_roi(best_box, img_w, img_h)
 
                 cv2.rectangle(frame, (int(orig_x1), int(orig_y1)), (int(orig_x2), int(orig_y2)), (0, 255, 0), 6)
@@ -261,7 +304,7 @@ def main():
                     f"{total_inf_time:.2f}", f"{end_to_end_time_ms:.2f}", cpu_load,
                     end_to_end_cpu_load_pct, f"{fps:.2f}",
                     f"{cx:.2f}", f"{cy:.2f}", f"{bw:.2f}", f"{bh:.2f}",
-                    f"{angle:.4f}", f"{best_conf:.4f}", tracking_lost
+                    f"{vector_magnitude:.4f}", f"{angle:.4f}", f"{best_conf:.4f}", tracking_lost
                 ])
                 log_handle.flush()
 
@@ -287,7 +330,7 @@ def main():
                 rec_color = (0, 0, 255) if recording else (180, 180, 180)
                 cv2.putText(display_frame, f"Mode: {inference_mode} | Input: {input_w}x{input_h}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
                 cv2.putText(display_frame, f"FPS: {fps:.1f} | CPU: {cpu_load}%", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-                cv2.putText(display_frame, f"Tracking Lost: {tracking_lost} | Angle: {angle:.1f} | Conf: {best_conf:.2f}", (10, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                cv2.putText(display_frame, f"Tracking Lost: {tracking_lost} | Vector Angle: {angle:.1f} | Conf: {best_conf:.2f}", (10, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
                 cv2.putText(display_frame, f"{rec_text} | r: record/reset | q: quit", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, rec_color, 2)
                 if recording and tracking_lost:
                     save_lost_tracking_images()
@@ -303,7 +346,7 @@ def main():
                         else:
                             start_recording()
                 except cv2.error as exc:
-                    print(f"[WARN] OpenCV GUI không khả dụng, tự chuyển sang --no-show: {exc}")
+                    print(f"[WARN] OpenCV GUI khong kha dung, tu chuyen sang --no-show: {exc}")
                     args.no_show = True
                     if not recording:
                         start_recording()
@@ -316,7 +359,7 @@ def main():
             if not recording:
                 elapsed_time = time.time() - start_benchmark_time
                 if elapsed_time >= max_duration:
-                    print(f"[INFO] Không ghi log trong {max_duration} giây. Tự động kết thúc!")
+                    print(f"[INFO] Khong ghi log trong {max_duration} giay. Tu dong ket thuc!")
                     break
     finally:
         if log_handle is not None:
@@ -325,7 +368,9 @@ def main():
     cap.release()
     if not args.no_show:
         cv2.destroyAllWindows()
-    print(f"[INFO] Hoàn tất. Đã lưu log vào file {log_file}")
+    print(f"[INFO] Hoan tat. Da luu log vao file {log_file}")
 
 if __name__ == "__main__":
     main()
+
+

@@ -340,8 +340,6 @@ Nhận xét:
 
 ![YOLO11n confusion matrix](trainResults/confusion_matrix.png)
 
-.
-
 #### 4.4. Các đường Precision / Recall / F1 / PR
 
 ![YOLO11n Box F1 curve](trainResults/BoxF1_curve.png)

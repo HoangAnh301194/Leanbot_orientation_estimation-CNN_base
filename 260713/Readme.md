@@ -108,11 +108,11 @@ roi_pre_width, roi_pre_height = rw, rh
 
 - YOLOv8n dùng kiến trúc họ YOLOv8 với các block `C2f`, `SPPF`, neck kiểu FPN/PAN và detection head anchor-free.
 
-![yolov8](image.png)
+![yolov8](images/yolov8.png)
 
 - YOLO11n là bản cải tiến sau YOLOv8, dùng block `C3k2` và thêm attention `C2PSA` để **tăng khả năng trích xuất đặc trưng**.
 
-![yolo11](image-1.png)
+![yolo11](images/yolov11.png)
 
 - Theo trang giải thích kiến trúc của Ultralytics, YOLOv8 chuyển sang `C2f` và anchor-free head; YOLO11 thêm `C2PSA` attention và `C3k2` block, trong khi neck vẫn giữ hướng FPN + PAN.
 
@@ -142,7 +142,7 @@ Nguồn:
   - YOLOv8n: `mAP50-95 = 37.3`.
 - YOLO11n cao hơn YOLOv8n khoảng `+2.2 mAP` trên COCO.
 
-![alt text](image-2.png)
+![alt text](images/compare.png)
 
 > Đây chỉ là COCO benchmark. Với dữ liệu Leanbot 24 class, cần train lại YOLO11n cùng dataset, cùng crop/resize, cùng hyperparameters rồi so sánh trực tiếp với YOLOv8n hiện tại.
 
@@ -188,7 +188,7 @@ model.export(format="openvino", imgsz=640, dynamic=False, quantize=16)
 
 Bảng tóm tắt từ benchmark Ultralytics:
 
-![sumary](image-3.png)
+![sumary](images/sumary.png)
 
 
 ## B. Khó khăn

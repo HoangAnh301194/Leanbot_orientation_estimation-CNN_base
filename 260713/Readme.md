@@ -360,10 +360,8 @@ Nhận xét:
 - Không
 
 ## C. Công việc tiếp theo
-- Export modol sau train sang OpenVINO và chạy inference ROI tracking, đánh giá kết quả.
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ. 
-
-
+- 
+- Export model sau train sang OpenVINO, chạy inference ROI tracking và đánh giá kết quả.
 
 
 

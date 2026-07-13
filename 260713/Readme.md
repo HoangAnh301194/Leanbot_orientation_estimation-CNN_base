@@ -5,7 +5,8 @@
   - Báo cáo lại quy trình crop, resize, các bước thay đổi kích thước, độ phân giải ảnh qua toàn bộ pipeline hiện tại.
   - Thêm log kích thước ROI trước resize và tọa độ tâm ROI để kiểm tra ROI có bị resize méo hay không. 
 - TÌm hiểu và so sánh YoloV8 nano và YoloV11 nano về khả năng triển khai cho dự án hiện tại và tính hiệu quả dự đoán.
-
+- Train lại với Model YOLO11 Nano 
+- Hệ thống hóa, báo cáo lại các thông tin : Soft cross Entropy loss, dataAugmentation , Hyperparameters . Đánh giá kết quả training 
 ### 1. Các bước biến đổi kích thước, độ phân giải ảnh hiện tại.
 #### 1.1 Qua trình train model YOLO. 
 - Ảnh đầu vào : 2K ( 2560x1440 )

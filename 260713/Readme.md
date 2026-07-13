@@ -264,8 +264,6 @@ Ví dụ target hard ban đầu chỉ có 1 class chính, sau Soft Angular BCE s
 | `fliplr` | `0.0` | Không lật ngang vì sẽ làm sai hướng/góc Leanbot |
 | `flipud` | `0.0` | Không lật dọc vì sẽ làm sai hướng/góc Leanbot |
 | `mosaic` | `1.0` | Giữ theo YOLO mặc định để tăng đa dạng dữ liệu |
-| `mixup` | `0.0` | Không dùng mixup để tránh trộn đặc trưng hướng/góc |
-| `copy_paste` | `0.0` | Không dùng copy-paste vì bài toán chỉ có 1 Leanbot trên sa bàn |
 | `hsv_h` | `0.015` | Biến đổi màu nhẹ |
 | `hsv_s` | `0.7` | Biến đổi saturation theo mặc định YOLO |
 | `hsv_v` | `0.4` | Biến đổi brightness theo mặc định YOLO |
@@ -360,7 +358,7 @@ Nhận xét:
 - Không
 
 ## C. Công việc tiếp theo
-- 
+- Em sẽ chạy ROI tracking với kích thước ảnh đầu vào là 2K (2560x1440) hay Full HD (1920x1080) ạ ? 
 - Export model sau train sang OpenVINO, chạy inference ROI tracking và đánh giá kết quả.
 
 

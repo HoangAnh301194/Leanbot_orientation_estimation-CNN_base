@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 13/07/2026
+﻿# Báo cáo công việc ngày 13/07/2026
 
 ## A. Công việc đã làm
 - Trong quá trình đợi hướng đi tiếp theo từ Thầy thì em có tổng quát lại một vài thông tin hiện tại như sau ạ :
@@ -191,10 +191,179 @@ Bảng tóm tắt từ benchmark Ultralytics:
 ![sumary](images/sumary.png)
 
 
-## B. Khó khăn
-- Hiện tại khi chạy inference thì đều có bước crop center, tức là chỉ lấy phần ở giữa frame ảnh để đưa vào model detect, những khu vực khác sẽ bị bỏ qua ( bao gồm cả 2 góc dưới của sa bàn). Trước đó Thầy có nói với em là bước crop center này sẽ chỉ dùng cho mục đích lấy hình ảnh để train thôi ạ, vậy em có cần sửa lại code inference để nhận diện cả frame ảnh không ạ ? 
 
+### 4. Triển khai train lại với Model YOLO11n
+
+#### 4.1. Thông tin training
+
+| Thông số | Giá trị thực tế |
+| :--- | :--- |
+| Model nền tảng | `yolo11n.pt` - YOLO11 Nano, pretrained COCO |
+| Task | Object Detection |
+| Số class | `24` |
+| Class | `Leanbot_0`, `Leanbot_p15`, `Leanbot_p30`, `Leanbot_p45`, `Leanbot_p60`, `Leanbot_p75`, `Leanbot_p90`, `Leanbot_p105`, `Leanbot_p120`, `Leanbot_p135`, `Leanbot_p150`, `Leanbot_p165`, `Leanbot_p180`, `Leanbot_p195`, `Leanbot_m150`, `Leanbot_m135`, `Leanbot_m120`, `Leanbot_m105`, `Leanbot_m90`, `Leanbot_m75`, `Leanbot_m60`, `Leanbot_m45`, `Leanbot_m30`, `Leanbot_m15` |
+| Dataset gốc | `datasets/24class` |
+| Dataset split | `72` ảnh train, `24` ảnh validation, `24` ảnh test |
+| Tổng dữ liệu | `120` ảnh, `24` class, mỗi class `5` ảnh |
+| Epochs | `150` |
+| Batch size | `16` |
+| Image size | `640 x 640` |
+| Optimizer | `optimizer=auto` |
+| Custom loss | Soft Angular BCE |
+| Sigma | `15.0` |
+| Augmentation chính | `degrees=10.0`, `fliplr=0.0`, `flipud=0.0`, `mosaic=1.0`, `scale=0.5`, `translate=0.1` |
+| Môi trường training | Google Colab, GPU runtime |
+| Thời gian training | `299.844 s`, ~5.0 phút |
+| Output | `trainResults` |
+| Best model | `trainResults/best.pt` |
+
+Kết quả train YOLO11n được lưu trong thư mục: [trainResults](trainResults/).
+
+Các file chính trong thư mục kết quả:
+- [best.pt](trainResults/best.pt): model tốt nhất sau training.
+- [results.csv](trainResults/results.csv): log loss, precision, recall, mAP theo từng epoch.
+- [results.png](trainResults/results.png): biểu đồ tổng hợp quá trình training.
+- [confusion_matrix.png](trainResults/confusion_matrix.png), [confusion_matrix_normalized.png](trainResults/confusion_matrix_normalized.png): ma trận nhầm lẫn.
+- [BoxP_curve.png](trainResults/BoxP_curve.png), [BoxR_curve.png](trainResults/BoxR_curve.png), [BoxF1_curve.png](trainResults/BoxF1_curve.png), [BoxPR_curve.png](trainResults/BoxPR_curve.png): các đường metric theo confidence.
+
+#### 4.1.1. Custom loss Soft Angular BCE
+
+| Nội dung | Cấu hình |
+| :--- | :--- |
+| Loss gốc của YOLO | BCE cho classification target |
+| Loss chỉnh sửa | Soft Angular BCE |
+| Vị trí chỉnh sửa | Bọc lại `v8DetectionLoss.bce` bằng `SoftBCEWithLogitsLoss` |
+| Phần được chỉnh | Classification loss / class target |
+| Phần giữ nguyên | Box loss và DFL loss giữ theo YOLO mặc định |
+| Sigma | `15.0` |
+| Khoảng cách class | `15°` giữa 2 class liền kề |
+| Class angle | `class_id * 15°` |
+| Khoảng cách góc | Dạng vòng tròn: `min(abs(a-b), 360-abs(a-b))` |
+| Mục đích | Làm mềm target sang các class góc lân cận để model học quan hệ góc liên tục |
+
+Công thức soft target:
+
+```python
+soft = exp(-0.5 * (d / sigma) ** 2) * original_iou_scores
+```
+
+Trong đó:
+- `d`: khoảng cách góc giữa class thật và từng class còn lại.
+- `sigma=15.0`: độ rộng Gaussian, tương ứng khoảng cách giữa 2 class góc liền kề.
+- `original_iou_scores`: score target gốc do YOLO gán cho foreground anchor.
+
+Ví dụ target hard ban đầu chỉ có 1 class chính, sau Soft Angular BCE sẽ lan một phần score sang các class góc lân cận.
+
+#### 4.1.2. Data augmentation
+
+| Thông số | Giá trị | Lý do |
+| :--- | ---: | :--- |
+| `degrees` | `10.0` | Cho phép xoay nhẹ ảnh, phù hợp vì các class cách nhau `15°` |
+| `translate` | `0.1` | Dịch ảnh nhẹ để tăng khả năng tổng quát vị trí |
+| `scale` | `0.5` | Thay đổi kích thước object trong giới hạn YOLO mặc định |
+| `fliplr` | `0.0` | Không lật ngang vì sẽ làm sai hướng/góc Leanbot |
+| `flipud` | `0.0` | Không lật dọc vì sẽ làm sai hướng/góc Leanbot |
+| `mosaic` | `1.0` | Giữ theo YOLO mặc định để tăng đa dạng dữ liệu |
+| `mixup` | `0.0` | Không dùng mixup để tránh trộn đặc trưng hướng/góc |
+| `copy_paste` | `0.0` | Không dùng copy-paste vì bài toán chỉ có 1 Leanbot trên sa bàn |
+| `hsv_h` | `0.015` | Biến đổi màu nhẹ |
+| `hsv_s` | `0.7` | Biến đổi saturation theo mặc định YOLO |
+| `hsv_v` | `0.4` | Biến đổi brightness theo mặc định YOLO |
+| `erasing` | `0.4` | Random erasing theo cấu hình train cũ |
+| `auto_augment` | `randaugment` | Giữ theo cấu hình Ultralytics cũ |
+
+
+> Resize đầu vào phải giữ quy trình crop/pad/resize đã dùng khi tạo dataset, tránh resize méo.
+
+#### 4.1.3. Hyperparameters
+
+| Hyperparameter | Giá trị |
+| :--- | ---: |
+| `epochs` | `150` |
+| `batch` | `16` |
+| `imgsz` | `640` |
+| `optimizer` | `auto` |
+| `lr0` | `0.01` |
+| `lrf` | `0.01` |
+| `momentum` | `0.937` |
+| `weight_decay` | `0.0005` |
+| `warmup_epochs` | `3.0` |
+| `warmup_momentum` | `0.8` |
+| `warmup_bias_lr` | `0.1` |
+| `close_mosaic` | `10` |
+| `device` | `0` |
+
+Các hyperparameters trên được lấy theo cấu hình train cũ trong `260529/24Class_soft_angular_bce_result/args.yaml`, dùng lại để sau này có thể so sánh YOLOv8n và YOLO11n khách quan .
+#### 4.2. Đánh giá kết quả training YOLO11n
+
+Metric chính csv:  `trainResults/results.csv`.
+
+Metric ở epoch cuối (`epoch=150`):
+
+| Metric | Giá trị |
+| :--- | ---: |
+| `train/box_loss` | `0.53037` |
+| `train/cls_loss` | `2.63717` |
+| `train/dfl_loss` | `0.87241` |
+| `metrics/precision(B)` | `0.65796` |
+| `metrics/recall(B)` | `0.83331` |
+| `metrics/mAP50(B)` | `0.81074` |
+| `metrics/mAP50-95(B)` | `0.70295` |
+| `val/box_loss` | `0.59205` |
+| `val/cls_loss` | `2.35754` |
+| `val/dfl_loss` | `0.88287` |
+
+Best metric trong toàn bộ quá trình train:
+
+| Metric | Best value | Epoch | Ghi chú |
+| :--- | ---: | ---: | :--- |
+| `metrics/precision(B)` | `0.66306` | `134` | Precision cao nhất |
+| `metrics/recall(B)` | `0.99074` | `20` | Recall cao nhất |
+| `metrics/mAP50(B)` | `0.82068` | `146` | mAP50 cao nhất |
+| `metrics/mAP50-95(B)` | `0.71583` | `143` | mAP50-95 cao nhất |
+| `train/box_loss` | `0.50743` | `148` | Loss bbox train thấp nhất |
+| `train/cls_loss` | `2.52076` | `149` | Loss class train thấp nhất |
+| `train/dfl_loss` | `0.86543` | `144` | Loss DFL train thấp nhất |
+| `val/box_loss` | `0.57005` | `142` | Loss bbox validation thấp nhất |
+| `val/cls_loss` | `2.32271` | `142` | Loss class validation thấp nhất |
+| `val/dfl_loss` | `0.84083` | `12` | Loss DFL validation thấp nhất |
+
+![YOLO11n training results](trainResults/results.png)
+
+Nhận xét:
+- Các loss train/val giảm rõ sau giai đoạn đầu và ổn định dần về cuối.
+- `mAP50` tốt nhất đạt `0.82068` ở epoch `146`.
+- `mAP50-95` tốt nhất đạt `0.71583` ở epoch `143`.
+- Epoch cuối vẫn giữ mức gần best: `mAP50=0.81074`, `mAP50-95=0.70295`.
+
+#### 4.3. Ma trận nhầm lẫn
+
+![YOLO11n normalized confusion matrix](trainResults/confusion_matrix_normalized.png)
+
+![YOLO11n confusion matrix](trainResults/confusion_matrix.png)
+
+.
+
+#### 4.4. Các đường Precision / Recall / F1 / PR
+
+![YOLO11n Box F1 curve](trainResults/BoxF1_curve.png)
+
+![YOLO11n Box Precision curve](trainResults/BoxP_curve.png)
+
+![YOLO11n Box Recall curve](trainResults/BoxR_curve.png)
+
+![YOLO11n Box PR curve](trainResults/BoxPR_curve.png)
+
+
+
+## B. Khó khăn
+- Không
 
 ## C. Công việc tiếp theo
-- Em có cần khảo sát thêm bản YOLO26 không ạ ? 
+
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ. 
+
+
+
+
+

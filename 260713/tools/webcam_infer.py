@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import sys
 import threading
 import time
@@ -52,8 +52,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--source",
-        default="0",
-        help="Nguon camera. Mac dinh la webcam 0. Co the dung 1, 2... hoac duong dan video.",
+        type=int,
+        default=0,
+        help="Nguon camera. Mac dinh la webcam 0. Co the dung 1, 2...",
     )
     parser.add_argument("--conf", type=float, default=0.5, help="Nguong confidence de hien thi box.")
     parser.add_argument("--imgsz", type=int, default=640, help="Kich thuoc anh suy luan.")
@@ -116,17 +117,14 @@ def resolve_model_path(model_arg: str | None) -> Path:
     return default_model
 
 
-def parse_source(source: str) -> int | str:
-    return int(source) if source.isdigit() else source
 
-
-def open_capture(source: int | str, width: int, height: int) -> cv2.VideoCapture:
+def open_capture(source: int, width: int, height: int) -> cv2.VideoCapture:
     cap = cv2.VideoCapture(source)
     if isinstance(source, int):
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
     if not cap.isOpened():
-        raise RuntimeError(f"Khong mo duoc webcam/video source: {source}")
+        raise RuntimeError(f"Khong mo duoc webcam source: {source}")
     return cap
 
 
@@ -248,7 +246,7 @@ def format_debug_text(detection_data, names_list, img_name="webcam_capture", rel
     lines.append("-" * 60)
     
     if not detection_data:
-        lines.append("Không phát hiện object nào.")
+        lines.append("KhÃ´ng phÃ¡t hiá»‡n object nÃ o.")
     else:
         for det in detection_data:
             x1, y1, x2, y2 = det['bbox']
@@ -270,7 +268,7 @@ def run_opencv_window(model, cap: cv2.VideoCapture, args: argparse.Namespace) ->
     while True:
         ok, frame = cap.read()
         if not ok:
-            print("Khong doc duoc frame tu webcam/video. Dang dung.")
+            print("Khong doc duoc frame tu webcam. Dang dung.")
             break
 
         annotated = run_inference(model, frame, args)
@@ -284,7 +282,7 @@ def run_opencv_window(model, cap: cv2.VideoCapture, args: argparse.Namespace) ->
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             folder_name = f"error_{timestamp}"
             
-            # Tạo thư mục con cho lần chụp này
+            # Táº¡o thÆ° má»¥c con cho láº§n chá»¥p nÃ y
             sub_dir = error_dir / folder_name
             sub_dir.mkdir(exist_ok=True)
             
@@ -388,7 +386,7 @@ def mjpeg_frame_producer(model, cap: cv2.VideoCapture, args: argparse.Namespace,
         while not state.stopped:
             ok, frame = cap.read()
             if not ok:
-                print("Khong doc duoc frame tu webcam/video. Dang dung stream.")
+                print("Khong doc duoc frame tu webcam. Dang dung stream.")
                 state.stop()
                 break
 
@@ -440,12 +438,11 @@ def main() -> None:
         raise SystemExit("--jpeg-quality phai nam trong khoang 0-100.")
 
     model_path = resolve_model_path(args.model)
-    source = parse_source(args.source)
 
     print(f"Dang dung model: {model_path}")
 
     model = YOLO(str(model_path))
-    cap = open_capture(source, args.width, args.height)
+    cap = open_capture(args.source, args.width, args.height)
 
     try:
         if args.mode == "opencv":
@@ -466,3 +463,5 @@ def main() -> None:
         
 if __name__ == "__main__":
     main()
+
+

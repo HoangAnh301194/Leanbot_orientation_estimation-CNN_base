@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import sys
 import time
 from pathlib import Path
@@ -14,6 +14,7 @@ import torch
 
 # Add current directory to sys.path for importing check_confidence
 sys.path.append(str(Path(__file__).resolve().parent))
+import check_confidence
 import check_confidence
 
 DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
@@ -166,11 +167,9 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
     if args.mirror:
         frame = cv2.flip(frame, 1)
         
-    # Preprocess (Full Frame Letterbox)
-    from ultralytics.data.augment import LetterBox
+    # Preprocess giá»‘ng training: center crop vÃ¹ng sa bÃ n, pad vuÃ´ng, resize 640x640.
     _t_pre0 = time.perf_counter()
-    letterbox = LetterBox(new_shape=(640, 640), auto=False, stride=32)
-    img640 = letterbox(image=frame)
+    img640, transform_params = check_confidence.training_style_crop_pad(frame)
     img_tensor = img640[:, :, ::-1].transpose(2, 0, 1)
     img_tensor = torch.from_numpy(np.ascontiguousarray(img_tensor)).to(model.device).float() / 255.0
     img_tensor = img_tensor.unsqueeze(0)
@@ -215,9 +214,9 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
     _t_filter = time.perf_counter()
     
     # 2. Map boxes back to original image coordinates
-    from ultralytics.utils.ops import xywh2xyxy, xyxy2xywh, scale_boxes
+    from ultralytics.utils.ops import xywh2xyxy, xyxy2xywh
     top_boxes_xyxy = xywh2xyxy(top_boxes)
-    orig_boxes_xyxy = scale_boxes(img640.shape[:2], top_boxes_xyxy, frame.shape[:2])
+    orig_boxes_xyxy = check_confidence.restore_boxes_from_training_style(top_boxes_xyxy, transform_params)
     orig_boxes_xywh = xyxy2xywh(orig_boxes_xyxy)
     
     # 3. Compute vector per anchor
@@ -258,7 +257,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
         n = run_realtime_inference._acc_n
         print(f"\n{'='*55}")
         print(f"  [PROFILE] Trung binh {n} frame gan nhat:")
-        print(f"  Preprocess (LetterBox) : {run_realtime_inference._acc_pre    / n:7.2f} ms")
+        print(f"  Preprocess (CenterCrop): {run_realtime_inference._acc_pre    / n:7.2f} ms")
         print(f"  YOLO Inference (GPU)   : {run_realtime_inference._acc_infer  / n:7.2f} ms")
         print(f"  Filter + TopK          : {run_realtime_inference._acc_filter / n:7.2f} ms")
         print(f"  Vector Computation     : {run_realtime_inference._acc_vector / n:7.2f} ms")
@@ -282,7 +281,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
             ang = float(row["angle"])
             xc, yc, bw, bh = row["x_center"], row["y_center"], row["width"], row["height"]
             
-            print(f" Group {gid:>2} | Anchors: {n_anch:>2} | Mag: {mag:>6.2f} | Angle: {ang:>7.2f}°")
+            print(f" Group {gid:>2} | Anchors: {n_anch:>2} | Mag: {mag:>6.2f} | Angle: {ang:>7.2f}Â°")
             
             if csv_writer:
                 csv_writer.writerow([timestamp, frame_id, gid, n_anch, f"{mag:.2f}", f"{xc:.1f}", f"{yc:.1f}", f"{bw:.1f}", f"{bh:.1f}", f"{ang:.2f}"])
@@ -308,7 +307,7 @@ def run_realtime_inference(model, frame, args, csv_writer, frame_id, timestamp):
 def main():
     parser = argparse.ArgumentParser(description="Webcam real-time vector inference")
     parser.add_argument("--model", default=None, help="Path to .pt model")
-    parser.add_argument("--source", default="0", help="Camera source (0 for default webcam)")
+    parser.add_argument("--source", type=int, default=0, help="Camera source (0 for default webcam)")
     parser.add_argument("--topk", type=int, default=100, help="Top-K anchors (default 100)")
     parser.add_argument("--iou", type=float, default=IOU_THRES, help="IoU threshold for grouping")
     parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold to filter anchors")
@@ -348,14 +347,12 @@ def main():
         inf_model = AutoBackend(str(model_path), device=dev, fp16=False)
         model = ModelWrapper(inf_model, inf_model.names, dev)
     
-    source = int(args.source) if args.source.isdigit() else args.source
-    cap = cv2.VideoCapture(source)
-    if isinstance(source, int):
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, args.width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
+    cap = cv2.VideoCapture(args.source)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, args.width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
         
     if not cap.isOpened():
-        sys.exit(f"Khong the mo camera source {source}")
+        sys.exit(f"Khong the mo camera source {args.source}")
 
     # Setup CSV
     run_dir = DEFAULT_MODEL_DIR.parent / "runs"
@@ -381,10 +378,10 @@ def main():
             frame_id += 1
             current_timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
             
-            # Tính toán và chú thích
+            # TÃ­nh toÃ¡n vÃ  chÃº thÃ­ch
             annotated = run_realtime_inference(model, frame, args, writer, frame_id, current_timestamp)
             
-            # Tính FPS toàn trình (bao gồm cả inference, pandas, cv2 drawing)
+            # TÃ­nh FPS toÃ n trÃ¬nh (bao gá»“m cáº£ inference, pandas, cv2 drawing)
             t_end = time.time()
             fps = 1.0 / (t_end - fps_time + 1e-9)
             fps_time = t_end
@@ -399,11 +396,11 @@ def main():
                 break
             elif key in [ord('r'), ord('R')]:
                 if not is_recording:
-                    # Bắt đầu record
+                    # Báº¯t Ä‘áº§u record
                     timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
                     csv_path = run_dir / f"webcam_vector_log_{timestamp_str}.csv"
                     img_path = run_dir / f"webcam_vector_log_{timestamp_str}.jpg"
-                    cv2.imwrite(str(img_path), annotated) # Lưu ảnh mẫu đầu tiên
+                    cv2.imwrite(str(img_path), annotated) # LÆ°u áº£nh máº«u Ä‘áº§u tiÃªn
                     f_csv = open(csv_path, mode="w", newline="", encoding="utf-8")
                     writer = csv.writer(f_csv)
                     writer.writerow(["timestamp", "frame_id", "group_id", "num_anchors", "magnitude", "x_center", "y_center", "width", "height", "angle"])
@@ -411,7 +408,7 @@ def main():
                     print(f"\n[RECORDING START] Dang luu log vao: {csv_path}")
                     print(f"[CAPTURE] Da luu anh mau vao: {img_path}")
                 else:
-                    # Dừng record
+                    # Dá»«ng record
                     is_recording = False
                     if f_csv is not None:
                         f_csv.close()
@@ -427,3 +424,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

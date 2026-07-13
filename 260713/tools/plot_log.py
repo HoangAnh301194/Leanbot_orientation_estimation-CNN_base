@@ -33,7 +33,9 @@ def plot_log(csv_file: str):
     df_plot = df_plot.sort_values('frame_id')
     
     # Khởi tạo 2 biểu đồ con (Subplots)
-    fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    has_roi_cols = all(c in df_plot.columns for c in ['roi_center_x', 'roi_center_y', 'roi_pre_width', 'roi_pre_height'])
+    n_axes = 4 if has_roi_cols else 2
+    fig, axes = plt.subplots(n_axes, 1, figsize=(12, 12 if has_roi_cols else 8), sharex=True)
     fig.suptitle(f'Leanbot Spin Ploter\n{csv_path.name}', fontsize=16, fontweight='bold')
     
     # ---------------------------------------------------------
@@ -63,6 +65,26 @@ def plot_log(csv_file: str):
     ax2.legend(loc='upper right')
     ax2.set_xlabel('Frame ID')
     ax2.set_title("X, Y Center")
+
+    if has_roi_cols:
+        roi_df = df_plot[df_plot['mode'] == 'ROI'] if 'mode' in df_plot.columns else df_plot
+
+        ax3 = axes[2]
+        ax3.plot(roi_df['frame_id'], roi_df['roi_center_x'], 'm.-', label='ROI center X', linewidth=1.5)
+        ax3.plot(roi_df['frame_id'], roi_df['roi_center_y'], 'c.-', label='ROI center Y', linewidth=1.5)
+        ax3.set_ylabel('Pixels')
+        ax3.grid(True, linestyle='--', alpha=0.7)
+        ax3.legend(loc='upper right')
+        ax3.set_title("ROI Center")
+
+        ax4 = axes[3]
+        ax4.plot(roi_df['frame_id'], roi_df['roi_pre_width'], 'r.-', label='ROI width before resize', linewidth=1.5)
+        ax4.plot(roi_df['frame_id'], roi_df['roi_pre_height'], 'g.-', label='ROI height before resize', linewidth=1.5)
+        ax4.set_ylabel('Pixels')
+        ax4.grid(True, linestyle='--', alpha=0.7)
+        ax4.legend(loc='upper right')
+        ax4.set_xlabel('Frame ID')
+        ax4.set_title("ROI Width/Height Before Resize")
     
     plt.tight_layout()
     

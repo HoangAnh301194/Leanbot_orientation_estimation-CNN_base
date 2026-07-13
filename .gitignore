@@ -7,7 +7,7 @@ __pycache__/
 *calibration_images/
 260416/Alignment_ECC/images/*_output/
 260416/tools/captures/
-
+*.mp4
 # 260420 generated outputs (Ignore heavy binary data)
 260420/output/sessions/
 260420/output/datasets/images/
@@ -143,3 +143,10 @@ __pycache__/
 260710/models/**/*.xml
 260710/tools/*.ipynb
 gmail_mcp/
+
+# 260713
+260713/models/**/*.onnx
+260713/models/**/*.bin
+260713/models/**/*.xml
+260713/tools/*.ipynb
+26013/testVideos

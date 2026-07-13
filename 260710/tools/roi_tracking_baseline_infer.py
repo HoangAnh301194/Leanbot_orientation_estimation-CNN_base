@@ -1,4 +1,4 @@
-﻿import cv2
+import cv2
 import numpy as np
 import time
 import psutil
@@ -117,6 +117,7 @@ def calculate_roi(bbox, img_w, img_h):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", default="0", help="Camera index or video path")
+    parser.add_argument("--video", default="", help="Path to video file (neu co se uu tien dung thay cho source)")
     parser.add_argument("--mode", default="roi", choices=["roi", "baseline"], help="Che do chay: roi hoac baseline")
     parser.add_argument("--log", default="", help="Ten file csv de luu log (mac dinh tu tao theo mode)")
     parser.add_argument("--width", type=int, default=1280, help="Chieu rong camera mong muon")
@@ -129,7 +130,8 @@ def main():
 
     full_model_path = r'models\quantized_fp16\best_24Class_Soft_Angular_BCE_openvino_model'
     tracking_model_path = r'models\best_24Class_Soft_Angular_BCE_static_160_openvino_model'
-    source = args.source
+    
+    source = args.video if args.video else args.source
     
     print("[INFO] Loading OpenVINO Models...")
     print(f"[INFO] Full detection model: {full_model_path}")
@@ -177,7 +179,7 @@ def main():
     current_process.cpu_percent() # Goi lan dau de khoi tao moc thoi gian
     
     csv_header = [
-        "frame_id", "timestamp", "mode", "input_width", "input_height",
+        "frame_id", "timestamp", "mode", "input_width", "input_height", "roi_w", "roi_h",
         "inf_time_ms", "end_to_end_time_ms", "cpu_load_pct", "end_to_end_cpu_load_pct", "fps",
         "x_center", "y_center", "width", "height", "vector_magnitude", "angle", "best_conf", "tracking_lost"
     ]
@@ -238,10 +240,12 @@ def main():
             display_roi = None
             tracking_lost = 0
             lost_roi_input = None
+            roi_w, roi_h = 0, 0
 
             if args.mode == "roi" and prev_roi is not None:
                 inference_mode = "ROI"
                 rx, ry, rw, rh = prev_roi
+                roi_w, roi_h = rw, rh
                 offset_x, offset_y = rx, ry
                 roi_input = frame[ry:ry+rh, rx:rx+rw]
                 lost_roi_input = roi_input.copy()
@@ -300,7 +304,7 @@ def main():
 
             if recording and writer is not None:
                 writer.writerow([
-                    frame_id, timestamp, inference_mode, input_w, input_h,
+                    frame_id, timestamp, inference_mode, input_w, input_h, roi_w, roi_h,
                     f"{total_inf_time:.2f}", f"{end_to_end_time_ms:.2f}", cpu_load,
                     end_to_end_cpu_load_pct, f"{fps:.2f}",
                     f"{cx:.2f}", f"{cy:.2f}", f"{bw:.2f}", f"{bh:.2f}",

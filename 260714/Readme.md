@@ -50,18 +50,29 @@ python .\tools\comprehensive_plot.py
 - Kết quả log csv lưu tại : [benchmark](./benchmark/)
 - Kết quả so sánh :
   - **So Sánh Tốc độ Khung hình (FPS):**
+
     ![FPS Comparison](./benchmark/1_fps_comparison.png)
+
   - **So Sánh Thời gian Xử lý Trung bình:**
+
     ![Time Comparison](./benchmark/2_time_comparison.png)
+
   - **So Sánh Mức độ Sử dụng CPU:**
+
     ![CPU Load Comparison](./benchmark/3_cpu_load_comparison.png)
+    
   - **So Sánh Số lần Mất dấu (Tracking Lost):**
+
     ![Tracking Lost Comparison](./benchmark/4_tracking_lost_comparison.png)
+
   - **So Sánh Kích thước Model (OpenVINO):**
+
     ![Model Size Comparison](./benchmark/5_model_size_comparison.png)
   - **Quỹ đạo Di chuyển (Trajectory & Angle):**
+
     - *YOLOv8n:*
       ![YOLOv8n Trajectory](./benchmark/6_yolov8n_trajectory.png)
+      
     - *YOLO11n:*
       ![YOLO11n Trajectory](./benchmark/7_yolo11n_trajectory.png)
 

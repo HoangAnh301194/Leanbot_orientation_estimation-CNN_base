@@ -1,0 +1,46 @@
+description: Ultralytics YOLO11n model trained on leanbot_data.yaml
+author: Ultralytics
+date: '2026-07-13T17:41:47.055914'
+version: 8.4.33
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: Leanbot_0
+  1: Leanbot_p15
+  2: Leanbot_p30
+  3: Leanbot_p45
+  4: Leanbot_p60
+  5: Leanbot_p75
+  6: Leanbot_p90
+  7: Leanbot_p105
+  8: Leanbot_p120
+  9: Leanbot_p135
+  10: Leanbot_p150
+  11: Leanbot_p165
+  12: Leanbot_p180
+  13: Leanbot_p195
+  14: Leanbot_m150
+  15: Leanbot_m135
+  16: Leanbot_m120
+  17: Leanbot_m105
+  18: Leanbot_m90
+  19: Leanbot_m75
+  20: Leanbot_m60
+  21: Leanbot_m45
+  22: Leanbot_m30
+  23: Leanbot_m15
+args:
+  batch: 1
+  fraction: 1.0
+  half: true
+  int8: false
+  dynamic: false
+  nms: false
+channels: 3
+end2end: false

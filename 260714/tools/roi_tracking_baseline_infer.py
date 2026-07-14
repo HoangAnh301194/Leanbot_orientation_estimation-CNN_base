@@ -167,16 +167,18 @@ def main():
     prev_roi = None
     frame_id = 0
     
-    out_dir = "benchmark"
+    if args.log:
+        log_file = args.log if os.path.dirname(args.log) else os.path.join("benchmark", args.log)
+    else:
+        log_file = os.path.join("benchmark", f"log_{args.mode}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
+        
+    out_dir = os.path.dirname(log_file)
+    if not out_dir:
+        out_dir = "."
     os.makedirs(out_dir, exist_ok=True)
+    
     lost_capture_dir = os.path.join(out_dir, "lost_tracking_captures")
     os.makedirs(lost_capture_dir, exist_ok=True)
-    
-    if args.log:
-        # Neu user truyen duong dan co thu muc thi giu nguyen, nguoc lai dat vao benchmark/
-        log_file = args.log if os.path.dirname(args.log) else os.path.join(out_dir, args.log)
-    else:
-        log_file = os.path.join(out_dir, f"log_{args.mode}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
     
     # Khoi tao Process object de do CPU cua rieng script nay
     current_process = psutil.Process()

@@ -27,8 +27,14 @@ openvino_fp16_path = model_pt.export(format="openvino", imgsz=640, half=True)
 
 
 #### 1.2 Chạy inference với YOLO11n OpenVINO FP16 ở chế độ ROI tracking độ phân giải ảnh đầu vào 2K (2560x1440)
-- Code export Model YOLO11n OpenVINO FP16 static 160x160 
-- Code sử dụng :[tools\roi_tracking_baseline_infer.py](tools\roi_tracking_baseline_infer.py)
+- Code export Model YOLO11n OpenVINO FP16 static 160x160 (Script tham khảo: [tools\export_static_160.py](tools\export_static_160.py)):
+```python
+from ultralytics import YOLO
+
+model = YOLO(r"models\YOLO11n_versions\Soft_Angular_BCE_yolo11n.pt")
+export_path = model.export(format="openvino", imgsz=160, half=True, dynamic=False)
+```
+- Code chạy inference sử dụng : [tools\roi_tracking_baseline_infer.py](tools\roi_tracking_baseline_infer.py)
 
 - Lệnh chạy :
 

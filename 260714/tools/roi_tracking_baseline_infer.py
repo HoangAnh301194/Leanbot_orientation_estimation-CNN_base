@@ -272,7 +272,7 @@ def main():
             if inference_mode == "FULL":
                 box = check_confidence.restore_boxes_from_training_style(box.reshape(1, 4), params)[0]
 
-            detected = best_conf >= 0.25
+            detected = best_conf >= 0.65
 
             cx, cy, bw, bh = 0.0, 0.0, 0.0, 0.0
 

@@ -351,8 +351,6 @@ Nhận xét:
 
 ![YOLO11n Box PR curve](trainResults/BoxPR_curve.png)
 
-
-
 ## B. Khó khăn
 - Không
 

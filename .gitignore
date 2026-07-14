@@ -137,6 +137,7 @@ __pycache__/
 260710/tools/*.ipynb
 
 
+
 # 260710
 260710/models/**/*.onnx
 260710/models/**/*.bin
@@ -149,5 +150,10 @@ gmail_mcp/
 260713/models/**/*.bin
 260713/models/**/*.xml
 260713/tools/*.ipynb
-260713/testVideos
 260713/datasets
+# 260714
+260714/models/**/*.onnx
+260714/models/**/*.bin
+260714/models/**/*.xml
+260714/tools/*.ipynb
+260714/datasets

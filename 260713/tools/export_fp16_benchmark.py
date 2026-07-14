@@ -5,15 +5,15 @@ from ultralytics import YOLO
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    original_pt_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
+    original_pt_path = os.path.join(current_dir, '..', 'models', 'YOLO11n_versions', 'Soft_Angular_BCE_yolo11n.pt')
     test_dir = os.path.join(current_dir, '..', '24class_test_images')
     
     # TẠO THƯ MỤC CHỨA MODEL LƯỢNG TỬ HÓA
-    quantized_dir = os.path.join(current_dir, '..', 'models', 'quantized_fp16')
+    quantized_dir = os.path.join(current_dir, '..', 'models', 'YOLO11n_versions','quantized_fp16')
     os.makedirs(quantized_dir, exist_ok=True)
     
     # Mẹo: Copy model gốc sang thư mục quantized_fp16 để Ultralytics tự động xuất file vào chung folder này
-    pt_model_path = os.path.join(quantized_dir, 'best_24Class_Soft_Angular_BCE.pt')
+    pt_model_path = os.path.join(quantized_dir, 'Soft_Angular_BCE_yolo11n.pt')
     if not os.path.exists(pt_model_path):
         shutil.copy(original_pt_path, pt_model_path)
     
@@ -35,10 +35,6 @@ def main():
     
     model_pt = YOLO(pt_model_path)
     
-    # Export ONNX FP16
-    print("\n[INFO] Đang Export sang định dạng ONNX (Quantize FP16)...")
-    onnx_fp16_path = model_pt.export(format="onnx", imgsz=640, half=True)
-    
     # Export OpenVINO FP16
     print("\n[INFO] Đang Export sang định dạng OpenVINO (Quantize FP16)...")
     openvino_fp16_path = model_pt.export(format="openvino", imgsz=640, half=True)
@@ -51,7 +47,6 @@ def main():
     # Định nghĩa danh sách các định dạng cần so sánh
     formats = {
         "PyTorch (FP32 Gốc)": original_pt_path,
-        "ONNX (FP16)": onnx_fp16_path,
         "OpenVINO (FP16)": openvino_fp16_path
     }
     

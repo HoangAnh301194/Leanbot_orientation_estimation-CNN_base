@@ -248,5 +248,6 @@ Từ đó có thể suy ra, khi chạy Full frame để Detect ROI thì model YO
 - Không
 
 ## C. Công việc tiếp theo
-- Hiện tại Git Pythaverse đang gặp vấn đề, nên em tạm thời báo cáo bằng gitHub cá nhân ạ .
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 
+- Độ chính xác model em cảm thấy chưa tốt ạ, còn nhiễu detection vì dataset quá lý tưởng và khôgn có nhiễu nên khi triển khai thực tế có nhiễu thì model sẽ detect kém hiệu quả ạ 
+- Hiện tại về phần tối ưu tốc độ khi chạy Inference đã xong chưa ạ Thầy ? Em muốn xin thêm ý kiến của Thầy về việc lựa chọn các phương pháp, model, mode cuối cùng ạ. 
+- Tìm hiểu thêm về **remove NMS layer**

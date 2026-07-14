@@ -88,5 +88,5 @@ python .\tools\comprehensive_plot.py
 
 - Dựa vào log thì các trường hợp lost này size của ROI là **288x288** vẫn đảm bảo tỉ lệ hình vuông --> không phải do méo ảnh khi resize mà do Model bị nhiễu detect.
 ## C. Công việc tiếp theo
-
+- Hiện tại Git Pythaverse đang gặp vấn đề, nên em tạm thời báo cáo bằng gitHub cá nhân ạ .
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

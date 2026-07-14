@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 14/07/2026
+﻿# Báo cáo công việc ngày 14/07/2026
 
 ## A. Công việc đã làm
 - Chạy thử YOLO11n OpenVINO FP16 và so sánh với YOLOv8n OpenVINO FP16 ở chế độ ROI tracking
@@ -27,7 +27,7 @@ openvino_fp16_path = model_pt.export(format="openvino", imgsz=640, half=True)
 
 
 #### 1.2 Chạy inference với YOLO11n OpenVINO FP16 ở chế độ ROI tracking độ phân giải ảnh đầu vào 2K (2560x1440)
-- Code export Model YOLO11n OpenVINO FP16 static 160x160 (Script tham khảo: [tools\export_static_160.py](tools\export_static_160.py)):
+- Code export Model YOLO11n OpenVINO FP16 static 160x160 :  [tools\export_static_160.py](tools\export_static_160.py):
 ```python
 from ultralytics import YOLO
 

@@ -167,8 +167,8 @@ python tools/roi_tracking_baseline_infer.py --source 1 --mode roi --show --full-
 | Tiêu chí | Model có NMS | Model không NMS |
 | :--- | :---: | :---: |
 | FPS trung bình | ~120 FPS | ~80 FPS |
-| Inference time | ~8 ms (ổn định) | ~15 ms (có đột biến) |
-| CPU load | Thấp, ổn định | Cao hơn, có đỉnh đột biến |
+| Inference time | ~8 ms (ổn định) | ~15 ms (có đỉnh nhảy đột biến) |
+| CPU load | Thấp hơn | Cao hơn |
 | Góc tính được | Bậc thang 15° | Mịn, liên tục |
 | Độ chính xác góc | Thấp hơn | Cao hơn |
 

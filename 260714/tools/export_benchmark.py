@@ -1,21 +1,11 @@
 import os
 import cv2
-import shutil
 from ultralytics import YOLO
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    original_pt_path = os.path.join(current_dir, '..', 'models', 'YOLO11n_versions', 'Soft_Angular_BCE_yolo11n.pt')
+    pt_model_path = os.path.join(current_dir, '..', 'models', 'best_24Class_Soft_Angular_BCE.pt')
     test_dir = os.path.join(current_dir, '..', '24class_test_images')
-    
-    # TẠO THƯ MỤC CHỨA MODEL LƯỢNG TỬ HÓA
-    quantized_dir = os.path.join(current_dir, '..', 'models', 'YOLO11n_versions','quantized_fp16')
-    os.makedirs(quantized_dir, exist_ok=True)
-    
-    # Mẹo: Copy model gốc sang thư mục quantized_fp16 để Ultralytics tự động xuất file vào chung folder này
-    pt_model_path = os.path.join(quantized_dir, 'Soft_Angular_BCE_yolo11n.pt')
-    if not os.path.exists(pt_model_path):
-        shutil.copy(original_pt_path, pt_model_path)
     
     # 1. Tìm toàn bộ ảnh test
     image_files = []
@@ -27,27 +17,32 @@ def main():
         print("[LỖI] Không tìm thấy ảnh test trong thư mục.")
         return
         
-    # 2. Export Model sang chuẩn FP16
+    # 2. Export Model (Sử dụng imgsz=416 như đề xuất)
     print("="*85)
-    print(" BƯỚC 1: TIẾN HÀNH EXPORT MODEL SANG ONNX VÀ OPENVINO (LƯỢNG TỬ HÓA FP16)")
-    print(f" (Tất cả file Model sẽ được gom chung tại: {quantized_dir})")
+    print(" BƯỚC 1: TIẾN HÀNH EXPORT MODEL SANG ONNX VÀ OPENVINO")
     print("="*85)
     
     model_pt = YOLO(pt_model_path)
     
-    # Export OpenVINO FP16
-    print("\n[INFO] Đang Export sang định dạng OpenVINO (Quantize FP16)...")
-    openvino_fp16_path = model_pt.export(format="openvino", imgsz=640, half=True)
+    # Export ONNX
+    print("\n[INFO] Đang Export sang định dạng ONNX...")
+    # Việc gọi hàm export có thể tốn vài phút và cần tải thư viện nếu máy chưa có
+    onnx_path = model_pt.export(format="onnx", imgsz=640, half=False)
+    
+    # Export OpenVINO
+    print("\n[INFO] Đang Export sang định dạng OpenVINO...")
+    openvino_path = model_pt.export(format="openvino", imgsz=640, half=False)
     
     # 3. Chuẩn bị Benchmark
     print("\n" + "="*85)
-    print(f" BƯỚC 2: TIẾN HÀNH BENCHMARK TRÊN {len(image_files)} ẢNH TEST (Độ phân giải 640x640)")
+    print(f" BƯỚC 2: TIẾN HÀNH BENCHMARK TRÊN {len(image_files)} ẢNH TEST (Cố định độ phân giải 640x640)")
     print("="*85)
     
     # Định nghĩa danh sách các định dạng cần so sánh
     formats = {
-        "PyTorch (FP32 Gốc)": original_pt_path,
-        "OpenVINO (FP16)": openvino_fp16_path
+        "PyTorch Gốc (.pt)": pt_model_path,
+        "ONNX Runtime": onnx_path,
+        "OpenVINO (Intel)": openvino_path
     }
     
     overall_stats = {fmt: [0.0, 0.0, 0.0] for fmt in formats.keys()}
@@ -55,20 +50,20 @@ def main():
     
     for fmt_name, path in formats.items():
         print(f"[INFO] Đang chạy vòng lặp đánh giá mô hình: {fmt_name} ...")
+        # Load model với format tương ứng
         model = YOLO(path)
         sum_pre, sum_inf, sum_post = 0.0, 0.0, 0.0
         
         for img_path in image_files:
             test_frame = cv2.imread(img_path)
             
-            is_half = (fmt_name == "PyTorch (FP16)")
             # Warmup engine
             for _ in range(3):
-                _ = model.predict(source=test_frame, imgsz=640, verbose=False, half=is_half)
+                _ = model.predict(source=test_frame, imgsz=640, verbose=False)
                 
             # Bắt đầu đo
             for _ in range(num_runs_per_img):
-                results = model.predict(source=test_frame, imgsz=640, verbose=False, half=is_half)
+                results = model.predict(source=test_frame, imgsz=640, verbose=False)
                 speed = results[0].speed
                 sum_pre += speed['preprocess']
                 sum_inf += speed['inference']
@@ -82,7 +77,7 @@ def main():
         
     # 4. In bảng kết quả
     print("\n" + "="*85)
-    print(" BẢNG SO SÁNH TỐC ĐỘ (AVERAGE 4 ẢNH) - QUANTIZATION FP16 (IMGSZ = 640x640)")
+    print(" BẢNG SO SÁNH TỐC ĐỘ (AVERAGE 4 ẢNH) GIỮA CÁC RUNTIME PHẦN CỨNG (IMGSZ = 640x640)")
     print("="*85)
     print(f"{'Định dạng Model':<20} | {'Tiền xử lý (ms)':<15} | {'Suy luận (ms)':<15} | {'Hậu xử lý (ms)':<15} | {'Ước tính FPS':<10}")
     print("-" * 85)

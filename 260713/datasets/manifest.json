@@ -1,0 +1,722 @@
+[
+  {
+    "index": 0,
+    "filename": "000000.jpg",
+    "source_session": "Leanbot_0",
+    "source_image": "angle_0_000.jpg"
+  },
+  {
+    "index": 1,
+    "filename": "000001.jpg",
+    "source_session": "Leanbot_0",
+    "source_image": "angle_0_001.jpg"
+  },
+  {
+    "index": 2,
+    "filename": "000002.jpg",
+    "source_session": "Leanbot_0",
+    "source_image": "angle_0_002.jpg"
+  },
+  {
+    "index": 3,
+    "filename": "000003.jpg",
+    "source_session": "Leanbot_0",
+    "source_image": "angle_0_003.jpg"
+  },
+  {
+    "index": 4,
+    "filename": "000004.jpg",
+    "source_session": "Leanbot_0",
+    "source_image": "angle_0_004.jpg"
+  },
+  {
+    "index": 5,
+    "filename": "000005.jpg",
+    "source_session": "Leanbot_m105",
+    "source_image": "angle_m105_000.jpg"
+  },
+  {
+    "index": 6,
+    "filename": "000006.jpg",
+    "source_session": "Leanbot_m105",
+    "source_image": "angle_m105_001.jpg"
+  },
+  {
+    "index": 7,
+    "filename": "000007.jpg",
+    "source_session": "Leanbot_m105",
+    "source_image": "angle_m105_002.jpg"
+  },
+  {
+    "index": 8,
+    "filename": "000008.jpg",
+    "source_session": "Leanbot_m105",
+    "source_image": "angle_m105_003.jpg"
+  },
+  {
+    "index": 9,
+    "filename": "000009.jpg",
+    "source_session": "Leanbot_m105",
+    "source_image": "angle_m105_004.jpg"
+  },
+  {
+    "index": 10,
+    "filename": "000010.jpg",
+    "source_session": "Leanbot_m120",
+    "source_image": "angle_m120_000.jpg"
+  },
+  {
+    "index": 11,
+    "filename": "000011.jpg",
+    "source_session": "Leanbot_m120",
+    "source_image": "angle_m120_001.jpg"
+  },
+  {
+    "index": 12,
+    "filename": "000012.jpg",
+    "source_session": "Leanbot_m120",
+    "source_image": "angle_m120_002.jpg"
+  },
+  {
+    "index": 13,
+    "filename": "000013.jpg",
+    "source_session": "Leanbot_m120",
+    "source_image": "angle_m120_003.jpg"
+  },
+  {
+    "index": 14,
+    "filename": "000014.jpg",
+    "source_session": "Leanbot_m120",
+    "source_image": "angle_m120_004.jpg"
+  },
+  {
+    "index": 15,
+    "filename": "000015.jpg",
+    "source_session": "Leanbot_m135",
+    "source_image": "angle_m135_000.jpg"
+  },
+  {
+    "index": 16,
+    "filename": "000016.jpg",
+    "source_session": "Leanbot_m135",
+    "source_image": "angle_m135_001.jpg"
+  },
+  {
+    "index": 17,
+    "filename": "000017.jpg",
+    "source_session": "Leanbot_m135",
+    "source_image": "angle_m135_002.jpg"
+  },
+  {
+    "index": 18,
+    "filename": "000018.jpg",
+    "source_session": "Leanbot_m135",
+    "source_image": "angle_m135_003.jpg"
+  },
+  {
+    "index": 19,
+    "filename": "000019.jpg",
+    "source_session": "Leanbot_m135",
+    "source_image": "angle_m135_004.jpg"
+  },
+  {
+    "index": 20,
+    "filename": "000020.jpg",
+    "source_session": "Leanbot_m15",
+    "source_image": "angle_m15_000.jpg"
+  },
+  {
+    "index": 21,
+    "filename": "000021.jpg",
+    "source_session": "Leanbot_m15",
+    "source_image": "angle_m15_001.jpg"
+  },
+  {
+    "index": 22,
+    "filename": "000022.jpg",
+    "source_session": "Leanbot_m15",
+    "source_image": "angle_m15_002.jpg"
+  },
+  {
+    "index": 23,
+    "filename": "000023.jpg",
+    "source_session": "Leanbot_m15",
+    "source_image": "angle_m15_003.jpg"
+  },
+  {
+    "index": 24,
+    "filename": "000024.jpg",
+    "source_session": "Leanbot_m15",
+    "source_image": "angle_m15_004.jpg"
+  },
+  {
+    "index": 25,
+    "filename": "000025.jpg",
+    "source_session": "Leanbot_m150",
+    "source_image": "angle_m150_000.jpg"
+  },
+  {
+    "index": 26,
+    "filename": "000026.jpg",
+    "source_session": "Leanbot_m150",
+    "source_image": "angle_m150_001.jpg"
+  },
+  {
+    "index": 27,
+    "filename": "000027.jpg",
+    "source_session": "Leanbot_m150",
+    "source_image": "angle_m150_002.jpg"
+  },
+  {
+    "index": 28,
+    "filename": "000028.jpg",
+    "source_session": "Leanbot_m150",
+    "source_image": "angle_m150_003.jpg"
+  },
+  {
+    "index": 29,
+    "filename": "000029.jpg",
+    "source_session": "Leanbot_m150",
+    "source_image": "angle_m150_004.jpg"
+  },
+  {
+    "index": 30,
+    "filename": "000030.jpg",
+    "source_session": "Leanbot_m30",
+    "source_image": "angle_m30_000.jpg"
+  },
+  {
+    "index": 31,
+    "filename": "000031.jpg",
+    "source_session": "Leanbot_m30",
+    "source_image": "angle_m30_001.jpg"
+  },
+  {
+    "index": 32,
+    "filename": "000032.jpg",
+    "source_session": "Leanbot_m30",
+    "source_image": "angle_m30_002.jpg"
+  },
+  {
+    "index": 33,
+    "filename": "000033.jpg",
+    "source_session": "Leanbot_m30",
+    "source_image": "angle_m30_003.jpg"
+  },
+  {
+    "index": 34,
+    "filename": "000034.jpg",
+    "source_session": "Leanbot_m30",
+    "source_image": "angle_m30_004.jpg"
+  },
+  {
+    "index": 35,
+    "filename": "000035.jpg",
+    "source_session": "Leanbot_m45",
+    "source_image": "angle_m45_000.jpg"
+  },
+  {
+    "index": 36,
+    "filename": "000036.jpg",
+    "source_session": "Leanbot_m45",
+    "source_image": "angle_m45_001.jpg"
+  },
+  {
+    "index": 37,
+    "filename": "000037.jpg",
+    "source_session": "Leanbot_m45",
+    "source_image": "angle_m45_002.jpg"
+  },
+  {
+    "index": 38,
+    "filename": "000038.jpg",
+    "source_session": "Leanbot_m45",
+    "source_image": "angle_m45_003.jpg"
+  },
+  {
+    "index": 39,
+    "filename": "000039.jpg",
+    "source_session": "Leanbot_m45",
+    "source_image": "angle_m45_004.jpg"
+  },
+  {
+    "index": 40,
+    "filename": "000040.jpg",
+    "source_session": "Leanbot_m60",
+    "source_image": "angle_m60_000.jpg"
+  },
+  {
+    "index": 41,
+    "filename": "000041.jpg",
+    "source_session": "Leanbot_m60",
+    "source_image": "angle_m60_001.jpg"
+  },
+  {
+    "index": 42,
+    "filename": "000042.jpg",
+    "source_session": "Leanbot_m60",
+    "source_image": "angle_m60_002.jpg"
+  },
+  {
+    "index": 43,
+    "filename": "000043.jpg",
+    "source_session": "Leanbot_m60",
+    "source_image": "angle_m60_003.jpg"
+  },
+  {
+    "index": 44,
+    "filename": "000044.jpg",
+    "source_session": "Leanbot_m60",
+    "source_image": "angle_m60_004.jpg"
+  },
+  {
+    "index": 45,
+    "filename": "000045.jpg",
+    "source_session": "Leanbot_m75",
+    "source_image": "angle_m75_000.jpg"
+  },
+  {
+    "index": 46,
+    "filename": "000046.jpg",
+    "source_session": "Leanbot_m75",
+    "source_image": "angle_m75_001.jpg"
+  },
+  {
+    "index": 47,
+    "filename": "000047.jpg",
+    "source_session": "Leanbot_m75",
+    "source_image": "angle_m75_002.jpg"
+  },
+  {
+    "index": 48,
+    "filename": "000048.jpg",
+    "source_session": "Leanbot_m75",
+    "source_image": "angle_m75_003.jpg"
+  },
+  {
+    "index": 49,
+    "filename": "000049.jpg",
+    "source_session": "Leanbot_m75",
+    "source_image": "angle_m75_004.jpg"
+  },
+  {
+    "index": 50,
+    "filename": "000050.jpg",
+    "source_session": "Leanbot_m90",
+    "source_image": "angle_m90_000.jpg"
+  },
+  {
+    "index": 51,
+    "filename": "000051.jpg",
+    "source_session": "Leanbot_m90",
+    "source_image": "angle_m90_001.jpg"
+  },
+  {
+    "index": 52,
+    "filename": "000052.jpg",
+    "source_session": "Leanbot_m90",
+    "source_image": "angle_m90_002.jpg"
+  },
+  {
+    "index": 53,
+    "filename": "000053.jpg",
+    "source_session": "Leanbot_m90",
+    "source_image": "angle_m90_003.jpg"
+  },
+  {
+    "index": 54,
+    "filename": "000054.jpg",
+    "source_session": "Leanbot_m90",
+    "source_image": "angle_m90_004.jpg"
+  },
+  {
+    "index": 55,
+    "filename": "000055.jpg",
+    "source_session": "Leanbot_p105",
+    "source_image": "angle_p105_000.jpg"
+  },
+  {
+    "index": 56,
+    "filename": "000056.jpg",
+    "source_session": "Leanbot_p105",
+    "source_image": "angle_p105_001.jpg"
+  },
+  {
+    "index": 57,
+    "filename": "000057.jpg",
+    "source_session": "Leanbot_p105",
+    "source_image": "angle_p105_002.jpg"
+  },
+  {
+    "index": 58,
+    "filename": "000058.jpg",
+    "source_session": "Leanbot_p105",
+    "source_image": "angle_p105_003.jpg"
+  },
+  {
+    "index": 59,
+    "filename": "000059.jpg",
+    "source_session": "Leanbot_p105",
+    "source_image": "angle_p105_004.jpg"
+  },
+  {
+    "index": 60,
+    "filename": "000060.jpg",
+    "source_session": "Leanbot_p120",
+    "source_image": "angle_p120_000.jpg"
+  },
+  {
+    "index": 61,
+    "filename": "000061.jpg",
+    "source_session": "Leanbot_p120",
+    "source_image": "angle_p120_001.jpg"
+  },
+  {
+    "index": 62,
+    "filename": "000062.jpg",
+    "source_session": "Leanbot_p120",
+    "source_image": "angle_p120_002.jpg"
+  },
+  {
+    "index": 63,
+    "filename": "000063.jpg",
+    "source_session": "Leanbot_p120",
+    "source_image": "angle_p120_003.jpg"
+  },
+  {
+    "index": 64,
+    "filename": "000064.jpg",
+    "source_session": "Leanbot_p120",
+    "source_image": "angle_p120_004.jpg"
+  },
+  {
+    "index": 65,
+    "filename": "000065.jpg",
+    "source_session": "Leanbot_p135",
+    "source_image": "angle_p135_000.jpg"
+  },
+  {
+    "index": 66,
+    "filename": "000066.jpg",
+    "source_session": "Leanbot_p135",
+    "source_image": "angle_p135_001.jpg"
+  },
+  {
+    "index": 67,
+    "filename": "000067.jpg",
+    "source_session": "Leanbot_p135",
+    "source_image": "angle_p135_002.jpg"
+  },
+  {
+    "index": 68,
+    "filename": "000068.jpg",
+    "source_session": "Leanbot_p135",
+    "source_image": "angle_p135_003.jpg"
+  },
+  {
+    "index": 69,
+    "filename": "000069.jpg",
+    "source_session": "Leanbot_p135",
+    "source_image": "angle_p135_004.jpg"
+  },
+  {
+    "index": 70,
+    "filename": "000070.jpg",
+    "source_session": "Leanbot_p15",
+    "source_image": "angle_p15_000.jpg"
+  },
+  {
+    "index": 71,
+    "filename": "000071.jpg",
+    "source_session": "Leanbot_p15",
+    "source_image": "angle_p15_001.jpg"
+  },
+  {
+    "index": 72,
+    "filename": "000072.jpg",
+    "source_session": "Leanbot_p15",
+    "source_image": "angle_p15_002.jpg"
+  },
+  {
+    "index": 73,
+    "filename": "000073.jpg",
+    "source_session": "Leanbot_p15",
+    "source_image": "angle_p15_003.jpg"
+  },
+  {
+    "index": 74,
+    "filename": "000074.jpg",
+    "source_session": "Leanbot_p15",
+    "source_image": "angle_p15_004.jpg"
+  },
+  {
+    "index": 75,
+    "filename": "000075.jpg",
+    "source_session": "Leanbot_p150",
+    "source_image": "angle_p150_000.jpg"
+  },
+  {
+    "index": 76,
+    "filename": "000076.jpg",
+    "source_session": "Leanbot_p150",
+    "source_image": "angle_p150_001.jpg"
+  },
+  {
+    "index": 77,
+    "filename": "000077.jpg",
+    "source_session": "Leanbot_p150",
+    "source_image": "angle_p150_002.jpg"
+  },
+  {
+    "index": 78,
+    "filename": "000078.jpg",
+    "source_session": "Leanbot_p150",
+    "source_image": "angle_p150_003.jpg"
+  },
+  {
+    "index": 79,
+    "filename": "000079.jpg",
+    "source_session": "Leanbot_p150",
+    "source_image": "angle_p150_004.jpg"
+  },
+  {
+    "index": 80,
+    "filename": "000080.jpg",
+    "source_session": "Leanbot_p165",
+    "source_image": "angle_p165_000.jpg"
+  },
+  {
+    "index": 81,
+    "filename": "000081.jpg",
+    "source_session": "Leanbot_p165",
+    "source_image": "angle_p165_001.jpg"
+  },
+  {
+    "index": 82,
+    "filename": "000082.jpg",
+    "source_session": "Leanbot_p165",
+    "source_image": "angle_p165_002.jpg"
+  },
+  {
+    "index": 83,
+    "filename": "000083.jpg",
+    "source_session": "Leanbot_p165",
+    "source_image": "angle_p165_003.jpg"
+  },
+  {
+    "index": 84,
+    "filename": "000084.jpg",
+    "source_session": "Leanbot_p165",
+    "source_image": "angle_p165_004.jpg"
+  },
+  {
+    "index": 85,
+    "filename": "000085.jpg",
+    "source_session": "Leanbot_p180",
+    "source_image": "angle_p180_000.jpg"
+  },
+  {
+    "index": 86,
+    "filename": "000086.jpg",
+    "source_session": "Leanbot_p180",
+    "source_image": "angle_p180_001.jpg"
+  },
+  {
+    "index": 87,
+    "filename": "000087.jpg",
+    "source_session": "Leanbot_p180",
+    "source_image": "angle_p180_002.jpg"
+  },
+  {
+    "index": 88,
+    "filename": "000088.jpg",
+    "source_session": "Leanbot_p180",
+    "source_image": "angle_p180_003.jpg"
+  },
+  {
+    "index": 89,
+    "filename": "000089.jpg",
+    "source_session": "Leanbot_p180",
+    "source_image": "angle_p180_004.jpg"
+  },
+  {
+    "index": 90,
+    "filename": "000090.jpg",
+    "source_session": "Leanbot_p195",
+    "source_image": "angle_p195_000.jpg"
+  },
+  {
+    "index": 91,
+    "filename": "000091.jpg",
+    "source_session": "Leanbot_p195",
+    "source_image": "angle_p195_001.jpg"
+  },
+  {
+    "index": 92,
+    "filename": "000092.jpg",
+    "source_session": "Leanbot_p195",
+    "source_image": "angle_p195_002.jpg"
+  },
+  {
+    "index": 93,
+    "filename": "000093.jpg",
+    "source_session": "Leanbot_p195",
+    "source_image": "angle_p195_003.jpg"
+  },
+  {
+    "index": 94,
+    "filename": "000094.jpg",
+    "source_session": "Leanbot_p195",
+    "source_image": "angle_p195_004.jpg"
+  },
+  {
+    "index": 95,
+    "filename": "000095.jpg",
+    "source_session": "Leanbot_p30",
+    "source_image": "angle_p30_000.jpg"
+  },
+  {
+    "index": 96,
+    "filename": "000096.jpg",
+    "source_session": "Leanbot_p30",
+    "source_image": "angle_p30_001.jpg"
+  },
+  {
+    "index": 97,
+    "filename": "000097.jpg",
+    "source_session": "Leanbot_p30",
+    "source_image": "angle_p30_002.jpg"
+  },
+  {
+    "index": 98,
+    "filename": "000098.jpg",
+    "source_session": "Leanbot_p30",
+    "source_image": "angle_p30_003.jpg"
+  },
+  {
+    "index": 99,
+    "filename": "000099.jpg",
+    "source_session": "Leanbot_p30",
+    "source_image": "angle_p30_004.jpg"
+  },
+  {
+    "index": 100,
+    "filename": "000100.jpg",
+    "source_session": "Leanbot_p45",
+    "source_image": "angle_p45_000.jpg"
+  },
+  {
+    "index": 101,
+    "filename": "000101.jpg",
+    "source_session": "Leanbot_p45",
+    "source_image": "angle_p45_001.jpg"
+  },
+  {
+    "index": 102,
+    "filename": "000102.jpg",
+    "source_session": "Leanbot_p45",
+    "source_image": "angle_p45_002.jpg"
+  },
+  {
+    "index": 103,
+    "filename": "000103.jpg",
+    "source_session": "Leanbot_p45",
+    "source_image": "angle_p45_003.jpg"
+  },
+  {
+    "index": 104,
+    "filename": "000104.jpg",
+    "source_session": "Leanbot_p45",
+    "source_image": "angle_p45_004.jpg"
+  },
+  {
+    "index": 105,
+    "filename": "000105.jpg",
+    "source_session": "Leanbot_p60",
+    "source_image": "angle_p60_000.jpg"
+  },
+  {
+    "index": 106,
+    "filename": "000106.jpg",
+    "source_session": "Leanbot_p60",
+    "source_image": "angle_p60_001.jpg"
+  },
+  {
+    "index": 107,
+    "filename": "000107.jpg",
+    "source_session": "Leanbot_p60",
+    "source_image": "angle_p60_002.jpg"
+  },
+  {
+    "index": 108,
+    "filename": "000108.jpg",
+    "source_session": "Leanbot_p60",
+    "source_image": "angle_p60_003.jpg"
+  },
+  {
+    "index": 109,
+    "filename": "000109.jpg",
+    "source_session": "Leanbot_p60",
+    "source_image": "angle_p60_004.jpg"
+  },
+  {
+    "index": 110,
+    "filename": "000110.jpg",
+    "source_session": "Leanbot_p75",
+    "source_image": "angle_p75_000.jpg"
+  },
+  {
+    "index": 111,
+    "filename": "000111.jpg",
+    "source_session": "Leanbot_p75",
+    "source_image": "angle_p75_001.jpg"
+  },
+  {
+    "index": 112,
+    "filename": "000112.jpg",
+    "source_session": "Leanbot_p75",
+    "source_image": "angle_p75_002.jpg"
+  },
+  {
+    "index": 113,
+    "filename": "000113.jpg",
+    "source_session": "Leanbot_p75",
+    "source_image": "angle_p75_003.jpg"
+  },
+  {
+    "index": 114,
+    "filename": "000114.jpg",
+    "source_session": "Leanbot_p75",
+    "source_image": "angle_p75_004.jpg"
+  },
+  {
+    "index": 115,
+    "filename": "000115.jpg",
+    "source_session": "Leanbot_p90",
+    "source_image": "angle_p90_000.jpg"
+  },
+  {
+    "index": 116,
+    "filename": "000116.jpg",
+    "source_session": "Leanbot_p90",
+    "source_image": "angle_p90_001.jpg"
+  },
+  {
+    "index": 117,
+    "filename": "000117.jpg",
+    "source_session": "Leanbot_p90",
+    "source_image": "angle_p90_002.jpg"
+  },
+  {
+    "index": 118,
+    "filename": "000118.jpg",
+    "source_session": "Leanbot_p90",
+    "source_image": "angle_p90_003.jpg"
+  },
+  {
+    "index": 119,
+    "filename": "000119.jpg",
+    "source_session": "Leanbot_p90",
+    "source_image": "angle_p90_004.jpg"
+  }
+]

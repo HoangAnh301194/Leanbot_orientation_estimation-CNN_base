@@ -3,7 +3,7 @@
 ## A. Công việc đã làm
 - Bật param remove NMS khi export model OpenVINO và đánh giá các thôgn số so với none NMS 
 - Chỉnh sửa code test ROI tracking tính góc từ tổng vector các anchors overlap. 
-
+- Chạy realtime và đánh giá model NMS và No NMS 
 ### 1. Bật rapam remove NMS khi export model OpenVINO 
 - Code sử dụng : [tools\export_openvino_fp16.py](tools\export_openvino_fp16.py)
 
@@ -178,5 +178,5 @@ python tools/roi_tracking_baseline_infer.py --source 1 --mode roi --show --full-
 
 ## B. Khó khăn 
 - Không 
-## C. Cônng việc tiếp theo 
+## C. Công việc tiếp theo 
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ .

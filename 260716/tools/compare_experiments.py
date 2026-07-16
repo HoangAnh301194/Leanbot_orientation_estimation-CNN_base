@@ -1,132 +1,86 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import argparse
 import os
-import sys
 
-# Fix lỗi in tiếng Việt trên console Windows
-if sys.stdout.encoding.lower() != 'utf-8':
-    sys.stdout.reconfigure(encoding='utf-8')
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+def tracking_lost_count(dataframe):
+    if "tracking_lost" in dataframe.columns:
+        return int(dataframe["tracking_lost"].sum())
+    if "lost_count" in dataframe.columns and not dataframe.empty:
+        return int(dataframe["lost_count"].iloc[-1])
+    return 0
+
+
+def save_line_plot(first_values, second_values, first_label, second_label,
+                   ylabel, title, output_path):
+    plt.figure(figsize=(10, 5))
+    plt.plot(range(len(second_values)), second_values, label=second_label, alpha=0.7)
+    plt.plot(range(len(first_values)), first_values, label=first_label, alpha=0.7)
+    plt.xlabel("Frames from start")
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(output_path)
+    plt.close()
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Đánh giá và so sánh kết quả log ROI vs Baseline")
-    parser.add_argument("--roi-log", required=True, help="Đường dẫn tới file csv của mode ROI")
-    parser.add_argument("--baseline-log", required=True, help="Đường dẫn tới file csv của mode Baseline")
-    parser.add_argument("--out-dir", default="benchmark", help="Thư mục lưu các biểu đồ")
+    parser = argparse.ArgumentParser(description="Compare benchmark logs from two models")
+    parser.add_argument("--roi-log", required=True, help="CSV log for the first model")
+    parser.add_argument("--baseline-log", required=True, help="CSV log for the second model")
+    parser.add_argument("--roi-label", default="Model 1", help="Display name for the first model")
+    parser.add_argument("--baseline-label", default="Model 2", help="Display name for the second model")
+    parser.add_argument("--out-dir", default="benchmark", help="Directory for generated plots")
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
+    first_data = pd.read_csv(args.roi_log)
+    second_data = pd.read_csv(args.baseline_log)
 
-    # Đọc dữ liệu
-    df_roi = pd.read_csv(args.roi_log)
-    df_base = pd.read_csv(args.baseline_log)
+    metrics = [
+        ("Average FPS", "fps", "FPS"),
+        ("Average inference time", "inf_time_ms", "ms"),
+        ("Average CPU load", "cpu_load_pct", "%"),
+        ("Average input width", "input_width", "px"),
+    ]
 
-    print("=== KẾT QUẢ SO SÁNH TRUNG BÌNH ===")
-    
-    avg_fps_roi = df_roi['fps'].mean()
-    avg_fps_base = df_base['fps'].mean()
-    
-    avg_inf_roi = df_roi['inf_time_ms'].mean()
-    avg_inf_base = df_base['inf_time_ms'].mean()
-    
-    avg_cpu_roi = df_roi['cpu_load_pct'].mean()
-    avg_cpu_base = df_base['cpu_load_pct'].mean()
-    
-    avg_input_roi = df_roi['input_width'].mean()
-    avg_input_base = df_base['input_width'].mean()
-    
-    if 'tracking_lost' in df_roi.columns:
-        lost_roi = int(df_roi['tracking_lost'].sum())
-    elif 'lost_count' in df_roi.columns and not df_roi.empty:
-        lost_roi = int(df_roi['lost_count'].iloc[-1])
-    else:
-        lost_roi = 0
+    print("=== AVERAGE COMPARISON ===")
+    for title, column, unit in metrics:
+        first_average = first_data[column].mean()
+        second_average = second_data[column].mean()
+        print(f"{title}:")
+        print(f"  - {args.roi_label}: {first_average:.2f} {unit}")
+        print(f"  - {args.baseline_label}: {second_average:.2f} {unit}")
 
-    if 'tracking_lost' in df_base.columns:
-        lost_base = int(df_base['tracking_lost'].sum())
-    elif 'lost_count' in df_base.columns and not df_base.empty:
-        lost_base = int(df_base['lost_count'].iloc[-1])
-    else:
-        lost_base = 0
+    print("Tracking-lost frames:")
+    print(f"  - {args.roi_label}: {tracking_lost_count(first_data)}")
+    print(f"  - {args.baseline_label}: {tracking_lost_count(second_data)}")
 
-    print(f"1. FPS trung bình:")
-    print(f"   - Baseline : {avg_fps_base:.2f} FPS")
-    print(f"   - ROI      : {avg_fps_roi:.2f} FPS")
-    
-    print(f"2. Inference time trung bình:")
-    print(f"   - Baseline : {avg_inf_base:.2f} ms")
-    print(f"   - ROI      : {avg_inf_roi:.2f} ms")
+    save_line_plot(
+        first_data["fps"], second_data["fps"],
+        args.roi_label, args.baseline_label,
+        "FPS", "FPS comparison",
+        os.path.join(args.out_dir, "fps_comparison.png"),
+    )
+    save_line_plot(
+        first_data["inf_time_ms"], second_data["inf_time_ms"],
+        args.roi_label, args.baseline_label,
+        "Inference time (ms)", "Inference time comparison",
+        os.path.join(args.out_dir, "inf_time_comparison.png"),
+    )
+    save_line_plot(
+        first_data["cpu_load_pct"], second_data["cpu_load_pct"],
+        args.roi_label, args.baseline_label,
+        "CPU load (%)", "CPU load comparison",
+        os.path.join(args.out_dir, "cpu_load_comparison.png"),
+    )
 
-    print(f"3. CPU load trung bình:")
-    print(f"   - Baseline : {avg_cpu_base:.2f}%")
-    print(f"   - ROI      : {avg_cpu_roi:.2f}%")
-    
-    print(f"4. Kích thước input trung bình (Width):")
-    print(f"   - Baseline : {avg_input_base:.2f} px")
-    print(f"   - ROI      : {avg_input_roi:.2f} px")
-    
-    print(f"5. Số frame tracking_lost / fallback:")
-    print(f"   - Baseline : {lost_base} lần")
-    print(f"   - ROI      : {lost_roi} lần")
+    print(f"Generated 3 plots in: {os.path.abspath(args.out_dir)}")
 
-    # Vẽ biểu đồ 1: FPS over time
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(len(df_base)), df_base['fps'], label='Baseline (Full-frame)', alpha=0.7)
-    plt.plot(range(len(df_roi)), df_roi['fps'], label='ROI Tracking', alpha=0.7)
-    plt.xlabel("Frames from start")
-    plt.ylabel("FPS")
-    plt.title("So sánh tốc độ khung hình (FPS)")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(args.out_dir, "fps_comparison.png"))
-    plt.close()
-
-    # Vẽ biểu đồ 2: Inference Time
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(len(df_base)), df_base['inf_time_ms'], label='Baseline', alpha=0.7)
-    plt.plot(range(len(df_roi)), df_roi['inf_time_ms'], label='ROI', alpha=0.7)
-    plt.xlabel("Frames from start")
-    plt.ylabel("Inference Time (ms)")
-    plt.title("So sánh Inference Time")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(args.out_dir, "inf_time_comparison.png"))
-    plt.close()
-
-    # Vẽ biểu đồ 3: CPU Load
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(len(df_base)), df_base['cpu_load_pct'], label='Baseline', alpha=0.7)
-    plt.plot(range(len(df_roi)), df_roi['cpu_load_pct'], label='ROI', alpha=0.7)
-    plt.xlabel("Frames from start")
-    plt.ylabel("CPU Load (%)")
-    plt.title("So sánh Tải CPU")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(args.out_dir, "cpu_load_comparison.png"))
-    plt.close()
-
-    # Vẽ biểu đồ 4: Quỹ đạo (Tọa độ center_x, center_y và Angle) của bản ROI
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
-    ax1.plot(range(len(df_roi)), df_roi['x_center'], label='Center X', color='blue')
-    ax1.plot(range(len(df_roi)), df_roi['y_center'], label='Center Y', color='orange')
-    ax1.set_xlabel("Frames from start")
-    ax1.set_ylabel("Pixel Coordinate")
-    ax1.set_title("Quỹ đạo tâm vật thể (Center X, Y) - ROI Mode")
-    ax1.legend()
-    ax1.grid(True)
-
-    ax2.plot(range(len(df_roi)), df_roi['angle'], label='Angle', color='green')
-    ax2.set_xlabel("Frames from start")
-    ax2.set_ylabel("Angle (rad/deg)")
-    ax2.set_title("Góc nghiêng vật thể (Angle) - ROI Mode")
-    ax2.legend()
-    ax2.grid(True)
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(args.out_dir, "trajectory_angle.png"))
-    plt.close()
-
-    print(f"\n[INFO] Đã lưu 4 biểu đồ vào thư mục: {os.path.abspath(args.out_dir)}")
 
 if __name__ == "__main__":
     main()

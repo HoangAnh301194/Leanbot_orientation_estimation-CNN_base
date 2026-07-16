@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import pandas as pd
 import time
 import psutil
 import argparse
@@ -20,12 +21,15 @@ sys.path.append(str(Path(__file__).resolve().parent))
 import check_confidence
 
 
+IOU_THRES = 0.5
+CLASS_ANGLE_MAP = {}
 ANGLE_PATTERN = re.compile(r"^Leanbot_(?:(?P<sign>[pm])(?P<value>\d+)|(?P<plain>\d+))$")
 
 def parse_angle_from_class_name(class_name: str):
+    """Returns the angle (float) encoded in the class name, or None if not an angle class."""
     match = ANGLE_PATTERN.match(class_name)
     if not match:
-        return 0.0
+        return None  # Not an angle class — caller decides fallback
     if match.group("plain") is not None:
         return float(match.group("plain"))
     value = float(match.group("value"))
@@ -33,24 +37,134 @@ def parse_angle_from_class_name(class_name: str):
 
 def angle_from_detection_class(model, cls_id):
     try:
-        return parse_angle_from_class_name(model.names[int(cls_id)])
+        result = parse_angle_from_class_name(model.names[int(cls_id)])
+        return result if result is not None else 0.0
     except Exception:
         return 0.0
 
 def get_vector_from_scores(class_scores, names):
+    """Tổng hợp vector từ toàn bộ class scores, dùng CLASS_ANGLE_MAP cache.
+    Các class không phải angle class sẽ bị bỏ qua (giống webcam_vector_infer).
+    """
+    if not CLASS_ANGLE_MAP:
+        for cid, cname in names.items():
+            a = parse_angle_from_class_name(cname)
+            if a is not None:
+                CLASS_ANGLE_MAP[cname] = a
     sum_x = 0.0
     sum_y = 0.0
     for cls_id, score in enumerate(class_scores):
-        class_name = names[int(cls_id)]
-        angle = parse_angle_from_class_name(class_name)
+        cls_name = names[int(cls_id)]
+        angle = CLASS_ANGLE_MAP.get(cls_name)
+        if angle is None:
+            continue  # Bỏ qua class không có angle
         theta_rad = math.radians(angle)
         sum_x += float(score) * math.cos(theta_rad)
         sum_y += float(score) * math.sin(theta_rad)
     magnitude = math.hypot(sum_x, sum_y)
     if magnitude <= 1e-9:
         return 0.0, 0.0
-    angle = math.degrees(math.atan2(sum_y, sum_x))
-    return magnitude, angle
+    angle_out = math.degrees(math.atan2(sum_y, sum_x))
+    return magnitude, angle_out
+
+# ---------------------------------------------------------------------------
+# Helper functions cho no-NMS pipeline (ported từ webcam_vector_infer.py)
+# ---------------------------------------------------------------------------
+
+def box_iou_numpy(box, boxes):
+    """Tính IoU giữa 1 box và mảng boxes (xyxy format)."""
+    if len(boxes) == 0:
+        return np.array([])
+    x1 = np.maximum(box[0], boxes[:, 0])
+    y1 = np.maximum(box[1], boxes[:, 1])
+    x2 = np.minimum(box[2], boxes[:, 2])
+    y2 = np.minimum(box[3], boxes[:, 3])
+    inter = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
+    area_box = max(0, box[2] - box[0]) * max(0, box[3] - box[1])
+    area_boxes = np.maximum(0, boxes[:, 2] - boxes[:, 0]) * np.maximum(0, boxes[:, 3] - boxes[:, 1])
+    return inter / (area_box + area_boxes - inter + 1e-9)
+
+def compute_weighted_bbox(group_df):
+    """Tính bounding box trung bình có trọng số theo vector_magnitude."""
+    w = group_df["vector_magnitude"].values
+    total = w.sum()
+    if total <= 1e-9:
+        return (float(group_df["x_center"].mean()), float(group_df["y_center"].mean()),
+                float(group_df["width"].mean()), float(group_df["height"].mean()))
+    return (
+        float(np.dot(w, group_df["x_center"].values) / total),
+        float(np.dot(w, group_df["y_center"].values) / total),
+        float(np.dot(w, group_df["width"].values) / total),
+        float(np.dot(w, group_df["height"].values) / total),
+    )
+
+def group_anchors(df, iou_thres=IOU_THRES):
+    """Greedy IoU grouping — gom các anchors chồng lấp thành nhóm."""
+    if len(df) == 0:
+        return []
+    df = df.sort_values("vector_magnitude", ascending=False).reset_index(drop=True)
+    df["x1"] = df["x_center"] - df["width"] / 2
+    df["y1"] = df["y_center"] - df["height"] / 2
+    df["x2"] = df["x_center"] + df["width"] / 2
+    df["y2"] = df["y_center"] + df["height"] / 2
+    boxes = df[["x1", "y1", "x2", "y2"]].values
+    remaining = list(range(len(df)))
+    groups = []
+    gid = 1
+    while remaining:
+        best = remaining[0]
+        for idx in remaining:
+            if df.loc[idx, "vector_magnitude"] > df.loc[best, "vector_magnitude"]:
+                best = idx
+        center_box = boxes[best]
+        rem_boxes = boxes[remaining]
+        ious = box_iou_numpy(center_box, rem_boxes)
+        mask = ious > iou_thres
+        in_group = [remaining[i] for i, m in enumerate(mask) if m]
+        remaining = [remaining[i] for i, m in enumerate(mask) if not m]
+        gdf = df.iloc[in_group].copy()
+        gdf["group_id"] = gid
+        gx, gy, gw, gh = compute_weighted_bbox(gdf)
+        gdf["group_x_center"] = gx
+        gdf["group_y_center"] = gy
+        gdf["group_width"] = gw
+        gdf["group_height"] = gh
+        groups.append(gdf)
+        gid += 1
+    return groups
+
+def compute_group_vectors(groups):
+    """Tính vector tổng hợp cho mỗi nhóm anchor."""
+    rows = []
+    for gdf in groups:
+        gid = int(gdf["group_id"].iloc[0])
+        sum_x, sum_y = 0.0, 0.0
+        for _, r in gdf.iterrows():
+            mag = r["vector_magnitude"]
+            ang = math.radians(r["estimated_angle"])
+            sum_x += mag * math.cos(ang)
+            sum_y += mag * math.sin(ang)
+        group_mag = math.hypot(sum_x, sum_y)
+        group_ang = math.degrees(math.atan2(sum_y, sum_x))
+        best_row = gdf.loc[gdf["vector_magnitude"].idxmax()]
+        gx = float(best_row.get("group_x_center", best_row["x_center"]))
+        gy = float(best_row.get("group_y_center", best_row["y_center"]))
+        gw = float(best_row.get("group_width", best_row["width"]))
+        gh = float(best_row.get("group_height", best_row["height"]))
+        rows.append({
+            "group_id": gid,
+            "number_of_anchors": len(gdf),
+            "vector_magnitude": round(group_mag, 2),
+            "x_center": round(gx, 2),
+            "y_center": round(gy, 2),
+            "width": round(gw, 2),
+            "height": round(gh, 2),
+            "angle": round(group_ang, 2),
+        })
+    df_out = pd.DataFrame(rows)
+    if not df_out.empty:
+        df_out = df_out.sort_values("vector_magnitude", ascending=False).reset_index(drop=True)
+    return df_out
 
 def infer_openvino_raw(compiled_model, image):
     input_tensor = image[:, :, ::-1].transpose(2, 0, 1)
@@ -62,22 +176,103 @@ def infer_openvino_raw(compiled_model, image):
         pred = pred.T
     return pred
 
-def select_best_vector_detection(compiled_model, image, names):
+def select_best_vector_detection(compiled_model, image, names,
+                                  conf_thres=0.25, topk=100,
+                                  iou_thres=IOU_THRES, min_mag=2.0):
+    """Chọn detection tốt nhất từ output của model.
+
+    - NMS output  (shape[1] == 6): lấy box có conf cao nhất, đọc angle từ class name.
+    - Raw output  (shape[1] >  6): dùng full vector pipeline giống webcam_vector_infer
+      (conf filter → Top-K → per-anchor vector → IoU grouping → group vector sum).
+
+    Returns: (box_xyxy, best_conf, angle, vector_magnitude)
+    """
     pred = infer_openvino_raw(compiled_model, image)
+
+    # ------------------------------------------------------------------
+    # Nhánh NMS: output 6 cột [x1, y1, x2, y2, conf, cls_id]
+    # ------------------------------------------------------------------
+    if pred.shape[1] == 6:
+        valid_pred = pred[pred[:, 4] > 0.0]
+        if len(valid_pred) == 0:
+            return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0
+        best_detection = valid_pred[int(np.argmax(valid_pred[:, 4]))]
+        box_xyxy = best_detection[:4].astype(np.float32)
+        best_conf = float(best_detection[4])
+        try:
+            class_name = names[int(best_detection[5])]
+            vector_angle = parse_angle_from_class_name(class_name)
+            if vector_angle is None:
+                vector_angle = 0.0
+        except (IndexError, KeyError, TypeError, ValueError):
+            vector_angle = 0.0
+        return box_xyxy, best_conf, vector_angle, best_conf
+
+    # ------------------------------------------------------------------
+    # Nhánh No-NMS: full vector pipeline (giống webcam_vector_infer.py)
+    # Output raw: [x_c, y_c, w, h, score_cls0, ..., score_clsN]
+    # ------------------------------------------------------------------
     boxes_xywh = pred[:, :4]
     class_scores = pred[:, 4:4 + len(names)]
-    best_scores = class_scores.max(axis=1)
-    best_idx = int(np.argmax(best_scores))
-    best_conf = float(best_scores[best_idx])
-    x_center, y_center, width, height = boxes_xywh[best_idx]
-    box_xyxy = np.array([
-        x_center - width / 2.0,
-        y_center - height / 2.0,
-        x_center + width / 2.0,
-        y_center + height / 2.0,
-    ], dtype=np.float32)
-    vector_magnitude, vector_angle = get_vector_from_scores(class_scores[best_idx], names)
-    return box_xyxy, best_conf, vector_angle, vector_magnitude
+
+    # 1. Confidence filter
+    best_scores_per_anchor = class_scores.max(axis=1)
+    conf_mask = best_scores_per_anchor > conf_thres
+    filtered_indices = np.where(conf_mask)[0]
+
+    if len(filtered_indices) == 0:
+        return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0
+
+    # 2. Top-K selection
+    filtered_scores = best_scores_per_anchor[filtered_indices]
+    topk_actual = min(topk, len(filtered_indices))
+    topk_relative = np.argsort(filtered_scores)[-topk_actual:][::-1]
+    topk_idx = filtered_indices[topk_relative]
+
+    top_boxes = boxes_xywh[topk_idx]
+    top_class_scores = class_scores[topk_idx]
+    # Conf đại diện = score cao nhất của anchor đứng đầu
+    best_conf = float(best_scores_per_anchor[topk_idx[0]])
+
+    # 3. Tính vector cho từng anchor
+    raw_rows = []
+    for i in range(topk_actual):
+        mag, ang = get_vector_from_scores(top_class_scores[i], names)
+        x, y, w, h = top_boxes[i]
+        raw_rows.append({
+            "vector_magnitude": float(mag),
+            "estimated_angle": float(ang),
+            "x_center": float(x),
+            "y_center": float(y),
+            "width": float(w),
+            "height": float(h),
+        })
+
+    raw_df = pd.DataFrame(raw_rows)
+
+    # 4. Gom nhóm anchor theo IoU
+    groups = group_anchors(raw_df, iou_thres=iou_thres)
+    if not groups:
+        return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0
+
+    # 5. Tính vector tổng hợp cho mỗi nhóm
+    summary_df = compute_group_vectors(groups)
+    summary_df = summary_df[summary_df["vector_magnitude"] >= min_mag]
+    if summary_df.empty:
+        return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0
+
+    # Nhóm tốt nhất (magnitude cao nhất — đã sort sẵn)
+    best = summary_df.iloc[0]
+    xc = float(best["x_center"])
+    yc = float(best["y_center"])
+    bw = float(best["width"])
+    bh = float(best["height"])
+    box_xyxy = np.array(
+        [xc - bw / 2, yc - bh / 2, xc + bw / 2, yc + bh / 2],
+        dtype=np.float32,
+    )
+    return box_xyxy, best_conf, float(best["angle"]), float(best["vector_magnitude"])
+
 
 def safe_timestamp_for_filename(text: str):
     return text.replace(":", "-").replace(".", "-")
@@ -86,32 +281,24 @@ def make_multiple_of_32(val):
     return int(np.ceil(val / 32.0) * 32)
 
 def calculate_roi(bbox, img_w, img_h):
-
     x1, y1, x2, y2 = bbox
     w = x2 - x1
     h = y2 - y1
     cx = x1 + w / 2.0
     cy = y1 + h / 2.0
-
-    # ROI hinh vuong: canh dua tren max(w, h) * he so
     side = max(w, h) * 2.0
     side_32 = make_multiple_of_32(side)
-    side_32 = min(side_32, img_w, img_h)  # Khong vuot qua kich thuoc anh
-
+    side_32 = min(side_32, img_w, img_h)
     x_min = int(cx - side_32 / 2.0)
     y_min = int(cy - side_32 / 2.0)
-
-    # Clamp de ROI nam trong khung hinh
     if x_min < 0:
         x_min = 0
     elif x_min + side_32 > img_w:
         x_min = img_w - side_32
-
     if y_min < 0:
         y_min = 0
     elif y_min + side_32 > img_h:
         y_min = img_h - side_32
-
     return x_min, y_min, side_32, side_32
 
 def main():
@@ -124,8 +311,13 @@ def main():
     parser.add_argument("--height", type=int, default=720, help="Chieu cao camera mong muon")
     parser.add_argument("--no-show", action="store_true", help="Khong hien thi cua so OpenCV")
     parser.add_argument("--show", action="store_true", help="Bat cua so OpenCV neu moi truong ho tro GUI")
-    parser.add_argument("--full-model", default=r"models\YOLOv8n_versions\quantized_fp16\best_24Class_Soft_Angular_BCE_openvino_model", help="Path to full detection model directory")
-    parser.add_argument("--tracking-model", default=r"models\YOLOv8n_versions\best_24Class_Soft_Angular_BCE_static_160_openvino_model", help="Path to ROI tracking model directory")
+    parser.add_argument("--full-model", default=r"models\YOLO11n_versions\quantized_fp16_nms\Soft_Angular_BCE_yolo11n_fp16_nms_imgsz640_openvino_model", help="Path to full detection model directory")
+    parser.add_argument("--tracking-model", default=r"models\YOLO11n_versions\quantized_fp16_nms\Soft_Angular_BCE_yolo11n_fp16_nms_imgsz160_openvino_model", help="Path to ROI tracking model directory")
+    # --- Tham so vector pipeline (chi dung khi model la no-NMS / raw output) ---
+    parser.add_argument("--topk", type=int, default=100, help="Top-K anchors cho no-NMS pipeline (default 100)")
+    parser.add_argument("--conf", type=float, default=0.25, help="Nguong confidence loc anchor (default 0.25)")
+    parser.add_argument("--iou", type=float, default=IOU_THRES, help="Nguong IoU gom nhom anchor (default 0.5)")
+    parser.add_argument("--min-mag", type=float, default=2.0, help="Vector magnitude toi thieu de chap nhan nhom (default 2.0)")
     args = parser.parse_args()
     if not args.show:
         args.no_show = True
@@ -266,7 +458,11 @@ def main():
                 infer_model = full_compiled_model
 
             infer_start = time.time()
-            box, best_conf, angle, vector_magnitude = select_best_vector_detection(infer_model, inference_input, names)
+            box, best_conf, angle, vector_magnitude = select_best_vector_detection(
+                infer_model, inference_input, names,
+                conf_thres=args.conf, topk=args.topk,
+                iou_thres=args.iou, min_mag=args.min_mag,
+            )
             total_inf_time = (time.time() - infer_start) * 1000
 
             if inference_mode == "FULL":

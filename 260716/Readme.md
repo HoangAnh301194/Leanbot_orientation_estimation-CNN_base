@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 14/07/2026
+# Báo cáo công việc ngày 16/07/2026
 
 ## A. Công việc đã làm
 - Bật param remove NMS khi export model OpenVINO và đánh giá các thôgn số so với none NMS 

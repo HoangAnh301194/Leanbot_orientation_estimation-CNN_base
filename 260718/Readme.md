@@ -4,7 +4,9 @@
 - Chạy model debug confidence với ảnh test 
 
 ### 1. Chạy Model debug 
-- Ảnh test : [24class_test_images/000021.jpg](24class_test_images/000021.jpg)
+- Ảnh test : 
+![24class_test_images/000021.jpg](24class_test_images/000021.jpg)
+
 - Code sử dụng : [tools/check_confidence.py](tools/check_confidence.py)
 - Lệnh chạy : 
 ```bash 
@@ -13,7 +15,9 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 ```
 
 - File csv kết quả : [output_confidence/000021_top200.csv](output_confidence/000021_top200.csv)
-- Ảnh debug : [output_confidence/debug_000021.jpg](output_confidence/debug_000021.jpg)
+- Ảnh debug : 
+
+![output_confidence/debug_000021.jpg](output_confidence/debug_000021.jpg)
 
 > Kết quả ảnh cho thấy Model sau khi train vẫn hoạt động tốt . 
 
@@ -34,7 +38,7 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 
 - Ảnh debug :
 
- [output_confidence_openvino/debug_000021.jpg](output_confidence_openvino/debug_000021.jpg)
+ ![output_confidence_openvino/debug_000021.jpg](output_confidence_openvino/debug_000021.jpg)
 
 > Kết quả cho thấy model sau export vẫn hoạt động bình thường, confidence vẫn cao. Confidence gần như không thay đổi so với model gốc.
 
@@ -49,7 +53,9 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 ```
 
 - Log csv kết quả : [output_confidence_openvino_old_model/000021_top200.csv](output_confidence_openvino_old_model/000021_top200.csv)
-- Ảnh debug : [output_confidence_openvino_old_model/debug_000021.jpg](output_confidence_openvino_old_model/debug_000021.jpg)
+- Ảnh debug : 
+
+![output_confidence_openvino_old_model/debug_000021.jpg](output_confidence_openvino_old_model/debug_000021.jpg)
 
 > Model cũ đã export hôm qua (17/7) vẫn hoạt động đúng . 
 
@@ -65,7 +71,9 @@ python tools/check_confidence.py --input D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260718
 ```
 - Log csv kết quả: [output_confidence_roi_crop_160/000021_top200.csv](output_confidence_roi_crop_160/000021_top200.csv)
 
-- Ảnh debug: [output_confidence_roi_crop_160/debug_roi_crop_test.png](output_confidence_roi_crop_160/debug_roi_crop_test.png)
+- Ảnh debug: 
+
+![output_confidence_roi_crop_160/debug_roi_crop_test.png](output_confidence_roi_crop_160/debug_roi_crop_test.png)
 
 > Khi đưa ảnh Crop vuông vào test model thì vẫn thấy hoạt động được 
 > Vấn đề là do quá trình roi tracking bị lỗi nên khi chạy Inference ROI tracking không detect được Leanbot để tracking theo ( lost tracking và ko detect lại được) 

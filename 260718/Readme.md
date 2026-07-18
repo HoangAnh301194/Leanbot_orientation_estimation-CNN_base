@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 17/07/2026
+# Báo cáo công việc ngày 18/07/2026
 
 ## A. Công việc đã làm 
 - Chạy model debug confidence với ảnh test 
@@ -38,7 +38,7 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 
 - Ảnh debug :
 
- ![output_confidence_openvino/debug_000021.jpg](output_confidence_openvino/debug_000021.jpg)
+![output_confidence_openvino/debug_000021.jpg](output_confidence_openvino/debug_000021.jpg)
 
 > Kết quả cho thấy model sau export vẫn hoạt động bình thường, confidence vẫn cao. Confidence gần như không thay đổi so với model gốc.
 
@@ -57,9 +57,9 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 
 ![output_confidence_openvino_old_model/debug_000021.jpg](output_confidence_openvino_old_model/debug_000021.jpg)
 
-> Model cũ đã export hôm qua (17/7) vẫn hoạt động đúng . 
+> Model cũ đã export hôm qua (16/7) vẫn hoạt động đúng . 
 
-- Test thử model export dạng **static 160x160**: [models\YOLO11n_versions\FP16_NO_NMS\static_160_openvino_model](models\YOLO11n_versions\FP16_NO_NMS\static_160_openvino_model)
+- Test thử model export dạng **static 160x160**: [models/YOLO11n_versions/FP16_NO_NMS/static_160_openvino_model](models/YOLO11n_versions/FP16_NO_NMS/static_160_openvino_model)
 
 - Ảnh test : 
 
@@ -67,9 +67,9 @@ python tools/check_confidence.py --input 24class_test_images --output output_con
 
 - Lệnh chạy:
 ```bash
-python tools/check_confidence.py --input D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260718\24class_test_images\roi_crop_test.png --output output_confidence_roi_crop_160 --model models/YOLO11n_versions/FP16_NO_NMS/static_160_openvino_model --imgsz 160
+python tools/check_confidence.py --input 24class_test_images/roi_crop_test.png --output output_confidence_roi_crop_160 --model models/YOLO11n_versions/FP16_NO_NMS/static_160_openvino_model --imgsz 160
 ```
-- Log csv kết quả: [output_confidence_roi_crop_160/000021_top200.csv](output_confidence_roi_crop_160/000021_top200.csv)
+- Log csv kết quả: [output_confidence_roi_crop_160/roi_crop_test_top200.csv](output_confidence_roi_crop_160/roi_crop_test_top200.csv)
 
 - Ảnh debug: 
 

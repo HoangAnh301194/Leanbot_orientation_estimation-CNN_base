@@ -1,0 +1,58 @@
+Image: roi_crop_test.png
+Path: D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260718\24class_test_images\roi_crop_test.png
+Relative dir: 
+------------------------------------------------------------
+
+Object 0 | Best: Leanbot_p15 (Conf: 0.9452)
+Bbox (xyxy): (16.0, 19.0, 78.0, 61.0) | Match: return_idxs
+  0 - Leanbot_0: 0.8800 
+  1 - Leanbot_p15: 0.9452 <-- BEST
+  2 - Leanbot_p30: 0.8480 
+  3 - Leanbot_p45: 0.3893 
+  4 - Leanbot_p60: 0.0447 
+  5 - Leanbot_p75: 0.0002 
+  6 - Leanbot_p90: 0.0017 
+  7 - Leanbot_p105: 0.0054 
+  8 - Leanbot_p120: 0.0018 
+  9 - Leanbot_p135: 0.0027 
+  10 - Leanbot_p150: 0.0013 
+  11 - Leanbot_p165: 0.0001 
+  12 - Leanbot_p180: 0.0010 
+  13 - Leanbot_p195: 0.0014 
+  14 - Leanbot_m150: 0.0000 
+  15 - Leanbot_m135: 0.0002 
+  16 - Leanbot_m120: 0.0015 
+  17 - Leanbot_m105: 0.0027 
+  18 - Leanbot_m90: 0.0001 
+  19 - Leanbot_m75: 0.0019 
+  20 - Leanbot_m60: 0.0001 
+  21 - Leanbot_m45: 0.0015 
+  22 - Leanbot_m30: 0.0049 
+  23 - Leanbot_m15: 0.1635 
+
+Object 1 | Best: Leanbot_0 (Conf: 0.0547)
+Bbox (xyxy): (15.0, 18.0, 80.0, 62.0) | Match: return_idxs
+  0 - Leanbot_0: 0.0547 <-- BEST
+  1 - Leanbot_p15: 0.0146 
+  2 - Leanbot_p30: 0.0087 
+  3 - Leanbot_p45: 0.0008 
+  4 - Leanbot_p60: 0.0004 
+  5 - Leanbot_p75: 0.0002 
+  6 - Leanbot_p90: 0.0001 
+  7 - Leanbot_p105: 0.0004 
+  8 - Leanbot_p120: 0.0000 
+  9 - Leanbot_p135: 0.0000 
+  10 - Leanbot_p150: 0.0002 
+  11 - Leanbot_p165: 0.0006 
+  12 - Leanbot_p180: 0.0006 
+  13 - Leanbot_p195: 0.0015 
+  14 - Leanbot_m150: 0.0010 
+  15 - Leanbot_m135: 0.0035 
+  16 - Leanbot_m120: 0.0061 
+  17 - Leanbot_m105: 0.0016 
+  18 - Leanbot_m90: 0.0005 
+  19 - Leanbot_m75: 0.0015 
+  20 - Leanbot_m60: 0.0002 
+  21 - Leanbot_m45: 0.0025 
+  22 - Leanbot_m30: 0.0024 
+  23 - Leanbot_m15: 0.0247 

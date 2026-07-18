@@ -1,5 +1,0 @@
-label,model_dir,xml_bytes,bin_bytes,metadata_bytes,total_bytes,total_mib
-NMS 160,D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260716\models\YOLO11n_versions\FP16_NMS\static_160_openvino_model,475010,5179736,886,5655632,5.3936309814453125
-NMS 640,D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260716\models\YOLO11n_versions\FP16_NMS\static_640_openvino_model,475764,5226986,886,5703636,5.439411163330078
-No-NMS 160,D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260716\models\YOLO11n_versions\FP16_NO_NMS\static_160_openvino_model,413709,5179536,887,5594132,5.334980010986328
-No-NMS 640,D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260716\models\YOLO11n_versions\FP16_NO_NMS\static_640_openvino_model,414445,5226786,887,5642118,5.380743026733398

@@ -74,5 +74,6 @@ python tools/check_confidence.py --input D:\PTIT\DTT\Nguyen_Huu_Hoang_Anh\260718
 ## B. Khó khăn 
 - Không
 ## C. Công việc tiếp theo 
+- Triển khai lại pipeline Roi tracking với model mới train + export để debug thêm. 
 - Em xin phép nhận đề xuất tiếp theo từ Thầy ạ . 
 - Em có cần báo cáo lại toàn bộ các bước tiền xử lí ảnh trước khi đưa vào 2 model **static 640x640** và **static 160x160** không ạ ? 

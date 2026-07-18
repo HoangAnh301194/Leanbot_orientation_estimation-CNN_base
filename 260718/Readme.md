@@ -94,5 +94,4 @@
 - Không
 ## C. Công việc tiếp theo 
 - Triển khai lại pipeline Roi tracking với model mới train + export để debug thêm. 
-- Em xin phép nhận đề xuất tiếp theo từ Thầy ạ . 
-- Em có cần báo cáo lại toàn bộ các bước tiền xử lí ảnh trước khi đưa vào 2 model **static 640x640** và **static 160x160** không ạ ? 
+- Chỉnh sửa code `roi_tracking_baseline_infer.py` để debug thêm thôgn tin khi lost tracking .

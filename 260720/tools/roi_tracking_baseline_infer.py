@@ -545,8 +545,8 @@ def main():
 
                 cv2.rectangle(frame, (int(orig_x1), int(orig_y1)), (int(orig_x2), int(orig_y2)), (0, 255, 0), 6)
             else:
-                if inference_mode == "ROI":
-                    tracking_lost = 1
+                # Mất detect: cả ROI mode (lost tracking) lẫn FULL/baseline mode (no detection)
+                tracking_lost = 1
                 prev_roi = None
 
             end_to_end_time_ms = (time.time() - t0) * 1000  # ms

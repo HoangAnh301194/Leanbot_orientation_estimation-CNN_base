@@ -2,7 +2,7 @@
 
 ## A. Công việc đã làm 
 - Debug quá trình lost tracking 
-- Quay 1 video lại để các định thời điểm, frame debug dễ hơn
+- Quay 1 video lại để phân tích khi không ở công ty. 
 - Debug , phân tích pipeLine của model full frame static 640x640.
 ### 1. Debug quá trình lost tracking 
 - Video được quay ở FPS = 30
@@ -31,7 +31,7 @@
 
 - **Các lỗi có thể có để tiến hành debug kiểm tra :** 
     - Điều kiện vẽ BBox để tính ra ROI của Full frame model (static 640x640)
-    - Điều kiện để tính là có Leanbot để trích xuất ra góc + vẽ bbox (Roi tracking model static 160x160)
+    - Điều kiện để tính là có Leanbot để trích xuất ra góc + vẽ bbox của Roi tracking model static 160x160
 
 #### 1.1 Debug lỗi của full frame model (static 640x640)
 - **Output của model full frame (640x640):**
@@ -69,13 +69,40 @@
 ```bash
 python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log fullframe_test.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0
 ```
-- **Chạy test full roi tracking mode :**
+- Khi 2 điều kiện lọc giảm xuống rất nhỏ , thì bbox được detect liên tục như sau : 
+
+![alt text](image.png)
+
+- Số lần mất detect chỉ có `1`  trong suốt quá trình inference :
+
+![lost frame](benchmark1\lost_tracking_captures\lost_frame_294_16-03-13-157_FULL_frame.png)
+
+> Khi giảm các điều kiện lọc xuống rất nhỏ, hầu hết các anchor sẽ được chấp nhận và đưa vào để gom nhóm để tính ra góc cuối cùng và vẽ bbox . Vì điều kiện để chọn group để vẽ BBox là group có `vector_magnitude` lớn nhất --> `vector_magnitude` group Leanbot thật luôn là lớn nhất và được vẽ Bbox .
+
+> Lỗi ảnh hưởng tới kết quả Bbox Leanbot detection là các ngưỡng lọc anchor tại các bước xử lí đầu ra của Model.
+
+- **chạy test với full pipeline Roi tracking :**
+
 ```bash
-python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode roi --log fullframe_test.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --roi_conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0 
+python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode roi --log fullframe_test.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0 --roi_conf 0.01 
 ```
 
-- Debug quá trình chạy inference 
+- Ảnh thực tế khi inference :
+
+![alt text](image-1.png)
+
+- Khi giảm ngưỡng lọc Anchors của Model roi tracking static 160x160 xuống `0.01` , thì đã có thể tracking theo Leanbot, chỉ có 1 lần lost tracking . Tuy nhiên có vài lần bị detect nhầm sang nền nhiễu .
+
+![alt text](image-2.png)
+
+![lost frame](benchmark\lost_tracking_captures\lost_frame_405_16-16-13-450_ROI_frame.png)
+
+
 
 ## B. Khó khăn 
-
+-  Không
 ## C. Công việc tiếp theo 
+- Hiện tại khi em giảm các điều kiện lọc anchors xuống rất thấp thì khi chạy inference đã detect và tracking được ổn định rồi ạ. Tuy nhiên có vài trường hợp số ít , bị detect nhầm vật thể nhiễu ( PCB Leanbot Base, khối gỗ). 
+- Em có cần thu thập thêm ảnh nhiễu nền không ạ ? 
+- Em có cần debug gì thêm nữa khôgn ạ ? 
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

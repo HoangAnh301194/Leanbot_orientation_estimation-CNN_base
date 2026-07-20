@@ -90,7 +90,7 @@ python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --
 
 ![benchmark/fullframe_A_default/lost_tracking_captures](benchmark/fullframe_A_default/lost_tracking_captures/lost_frame_665_16-39-52-415_FULL_frame.png).
 
-- Với cấu hình mặc định, model chỉ detect được `115/667` frame (`17.24%`) và mất detection tại `552/667` frame. BBox xuất hiện rời rạc, không đủ để duy trì detection liên tục.
+- Toàn bộ quá trình chạy conference đều mất toàn bộ detection .
 
 ##### Test B — Chỉ giảm confidence
 
@@ -107,6 +107,8 @@ python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --
 
 ![`benchmark/fullframe_B_low_conf/lost_tracking_captures`](benchmark\fullframe_B_low_conf\lost_tracking_captures\lost_frame_46_16-44-44-133_FULL_frame.png).
 
+- Cả quá trình chạy inference đều khong detect được Leanbot liên tục, chỉ có số ít vài frame được detect.
+
 
 ##### Test C — Chỉ giảm minimum vector magnitude
 
@@ -121,6 +123,8 @@ python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --
 - Ảnh mất detection: 
 
 ![`benchmark/fullframe_C_low_min_mag/lost_tracking_captures`](benchmark/fullframe_C_low_min_mag/lost_tracking_captures/lost_frame_165_16-48-08-690_FULL_frame.png).
+
+- Quá trình chạy inference vẫn vậy, đều không detect liên tục được Leanbot, chỉ có một vài frame là detect được .
 
 
 ##### Test D — Giảm đồng thời confidence và magnitude

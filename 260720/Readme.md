@@ -64,24 +64,98 @@
     6. `x_center`, `y_center`, `width`, `height` là bbox trung bình có trọng số của group được chọn, sau đó được chuyển về hệ tọa độ frame gốc. (BBox của Leanbot)
     7. Nếu không có anchor vượt confidence, không tạo được group hoặc mọi group đều có `vector_magnitude < 2.0`, hàm trả về bbox, `best_conf`, `vector_magnitude` và `angle` bằng `0`; CSV sẽ ghi các giá trị `0` tương ứng.
 
-> Các thôgn số ảnh hưởng tới việc lọc anchor để vẽ ra bbox group là : `--conf` , `--topk` , `--iou` , `--min-mag` và `--roi_conf` đối với roi tracking model . Trước mắt giảm toàn bộ về nhỏ nhất để thử . 
-- **Chạy test model full frame riêng:**
+> Các tham số ảnh hưởng đến quá trình lọc anchor gồm `--conf`, `--topk`, `--iou` và `--min-mag`. Đối với ROI tracking có thêm `--roi_conf`. Để xác định riêng ảnh hưởng của `--conf` và `--min-mag`, tiến hành bốn thí nghiệm trên cùng video, cùng model, `topk=100` và `iou=0.5`.
+
+#### 1.2. Kiểm thử riêng model Full Frame với từng điều kiện lọc
+
+| Thí nghiệm | `conf` | `min-mag` | Mục đích | Thư mục kết quả |
+|:---:|---:|---:|:---|:---|
+| A | `0.25` | `2.0` | Baseline với cấu hình mặc định | `benchmark/fullframe_A_default` |
+| B | `0.01` | `2.0` | Chỉ giảm confidence để kiểm tra bước lọc anchor | `benchmark/fullframe_B_low_conf` |
+| C | `0.25` | `0.0` | Chỉ bỏ ngưỡng magnitude để kiểm tra bước lọc group | `benchmark/fullframe_C_low_min_mag` |
+| D | `0.01` | `0.0` | Giảm đồng thời hai ngưỡng để kiểm tra ảnh hưởng kết hợp | `benchmark/fullframe_D_low_both` |
+
+Các thí nghiệm sử dụng `--mode baseline`; model static `160x160` vẫn được truyền vào theo tham số của chương trình nhưng không tham gia inference trong chế độ này. File CSV và ảnh tại các frame mất detection được lưu riêng trong từng thư mục thí nghiệm.
+
+##### Test A — Cấu hình mặc định
+
+- Giữ nguyên `conf=0.25` và `min-mag=2.0` để tạo kết quả đối chứng.
+
 ```bash
-python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log fullframe_test.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0
+python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log benchmark/fullframe_A_default/fullframe_A.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.25 --iou 0.5 --topk 100 --min-mag 2.0
 ```
-- Khi 2 điều kiện lọc giảm xuống rất nhỏ , thì bbox được detect liên tục như sau : 
 
-![alt text](image.png)
+- CSV: [benchmark/fullframe_A_default/fullframe_A.csv](benchmark/fullframe_A_default/fullframe_A.csv).
+- Ảnh mất detection:
 
-- Số lần mất detect chỉ có `1`  trong suốt quá trình inference :
+![benchmark/fullframe_A_default/lost_tracking_captures](benchmark/fullframe_A_default/lost_tracking_captures/lost_frame_665_16-39-52-415_FULL_frame.png).
 
-![lost frame](benchmark1\lost_tracking_captures\lost_frame_294_16-03-13-157_FULL_frame.png)
+- Với cấu hình mặc định, model chỉ detect được `115/667` frame (`17.24%`) và mất detection tại `552/667` frame. BBox xuất hiện rời rạc, không đủ để duy trì detection liên tục.
 
-> Khi giảm các điều kiện lọc xuống rất nhỏ, hầu hết các anchor sẽ được chấp nhận và đưa vào để gom nhóm để tính ra góc cuối cùng và vẽ bbox . Vì điều kiện để chọn group để vẽ BBox là group có `vector_magnitude` lớn nhất --> `vector_magnitude` group Leanbot thật luôn là lớn nhất và được vẽ Bbox .
+##### Test B — Chỉ giảm confidence
 
-> Lỗi ảnh hưởng tới kết quả Bbox Leanbot detection là các ngưỡng lọc anchor tại các bước xử lí đầu ra của Model.
+- Giảm `conf` từ `0.25` xuống `0.01`; giữ `min-mag=2.0`.
+- Nếu kết quả tốt hơn test A, bước lọc confidence đang loại bỏ các anchor cần thiết. Nếu kết quả không thay đổi, group có thể tiếp tục bị loại bởi `min-mag`.
 
-- **chạy test với full pipeline Roi tracking :**
+```bash
+python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log benchmark/fullframe_B_low_conf/fullframe_B.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 2.0
+```
+
+- CSV: [`benchmark/fullframe_B_low_conf/fullframe_B.csv`](benchmark/fullframe_B_low_conf/fullframe_B.csv).
+
+- Ảnh mất detection: 
+
+![`benchmark/fullframe_B_low_conf/lost_tracking_captures`](benchmark\fullframe_B_low_conf\lost_tracking_captures\lost_frame_46_16-44-44-133_FULL_frame.png).
+
+
+##### Test C — Chỉ giảm minimum vector magnitude
+
+- Giữ `conf=0.25`; giảm `min-mag` từ `2.0` xuống `0.0`.
+- Nếu kết quả tốt hơn A, các anchor đã vượt confidence và tạo được group nhưng group bị loại tại bước kiểm tra magnitude.
+
+```bash
+python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log benchmark/fullframe_C_low_min_mag/fullframe_C.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.25 --iou 0.5 --topk 100 --min-mag 0.0
+```
+
+- CSV: [`benchmark/fullframe_C_low_min_mag/fullframe_C.csv`](benchmark/fullframe_C_low_min_mag/fullframe_C.csv).
+- Ảnh mất detection: 
+
+![`benchmark/fullframe_C_low_min_mag/lost_tracking_captures`](benchmark/fullframe_C_low_min_mag/lost_tracking_captures/lost_frame_165_16-48-08-690_FULL_frame.png).
+
+
+##### Test D — Giảm đồng thời confidence và magnitude
+
+- Giảm `conf=0.01` và `min-mag=0.0` để hạn chế việc loại anchor/group tại hai bước đang kiểm tra.
+
+```bash
+python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode baseline --log benchmark/fullframe_D_low_both/fullframe_D.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0
+```
+
+- CSV: [`benchmark/fullframe_D_low_both/fullframe_D.csv`](benchmark/fullframe_D_low_both/fullframe_D.csv).
+
+
+- Với cấu hình này, BBox được detect gần như liên tục trong video kiểm thử:
+
+![Full-frame experiment D](image.png)
+
+- Ghi nhận `2` frame liên tiếp mất detection (`frame 294` và `frame 295`) trong lần chạy thử nghiệm:
+
+![Lost frame experiment D](benchmark/fullframe_D_low_both/lost_tracking_captures/lost_frame_294_16-50-53-478_FULL_frame.png)
+
+
+> Qua bốn thử nghiệm cho thấy hai ngưỡng `conf` và `min-mag` cùng ảnh hưởng đến kết quả tạo BBox. Với cấu hình mặc định ở test A, phần lớn frame không tạo được group hợp lệ. 
+
+> Test B cho thấy giảm riêng confidence chỉ giúp thêm một số anchor vượt qua bước lọc đầu tiên, nhưng group vẫn có thể bị loại bởi `min-mag=2.0`. 
+
+> Test C cho kết quả tốt hơn test A khi bỏ ngưỡng magnitude, tuy nhiên detection vẫn không liên tục vì `conf=0.25` tiếp tục loại nhiều anchor trước khi gom nhóm. 
+
+> Chỉ khi giảm đồng thời `conf=0.01` và `min-mag=0.0` ở test D, model mới detect được `665/667` frame (`99.70%`).
+
+> Từ kết quả trên có thể xác định cơ chế gây mất BBox trực tiếp nằm ở sự kết hợp của hai bước lọc: ngưỡng confidence cao làm giảm số anchor của Leanbot được đưa vào gom nhóm, sau đó ngưỡng `vector_magnitude` tiếp tục loại các group còn lại có độ lớn vector thấp. Việc chỉ giảm một trong hai ngưỡng chưa đủ để duy trì detection; cần điều chỉnh đồng thời để các anchor tạo được group và group được chấp nhận làm kết quả cuối cùng.
+
+
+
+#### 1.3. Chạy test với full pipeline ROI tracking (`roi_conf=0.01`)
 
 ```bash
 python tools/roi_tracking_baseline_infer.py --show --video videoTest/test.mp4 --mode roi --log fullframe_test.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.01 --iou 0.5 --topk 100 --min-mag 0.0 --roi_conf 0.01 

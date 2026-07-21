@@ -90,18 +90,19 @@ group_vector_magnitude >= min_mag
   - Chỉ chấp nhận group có đủ tổng tín hiệu.
 - `min-mag` không phải confidence của một Anchor; đây là đại lượng độ dài vector của toàn bộ group sau IoU grouping.
 #### 1.4. Quy trình xử lý chi tiết
+
 ```text
-1. Raw model output
-2. Tính confidence lớn nhất của từng Anchor
-3. Lọc Anchor bằng `conf` hoặc `roi_conf`
-4. Lấy Top-K Anchor có confidence cao nhất
-5. Tính vector góc cho từng Anchor từ toàn bộ 24 class score
-6. Gom các Anchor overlap theo IoU
-7. Tính BBox trung bình có trọng số cho từng group
-8. Tính vector tổng, magnitude và angle của từng group
-9. Lọc group bằng `min-mag`
-10. Chọn group có `vector_magnitude` lớn nhất
-11. Chuyển BBox về frame gốc và cập nhật ROI
+  1. Raw model output
+  2. Tính confidence lớn nhất của từng Anchor
+  3. Lọc Anchor bằng `conf` hoặc `roi_conf`
+  4. Lấy Top-K Anchor có confidence cao nhất
+  5. Tính vector góc cho từng Anchor từ toàn bộ 24 class score
+  6. Gom các Anchor overlap theo IoU
+  7. Tính BBox trung bình có trọng số cho từng group
+  8. Tính vector tổng, magnitude và angle của từng group
+  9. Lọc group bằng `min-mag`
+  10. Chọn group có `vector_magnitude` lớn nhất
+  11. Chuyển BBox về frame gốc và cập nhật ROI
 ```
 
 ##### Bước 1 — Tính confidence đại diện của từng Anchor

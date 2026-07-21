@@ -313,8 +313,7 @@ angle = 5.41°
 bbox ≈ (100.21, 100.11, 40.98, 39.74)
 ```
 
-#### 1.7. Kết luận về các ngưỡng lọc
-
+> **Kết luận về các ngưỡng lọc: **
 - `conf` và `roi_conf` lọc ở **cấp Anchor**, trước Top-K và IoU grouping.
 - `min-mag` lọc ở **cấp group**, sau khi cộng vector của các Anchor overlap.
 
@@ -336,6 +335,9 @@ python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi \
 - Kết quả đồ thị khi chạy : 
 
 ![fullframe_test](benchmark/fullframe_test.png)
+
+> **Giải thích về hiện tượng đồ thị góc bị kéo xuống âm:**
+> Tại frame 862, việc BBox nhảy nhầm sang nhiễu khiến góc nhảy vọt từ `-101°` lên `+85°` (mức chênh lệch `186° > 180°`). Thuật toán `unwrap` lầm tưởng xe vừa quay qua mốc 180 độ nên đã tự động **trừ đi 360°** cho phần đồ thị phía sau. Khi BBox quay lại bắt đúng Leanbot ở frame 864, bước nhảy góc ngược lại bị thay đổi thành `-149°`. Vì `-149° < 180°` nên `unwrap` **không cộng trả lại 360°**. Hậu quả là chuỗi sai số do nhiễu đã khiến toàn bộ đồ thị về sau bị sai lệch xuống phía dưới, và sau phần nhiễu này thì góc Leanbot vẫn tiếp tục tăng theo thực tế chạy . 
 
 ### 3. Debug các frame bị detect nhầm
 

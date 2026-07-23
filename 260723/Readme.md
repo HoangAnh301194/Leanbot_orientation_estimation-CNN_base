@@ -4,7 +4,7 @@
 - Trả lời một số câu hỏi của Thầy .
 - Bổ sung thêm log CSV ( IoU của Bbox frame trước và bbox frame hiện tại; Đồ thị Iou ; magnitude group1 & 2 )
 - Chạy inference khảo sát Leanbot chạy vòng tròn lẫn với các khối đỏ.
-
+- Đặt mặc định `--min-mag = 0.0` và thêm log csv cột thông min vector magnitude của 
 
 ### 1. Trả lời một số câu hỏi của Thầy. 
 

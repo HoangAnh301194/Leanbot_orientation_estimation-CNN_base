@@ -166,6 +166,7 @@ gmail_mcp/
 260721/tools/*.ipynb
 260721/videoTest
 
+260723/models
 # Global ignores for heavy models
 *.bin
 */weights/

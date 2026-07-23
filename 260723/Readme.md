@@ -33,20 +33,19 @@
 
 - **Các cột thông tin hiện tại trong Log CSV (`csv_header`):**
 
-  | STT | Tên cột | Ý nghĩa |
-  | :-: | :--- | :--- |
-  | 1 | `frame_id` | Thứ tự frame hình ảnh |
-  | 2 | `timestamp` | Thời gian ghi nhận frame (hh:mm:ss.ms) |
-  | 3 | `mode` | Chế độ inference (`FULL` 640x640 hoặc `ROI` 160x160) |
-  | 4 | `input_width`, `input_height` | Kích thước ảnh đưa vào model |
-  | 5 | `roi_w`, `roi_h` | Kích thước ROI crop được từ frame gốc |
-  | 6 | `inf_time_ms`, `end_to_end_time_ms` | Thời gian inference và thời gian xử lý toàn bộ frame (ms) |
-  | 7 | `cpu_load_pct`, `fps` | Tải CPU tiến trình (%) và tốc độ khung hình (FPS) |
-  | 8 | `x_center`, `y_center`, `width`, `height` | Tọa độ tâm và kích thước BBox detect |
-  | 9 | **`iou_prev_bbox`** *(Mới)* | **Chỉ số IoU giữa BBox frame trước và BBox frame hiện tại (0.0 đến 1.0)** |
-  | 10 | **`group1_magnitude`**, `group1_angle` | Độ dài vector magnitude và góc của nhóm Anchor tốt nhất (Group 1) |
-  | 11 | **`group2_magnitude`**, `group2_angle` | Độ dài vector magnitude và góc của nhóm Anchor tốt thứ 2 (Group 2) |
-
+| STT | Tên cột | Ý nghĩa |
+| :-: | :--- | :--- |
+| 1 | `frame_id` | Thứ tự frame hình ảnh |
+| 2 | `timestamp` | Thời gian ghi nhận frame (hh:mm:ss.ms) |
+| 3 | `mode` | Chế độ inference (`FULL` 640x640 hoặc `ROI` 160x160) |
+| 4 | `input_width`, `input_height` | Kích thước ảnh đưa vào model |
+| 5 | `roi_w`, `roi_h` | Kích thước ROI crop được từ frame gốc |
+| 6 | `inf_time_ms`, `end_to_end_time_ms` | Thời gian inference và thời gian xử lý toàn bộ frame (ms) |
+| 7 | `cpu_load_pct`, `fps` | Tải CPU tiến trình (%) và tốc độ khung hình (FPS) |
+| 8 | `x_center`, `y_center`, `width`, `height` | Tọa độ tâm và kích thước BBox detect |
+| 9 | **`iou_prev_bbox`** *(Mới)* | **Chỉ số IoU giữa BBox frame trước và BBox frame hiện tại (0.0 đến 1.0)** |
+| 10 | **`group1_magnitude`**, `group1_angle` | Độ dài vector magnitude và góc của nhóm Anchor tốt nhất (Group 1) |
+| 11 | **`group2_magnitude`**, `group2_angle` | Độ dài vector magnitude và góc của nhóm Anchor tốt thứ 2 (Group 2) |
 
 - **Code tính toán IoU của frame trước và frame hiện tại:**
 

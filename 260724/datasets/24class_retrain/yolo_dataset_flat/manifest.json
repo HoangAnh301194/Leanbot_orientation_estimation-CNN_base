@@ -1,0 +1,20 @@
+[
+  {
+    "index": 0,
+    "filename": "000000.jpg",
+    "source_session": "Leanbot_0_redObstacle",
+    "source_image": "deg_0_000.jpg"
+  },
+  {
+    "index": 1,
+    "filename": "000001.jpg",
+    "source_session": "Leanbot_0_redObstacle",
+    "source_image": "deg_0_001.jpg"
+  },
+  {
+    "index": 2,
+    "filename": "000002.jpg",
+    "source_session": "Leanbot_0_redObstacle",
+    "source_image": "deg_0_002.jpg"
+  }
+]

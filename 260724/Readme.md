@@ -223,11 +223,65 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
   - File CSV: [manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv)
 
-## B. Khó khăn 
-- Hiện tại thì Model vẫn bị nhiễu khi Leanbot gần các khối gỗ đỏ. Em có cần chụp thêm ảnh nhiễu nền để train lại khôgn ạ ? 
-- Ngoài ra khi train thì dataset hiện tại chỉ có Leanbot trên nền trắng , chưa có trường hợp Leanbot trên nền có vật nhiễu ạ . 
-- Hiện tại khi đánh giá chi tiết các ảnh nhiễu và vẽ các Anchors thì em thấy ngưỡng --topK = 100 khá cao, và ảnh trực quan hóa anchors hơi khó nhìn ạ, Em có cần giảm ngưỡng này xuống khôgn ạ ? 
 
+### 4. Thu thập thêm dữ liệu ảnh Leanbot trên sa bàn có khối gỗ đỏ
+- Code thu thập thêm ảnh: [capture_session.py](tools/capture_session.py)
+
+- Lệnh chạy:
+
+```powershell
+python .\tools\capture_session.py --source 1 --session_name Leanbot_0_redObstacle --class_name Leanbot_0 --class_id 0
+```
+
+- Background chứa các khối gỗ đỏ, không có Leanbot:
+
+![Background khối gỗ đỏ](raw_image/Leanbot_0_redObstacle/backgrounds/background_000.jpg)
+
+- Ba ảnh class `Leanbot_0` đã thu thập:
+
+|Ảnh 1|Ảnh 2|Ảnh 3|
+|:-:|:-:|:-:|
+|![Ảnh Leanbot 0 số 1](raw_image/Leanbot_0_redObstacle/raw_images/deg_0_000.jpg)|![Ảnh Leanbot 0 số 2](raw_image/Leanbot_0_redObstacle/raw_images/deg_0_001.jpg)|![Ảnh Leanbot 0 số 3](raw_image/Leanbot_0_redObstacle/raw_images/deg_0_002.jpg)|
+
+- Ảnh mask sau phép trừ background với ảnh dữ liệu:
+
+|Mask ảnh 1|Mask ảnh 2|Mask ảnh 3|
+|:-:|:-:|:-:|
+|![Mask ảnh 1](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_000_mask.jpg)|![Mask ảnh 2](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_001_mask.jpg)|![Mask ảnh 3](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_002_mask.jpg)|
+
+- Các thông số auto-label BBox:
+
+|Thông số|Giá trị|
+|:--|--:|
+|Class|`Leanbot_0`|
+|Class ID|`0`|
+|Diff mode|`HUE`|
+|Threshold|`40`|
+|Blur|`5`|
+|Min / max area|`6000 / 300000`|
+|Min / max width|`20 / 600`|
+|Min / max height|`20 / 600`|
+|Mask merge kernel|`12`|
+|Mask merge iterations|`1`|
+|Số ảnh|`3`|
+|Số BBox mỗi ảnh|`9`|
+|Tổng số BBox|`27`|
+
+- Code build dataset từ ảnh đã chụp:
+  - [process_auto_label.py](tools/process_auto_label.py): trừ background và sinh label BBox.
+  - [crop_tool.py](tools/crop_tool.py): crop center `1600 x 1440`, padding `1600 x 1600`, resize `640 x 640` và chuyển đổi tọa độ label.
+  - [build_dataset.py](tools/build_dataset.py): gom ảnh và label thành dataset YOLO.
+
+- Ảnh dataset sau khi build:
+
+|Ảnh dataset `640 x 640`|Ảnh vẽ BBox debug tương ứng|
+|:-:|:-:|
+|![Dataset ảnh 000000](datasets/24class_retrain/yolo_dataset_flat/images/000000.jpg)|![BBox nguồn ảnh 000000](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_000_bbox.jpg)|
+|![Dataset ảnh 000001](datasets/24class_retrain/yolo_dataset_flat/images/000001.jpg)|![BBox nguồn ảnh 000001](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_001_bbox.jpg)|
+|![Dataset ảnh 000002](datasets/24class_retrain/yolo_dataset_flat/images/000002.jpg)|![BBox nguồn ảnh 000002](datasets/24class_retrain/tool1_output/Leanbot_0_redObstacle/debug/deg_0_002_bbox.jpg)|
+
+
+## B. Khó khăn
+- Không
 ## C. Công việc tiếp theo 
-- Hiện tại cấu trúc file CSV debug chi tiết các ảnh đã ổn chưa ạ ? em cần debug thêm thông tin gì không ạ ? 
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

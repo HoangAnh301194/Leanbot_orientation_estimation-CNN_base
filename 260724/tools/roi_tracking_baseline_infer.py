@@ -178,7 +178,7 @@ def infer_openvino_raw(compiled_model, image):
 
 def select_best_vector_detection(compiled_model, image, names,
                                   conf_thres=0.25, topk=100,
-                                  iou_thres=IOU_THRES, min_mag=2.0):
+                                  iou_thres=IOU_THRES, mag_threshold=2.0):
     """Chọn detection tốt nhất từ output của model.
 
     - NMS output  (shape[1] == 6): lấy box có conf cao nhất, đọc angle từ class name.
@@ -257,7 +257,7 @@ def select_best_vector_detection(compiled_model, image, names,
 
     # 5. Tính vector tổng hợp cho mỗi nhóm
     summary_df = compute_group_vectors(groups)
-    summary_df = summary_df[summary_df["vector_magnitude"] >= min_mag]
+    summary_df = summary_df[summary_df["vector_magnitude"] >= mag_threshold]
     if summary_df.empty:
         return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0, 0.0, 0.0
 
@@ -324,7 +324,7 @@ def main():
     parser.add_argument("--conf", type=float, default=0.25, help="Nguong confidence loc anchor FULL 640 (default 0.25)")
     parser.add_argument("--roi_conf", type=float, default=0.15, help="Nguong confidence loc anchor ROI 160 (default 0.15)")
     parser.add_argument("--iou", type=float, default=IOU_THRES, help="Nguong IoU gom nhom anchor (default 0.5)")
-    parser.add_argument("--min-mag", type=float, default=2.0, help="Vector magnitude toi thieu de chap nhan nhom (default 2.0)")
+    parser.add_argument("--mag-threshold", type=float, default=2.0, help="Vector magnitude toi thieu de chap nhan nhom (default 2.0)")
     parser.add_argument("--debug-imgsz", action="store_true", help="Luu anh debug cac buoc resize/padding vao benchmark/imgszdebug/")
     args = parser.parse_args()
     if not args.show:
@@ -390,6 +390,9 @@ def main():
     
     lost_capture_dir = os.path.join(out_dir, "lost_tracking_captures")
     os.makedirs(lost_capture_dir, exist_ok=True)
+    
+    manual_capture_dir = os.path.join(out_dir, "manual_captures")
+    os.makedirs(manual_capture_dir, exist_ok=True)
     
     # Khoi tao Process object de do CPU cua rieng script nay
     current_process = psutil.Process()
@@ -521,7 +524,7 @@ def main():
             box, best_conf, angle, vector_magnitude, angle2, mag2 = select_best_vector_detection(
                 infer_model, inference_input, names,
                 conf_thres=current_conf, topk=args.topk,
-                iou_thres=args.iou, min_mag=args.min_mag,
+                iou_thres=args.iou, mag_threshold=args.mag_threshold,
             )
             total_inf_time = (time.time() - infer_start) * 1000
 
@@ -622,8 +625,8 @@ def main():
                             start_recording()
                     if key == ord('c'):
                         cap_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-                        ui_path = os.path.join(lost_capture_dir, f"manual_cap_{frame_id}_{cap_time}_ui.png")
-                        orig_path = os.path.join(lost_capture_dir, f"manual_cap_{frame_id}_{cap_time}_orig.png")
+                        ui_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_ui.png")
+                        orig_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_orig.png")
                         cv2.imwrite(ui_path, display_frame)
                         cv2.imwrite(orig_path, orig_frame)
                         print(f"\n[INFO] DA CHUP ANH THU CONG (Frame {frame_id}):\n       - UI: {ui_path}\n       - Goc: {orig_path}\n")

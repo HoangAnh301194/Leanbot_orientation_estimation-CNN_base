@@ -51,7 +51,7 @@ python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log r
 | 6 | `inf_time_ms`, `end_to_end_time_ms` | Thời gian inference và thời gian xử lý toàn bộ frame (ms) |
 | 7 | `cpu_load_pct`, `end_to_end_cpu_load_pct`, `fps` | Tải CPU tiến trình (vòng lặp / toàn trình, tính theo %) và tốc độ khung hình (FPS) |
 | 8 | `x_center`, `y_center`, `width`, `height` | Tọa độ tâm và kích thước BBox detect |
-| 9 | **`iou_prev_bbox`** *(Mới)* | **Chỉ số IoU giữa BBox frame trước và BBox frame hiện tại (0.0 đến 1.0)** |
+| 9 | **`iou_prev_bbox`**  | Chỉ số IoU giữa BBox frame trước và BBox frame hiện tại (0.0 đến 1.0) |
 | 10 | **`group1_magnitude`**, `group1_angle` | Độ dài vector magnitude **Tổng** và góc của nhóm Anchor tốt nhất (Group 1) |
 | 11 | **`group2_magnitude`**, `group2_angle` | Độ dài vector magnitude **Tổng** và góc của nhóm Anchor tốt thứ 2 (Group 2) |
 | 12 | **`best_conf`** | Độ tự tin (confidence) cao nhất của detection hiện tại |

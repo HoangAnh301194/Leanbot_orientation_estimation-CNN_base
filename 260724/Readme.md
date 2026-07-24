@@ -14,7 +14,6 @@
   - Có anchor nào có BBox chỉ bao gồm Leanbot, không bị lẫn thêm các khối gỗ đỏ vào không?
   - Vẽ ra tất cả Top-K anchor để quan sát
 
-### Mục Lục 
 
 ### 1. Đổi tên biến `--min-mag` và Thông tin các cột categories trong log CSV.
 - Code chỉnh sửa : 

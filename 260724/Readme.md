@@ -145,7 +145,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
   - File CSV: 
 
-  [manual_cap_679_20260724_143153_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_679_20260724_143153_orig_roi160_top100_anchors.csv)
+  [manual_cap_679_20260724_143153_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_679_20260724_143153_orig_roi160_top100_anchors.csv)
 
 
 - **Ảnh nhiễu 2:** 
@@ -158,7 +158,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_962_20260724_143212_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_962_20260724_143212_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_962_20260724_143212_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_962_20260724_143212_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_962_20260724_143212_orig_roi160_top100_anchors.csv)
 
 - **Ảnh nhiễu 3:** 
 
@@ -170,7 +170,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_1359_20260724_143529_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_1359_20260724_143529_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_1359_20260724_143529_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_1359_20260724_143529_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_1359_20260724_143529_orig_roi160_top100_anchors.csv)
 
 - **Ảnh nhiễu 4:**
 
@@ -182,7 +182,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_456_20260724_143429_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_456_20260724_143429_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_456_20260724_143429_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_456_20260724_143429_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_456_20260724_143429_orig_roi160_top100_anchors.csv)
 
 - **Ảnh nhiễu 5:**
 
@@ -194,7 +194,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_469_20260724_143429_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_469_20260724_143429_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_469_20260724_143429_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_469_20260724_143429_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_469_20260724_143429_orig_roi160_top100_anchors.csv)
 
 - **Ảnh nhiễu 6:**
 
@@ -206,7 +206,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_485_20260724_143430_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_485_20260724_143430_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_485_20260724_143430_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_485_20260724_143430_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_485_20260724_143430_orig_roi160_top100_anchors.csv)
 
 - **Ảnh nhiễu 7:**
 
@@ -218,7 +218,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 ![Ảnh anchor trực quan hóa](benchmark/manual_captures_anchor_analysis/manual_cap_580_20260724_143436_orig_roi160_top100_anchors.png)
 
-  - File CSV: [manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv)
+  - File CSV: [manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/260724/benchmark/manual_captures_anchor_analysis/manual_cap_580_20260724_143436_orig_roi160_top100_anchors.csv)
 
 ## B. Khó khăn 
 - Hiện tại thì Model vẫn bị nhiễu khi Leanbot gần các khối gỗ đỏ. Em có cần chụp thêm ảnh nhiễu nền để train lại khôgn ạ ? 

@@ -1,7 +1,7 @@
 # Báo cáo công việc ngày 24/07/2026
 
 ## A. Công việc đã làm 
-- Đã nhận được Email Công ty cấp, và đăng nhập Git thành công, hiện tại có 3 repository như sau :
+- Đã nhận được Email Công ty cấp `anh.nguyen@dtt.vn` , và đăng nhập Git thành công, hiện tại có 3 repository như sau :
   - `anhdtt/https---github.com-giangduong-dulieumo.org`
   - `anhdtt/dulieumo.org`
   - `anhdtt/kml`

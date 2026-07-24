@@ -14,6 +14,7 @@
   - Có anchor nào có BBox chỉ bao gồm Leanbot, không bị lẫn thêm các khối gỗ đỏ vào không?
   - Vẽ ra tất cả Top-K anchor để quan sát
 
+- Thu thập mẫu dataset .
 
 ### 1. Đổi tên biến `--min-mag` và Thông tin các cột categories trong log CSV.
 
@@ -284,4 +285,5 @@ python .\tools\capture_session.py --source 1 --session_name Leanbot_0_redObstacl
 ## B. Khó khăn
 - Không
 ## C. Công việc tiếp theo 
+- Vì sáng mai lên Lab nên em không kịp chụp được thêm dataset nên em xin nhận thêm công việc khác trước ạ . Việc thu thập dataset em sẽ tiếp tục thực hiện vào thứ 2 ạ .
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

@@ -140,7 +140,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_679_20260724_143153_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_679_20260724_143153_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_679_20260724_143153_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_679_20260724_143153_ui.png)|
 
   - Ảnh Anchor trực quan hóa 
 
@@ -155,7 +155,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_962_20260724_143212_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_962_20260724_143212_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_962_20260724_143212_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_962_20260724_143212_ui.png)|
 
   - Ảnh Anchor trực quan hóa 
 
@@ -167,7 +167,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_1359_20260724_143529_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_1359_20260724_143529_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_1359_20260724_143529_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_1359_20260724_143529_ui.png)|
 
   - Ảnh Anchor trực quan hóa 
 
@@ -179,7 +179,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_456_20260724_143429_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_456_20260724_143429_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_456_20260724_143429_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_456_20260724_143429_ui.png)|
 
   - Ảnh Anchor trực quan hóa
 
@@ -191,7 +191,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_469_20260724_143429_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_469_20260724_143429_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_469_20260724_143429_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_469_20260724_143429_ui.png)|
 
   - Ảnh Anchor trực quan hóa
 
@@ -203,7 +203,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_485_20260724_143430_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_485_20260724_143430_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_485_20260724_143430_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_485_20260724_143430_ui.png)|
 
   - Ảnh Anchor trực quan hóa
 
@@ -215,7 +215,7 @@ python tools/evaluate_manual_roi_anchors.py --input-dir benchmark/manual_capture
 
 |Ảnh gốc|Ảnh UI|
 |:--:|:--:|
-|<img src="benchmark/manual_captures/manual_cap_580_20260724_143436_orig.png" width="480">|<img src="benchmark/manual_captures/manual_cap_580_20260724_143436_ui.png" width="480">|
+|![Ảnh gốc](benchmark/manual_captures/manual_cap_580_20260724_143436_orig.png)|![Ảnh UI](benchmark/manual_captures/manual_cap_580_20260724_143436_ui.png)|
 
   - Ảnh Anchor trực quan hóa
 

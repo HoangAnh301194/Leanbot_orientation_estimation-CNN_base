@@ -16,24 +16,28 @@
 
 
 ### 1. Đổi tên biến `--min-mag` và Thông tin các cột categories trong log CSV.
-- Code chỉnh sửa : 
-```python 
-# Định nghĩa hàm select_best_vector_detection nhận tham số mag_threshold mặc định là 0:
-def select_best_vector_detection(compiled_model, image, names,
-                                  conf_thres=0.0, topk=100,
-                                  iou_thres=IOU_THRES, mag_threshold=0.0):
-    ...
-    # Lọc group bằng magnitude tổng hợp:
-    summary_df = summary_df[summary_df["vector_magnitude"] >= mag_threshold]
 
-# 2. Đổi tên thành --mag-threshold trong argparse:
-    parser.add_argument("--mag-threshold", type=float, default=0.0, help="Vector magnitude toi thieu de chap nhan nhom (default 0.0)")
+- Code chỉnh sửa : 
+
+```python 
+  # Định nghĩa hàm select_best_vector_detection nhận tham số mag_threshold mặc định là 0:
+  def select_best_vector_detection(compiled_model, image, names,
+                                    conf_thres=0.0, topk=100,
+                                    iou_thres=IOU_THRES, mag_threshold=0.0):
+      ...
+      # Lọc group bằng magnitude tổng hợp:
+      summary_df = summary_df[summary_df["vector_magnitude"] >= mag_threshold]
+
+  # 2. Đổi tên thành --mag-threshold trong argparse:
+      parser.add_argument("--mag-threshold", type=float, default=0.0, help="Vector magnitude toi thieu de chap nhan nhom (default 0.0)")
 ```
 
 - Lệnh chạy code sau khi chỉnh sửa : 
+
 ```bash
 python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log roi_tracking_redObstacle.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.00 --iou 0.5 --topk 100 --mag-threshold 0.0 --roi_conf 0.00
 ```
+
 - Các cột thông tin categories hiện tại : 
 
 

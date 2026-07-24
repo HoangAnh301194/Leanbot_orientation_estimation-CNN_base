@@ -78,7 +78,7 @@ python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log r
 
 - Đồ thị góc và các vector magnitude tổng của 2 group :
 
-![roi_tracking_redObstacle.png](benchmark\roi_tracking_redObstacle.png)
+![roi_tracking_redObstacle.png](benchmark/roi_tracking_redObstacle.png)
 
 **Đánh giá tổng quan :**
 - Hôm nay em xếp các khối gỗ dày hơn chút thì thấy liên tục bị nhiễu detect và roi tracking bị giữ lại tại vật nhiễu ạ . 

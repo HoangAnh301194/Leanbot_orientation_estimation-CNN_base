@@ -1,15 +1,14 @@
 {
   "session_name": "Leanbot_0_redObstacle",
   "session_dir": "D:\\PTIT\\DTT\\Nguyen_Huu_Hoang_Anh\\260727\\raw_image\\Leanbot_0_redObstacle",
-  "created_at": "2026-07-27 13:56:20",
+  "created_at": "2026-07-27 15:01:04",
   "class_name": "Leanbot_0",
   "class_id": 0,
-  "background_count": 3,
+  "background_count": 2,
   "raw_image_count": 2,
   "background_files": [
     "background_000.jpg",
-    "background_001.jpg",
-    "background_002.jpg"
+    "background_001.jpg"
   ],
   "raw_image_files": [
     "deg_0_000.jpg",

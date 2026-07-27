@@ -10,11 +10,9 @@
 |[10/07/2026](../260710/Readme.md)|[log_roi_tracking_720p.csv](../260710/benchmark/log_roi_tracking_720p.csv) — 551 frame, lost `0`|ROI tracking; full model `640` + tracking model `160`; camera `source=1`, `1280x720`|![Angle và XY center](../260710/benchmark/log_roi_tracking_720p.png)|
 |[14/07/2026](../260714/Readme.md)|[yolo11n_fp16_roi_tracking.csv — Full HD](../260714/benchmarkFullHD/yolo11n_fp16_roi_tracking.csv) — 561 frame, lost `0`|YOLO11n OpenVINO FP16; ROI `640/160`; camera `source=1`, `1920x1080`; `conf=0.25` mặc định|![YOLO11n trajectory](../260714/benchmarkFullHD/7_yolo11n_trajectory.png)|
 |[14/07/2026](../260714/Readme.md)|[yolov8n_fp16_roi_tracking.csv — Full HD](../260714/benchmarkFullHD/yolov8n_fp16_roi_tracking.csv) — 566 frame, lost `0`|YOLOv8n OpenVINO FP16; ROI `640/160`; camera `source=1`, `1920x1080`; `conf=0.25` mặc định|![YOLOv8n trajectory](../260714/benchmarkFullHD/6_yolov8n_trajectory.png)|
-|[14/07/2026](../260714/Readme.md)|[yolo11n obstacle — conf 0.25 lần 1](../260714/benchmarkWithObstacle/yolo11n_fp16_roi_tracking.csv) — 542 frame, lost `0`|YOLO11n OpenVINO FP16; ROI `640/160`; `1920x1080`; có khối gỗ chắn; `conf=0.25`; lần này BBox bám nhầm vật cản|![Angle và XY center](../260714/benchmarkWithObstacle/yolo11n_fp16_roi_tracking.png)|
 |[14/07/2026](../260714/Readme.md)|[yolo11n obstacle — conf 0.25 lần 2](../260714/benchmarkWithObstacle/yolo11n_fp16_roi_tracking_tunr2.csv) — 506 frame, lost `2`|YOLO11n OpenVINO FP16; ROI `640/160`; `1920x1080`; có khối gỗ chắn; `conf=0.25`|![Angle và XY center](../260714/benchmarkWithObstacle/yolo11n_fp16_roi_tracking_tunr2.png)|
 |[14/07/2026](../260714/Readme.md)|[yolo11n obstacle — conf 0.65](../260714/benchmarkWithObstacle_065/yolo11n_fp16_roi_tracking_065.csv) — 512 frame, lost `14`|YOLO11n OpenVINO FP16; ROI `640/160`; `1920x1080`; có khối gỗ chắn; tăng `conf=0.65`|![Angle và XY center](../260714/benchmarkWithObstacle_065/yolo11n_fp16_roi_tracking_065.png)|
 |[16/07/2026](../260716/Readme.md)|[log_no_nms.csv](../260716/benchmark/log_no_nms.csv) — 549 frame, lost `0`|YOLO11n OpenVINO FP16 No-NMS; ROI static `640/160`; `source=1`; `conf=0.25`, `topk=200`, `IoU=0.5`, `min-mag=2.0`|![Trajectory No-NMS](../260716/benchmark/trajectory_angle_no_nms.png)|
-|[17/07/2026](../260717/Readme.md)|[roi_tracking_log.csv](../260717/leanbot_colab/roi_tracking_log.csv) — 570 frame, lost `4`|YOLO11n retrain có ảnh nền, OpenVINO FP16 No-NMS `640/160`; ROI; `1920x1080`; `conf=0.25`, `topk=200`, `IoU=0.5`, `min-mag=2.0`; Leanbot chạy 5 vòng, bánh `1200/2000`|![Trajectory](../260717/leanbot_colab/plots/1_trajectory.png)|
 |[20/07/2026](../260720/Readme.md)|[benchmark1/fullframe_test.csv](../260720/benchmark1/fullframe_test.csv) — 667 frame, lost `1`|Cùng video `1920x1080`; ROI; full/tracking No-NMS `640/160`; `conf=0.01`, `roi_conf=0.01`, `topk=100`, `IoU=0.5`, `min-mag=0.0`; lần 1|![Angle và XY center — lần 1](../260720/benchmark1/fullframe_test.png)|
 |[20/07/2026](../260720/Readme.md)|[benchmark/fullframe_test.csv](../260720/benchmark/fullframe_test.csv) — 667 frame, lost `1`|Cùng video `1920x1080`; ROI; full/tracking No-NMS `640/160`; `conf=0.01`, `roi_conf=0.01`, `topk=100`, `IoU=0.5`, `min-mag=0.0`; lần 2|![Angle và XY center — lần 2](../260720/benchmark/fullframe_test.png)|
 |[21/07/2026](../260721/Readme.md)|[benchmark_0/fullframe_test.csv](../260721/benchmark_0/fullframe_test.csv) — 560 frame, lost `0`|Camera `source=1`; ROI No-NMS `640/160`; schema log cũ; chạy tắt ngưỡng lọc|![Angle và XY center](../260721/benchmark_0/fullframe_test.png)|
@@ -105,7 +103,6 @@ python .\260725\tools\plot_oxy_trajectory.py .\260716\benchmark\log_no_nms.csv -
 - Đồ thị quỹ đạo di chuyển trong không gian Oxy (X Center vs Y Center, có fit ellipse):
 
 ![Oxy Trajectory](benchmark/log_no_nms_oxy_trajectory.png)
-
 
 ## B. Khó khăn 
 - Không

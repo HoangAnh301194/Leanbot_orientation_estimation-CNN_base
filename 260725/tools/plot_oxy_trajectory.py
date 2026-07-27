@@ -102,9 +102,7 @@ def plot_single_oxy(csv_path: Path, out_dir: Path = None, fit_ellipse: bool = Tr
         return None
         
     # Lọc các frame hợp lệ (x > 0, y > 0 và không bị tracking lost nếu có cột tracking_lost)
-    valid_mask = (df[x_col] > 0) & (df[y_col] > 0) & (~df[x_col].isna()) & (~df[y_col].isna())
-    if 'tracking_lost' in df.columns:
-        valid_mask = valid_mask & (df['tracking_lost'] == 0)
+    valid_mask = (~df[x_col].isna()) & (~df[y_col].isna())
         
     df_valid = df[valid_mask].copy()
     if len(df_valid) < 2:

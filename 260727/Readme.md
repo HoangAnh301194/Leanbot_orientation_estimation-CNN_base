@@ -28,7 +28,7 @@
 - Lệnh chạy tại thư mục `260727`:
 
 ```powershell
-python tools/plot_oxy_trajectory.py Readme.md
+python tools/plot_oxy_trajectory.py
 ```
 
 - Đồ thị tổng hợp quỹ đạo của các log csv . 
@@ -60,5 +60,4 @@ Ví dụ 2 :
 ## B. Khó khăn 
 - Không
 ## C. Công việc tiếp theo
-- Báo cáo lại quy trình auto labels và các ngưỡng để vẽ ra BBox .
 - Chờ Thầy xác nhận cách sắp xếp, chụp dataset và triển khai chụp dataset cho 24 class, mỗi class 3 ảnh Leanbot + nhiễu thanh gỗ .

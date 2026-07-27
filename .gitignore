@@ -167,6 +167,9 @@ gmail_mcp/
 260721/videoTest
 
 260723/models
+
+260727/raw_image
+260727/staging
 # Global ignores for heavy models
 *.bin
 */weights/

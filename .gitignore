@@ -170,6 +170,12 @@ gmail_mcp/
 
 260727/raw_image
 260727/staging
+260727/datasets
+260727/outut_paired_260727
+
+260728/raw_image
+260728/staging
+260728/datasets
 # Global ignores for heavy models
 *.bin
 */weights/

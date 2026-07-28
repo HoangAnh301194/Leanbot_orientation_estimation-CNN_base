@@ -294,7 +294,8 @@ def calculate_roi(bbox, img_w, img_h):
     cy = y1 + h / 2.0
     side = max(w, h) * 2.0
     side_32 = make_multiple_of_32(side)
-    side_32 = min(side_32, img_w, img_h)
+    max_side_32 = (min(img_w, img_h) // 32) * 32
+    side_32 = min(side_32, max_side_32)
     x_min = int(cx - side_32 / 2.0)
     y_min = int(cy - side_32 / 2.0)
     if x_min < 0:
@@ -468,7 +469,6 @@ def main():
             inference_mode = "FULL"
             offset_x, offset_y = 0, 0
             roi_scale_x, roi_scale_y = 1.0, 1.0
-            display_roi = None
             tracking_lost = 0
             lost_roi_input = None
             roi_w, roi_h = 0, 0
@@ -485,7 +485,6 @@ def main():
                 input_w, input_h = 160, 160
                 roi_scale_x = rw / 160.0
                 roi_scale_y = rh / 160.0
-                display_roi = (rx, ry, rw, rh)
                 infer_model = tracking_compiled_model
                 # --- Debug imgsz ROI ---
                 if args.debug_imgsz and not debug_roi_saved:
@@ -604,12 +603,12 @@ def main():
                     print(f"[INFO] Saved lost tracking ROI crop: {roi_path}")
 
             if not args.no_show:
-                roi_frame = orig_frame.copy()
                 detection_frame = orig_frame.copy()
 
-                if inference_mode == "ROI" and display_roi is not None:
-                    rx, ry, rw, rh = display_roi
-                    cv2.rectangle(roi_frame, (rx, ry), (rx + rw, ry + rh), (0, 255, 255), 6)
+                if lost_roi_input is not None and lost_roi_input.size > 0:
+                    roi_display = lost_roi_input.copy()
+                else:
+                    roi_display = np.zeros((160, 160, 3), dtype=np.uint8)
 
                 if display_bbox is not None:
                     x1, y1, x2, y2 = display_bbox
@@ -619,7 +618,6 @@ def main():
                 detection_crop_x = (img_w - detection_crop_w) // 2
                 detection_frame = detection_frame[:, detection_crop_x:detection_crop_x + detection_crop_w]
 
-                roi_display = cv2.resize(roi_frame, (640, 360))
                 detection_display = detection_frame
 
                 cv2.putText(roi_display, f"FPS: {fps:.1f}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
@@ -636,7 +634,7 @@ def main():
                     cv2.imshow("Leanbot Detection", detection_display)
                     if not windows_positioned:
                         cv2.moveWindow("ROI View", 0, 0)
-                        cv2.moveWindow("Leanbot Detection", 650, 0)
+                        cv2.moveWindow("Leanbot Detection", img_h + 10, 0)
                         windows_positioned = True
                     key = cv2.waitKey(1) & 0xFF
                     if key == ord('q'):

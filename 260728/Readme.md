@@ -261,7 +261,7 @@ File `roi_tracking_baseline_infer.py` được giữ lại để đối chiếu.
 
 | Cửa sổ | Kích thước hiển thị | Nội dung |
 | :--- | :---: | :--- |
-| `ROI View` | `640 x 360` | Hiển thị toàn frame, chỉ vẽ khung ROI màu vàng; FPS màu đỏ và kích thước ROI màu xanh dương đậm |
+| `ROI View` | Thay đổi theo ROI, dạng `32N x 32N` | Hiển thị trực tiếp ảnh crop đúng vùng ROI tracking ở kích thước thật, không resize, không hiển thị toàn frame và không vẽ bbox; FPS màu đỏ và kích thước ROI màu xanh dương đậm |
 | `Leanbot Detection` | `800 x 720` với nguồn `1280 x 720` | Center crop `62.5%` chiều rộng, giữ nguyên toàn bộ chiều cao; chỉ vẽ bbox Leanbot màu xanh lá, không vẽ khung ROI |
 
 Thông tin debug trên cửa sổ `Leanbot Detection` :
@@ -270,6 +270,8 @@ Thông tin debug trên cửa sổ `Leanbot Detection` :
 - Độ dài vector (`Vector length`) màu xanh dương đậm.
 
 Center crop của cửa sổ `Leanbot Detection` sử dụng cùng tỉ lệ với bước chuẩn bị dữ liệu và model Full: frame `1280 x 720` được crop giữa thành `800 x 720`. Ảnh crop được hiển thị ở đúng kích thước này, không resize về `640 x 360`.
+
+Kích thước `ROI View` được tính từ cạnh lớn nhất của bbox, mở rộng `2` lần rồi làm tròn lên bội số gần nhất của `32`. Vì vậy ROI luôn có dạng hình vuông `32N x 32N` như `256 x 256`, `288 x 288`, `320 x 320`, ... Khi ROI tăng hoặc giảm, cửa sổ thay đổi kích thước theo từng bước `32` pixel thay vì resize về một kích thước hiển thị cố định. Nếu ROI chạm giới hạn frame, kích thước được giới hạn tại bội số `32` lớn nhất còn nằm trong frame.
 
 Hai OpenVINO model cùng sử dụng thiết bị được chọn qua `--device`; mặc định cố định `CPU` và dùng `PERFORMANCE_HINT=LATENCY` để benchmark ổn định. Model Full nhận đầu vào `640 x 640`; model ROI nhận đầu vào `160 x 160`.
 
@@ -299,9 +301,15 @@ python .\tools\roi_tracking_dual_view_infer.py `
 
 #### 3.4. Kết quả hiển thị
 
-![OpenCV UI hai khung video realtime](image.png)
+- `ROI View` chỉ hiển thị phần ảnh đã crop theo ROI hiện tại. Kích thước cửa sổ bằng đúng kích thước ROI `32N x 32N`, không resize về kích thước của bbox hình chữ nhật.
+- `Leanbot Detection` hiển thị center crop `800 x 720`, bbox Leanbot, FPS, góc vector và độ dài vector.
 
-Trong ảnh trên, cửa sổ bên trái hiển thị vùng ROI tracking; cửa sổ bên phải hiển thị center crop và bbox Leanbot cùng kết quả vector tính toán.
+![OpenCV UI hai khung video realtime với ROI 32N](image.png)
+
+Kết quả chạy thực tế trong ảnh trên:
+
+- `ROI View` hiển thị trực tiếp ảnh crop `224 x 224`, tương ứng `32 x 7`, không resize và không hiển thị toàn sa bàn.
+
 
 ### 4. Export FP16 OpenVINO static 640 & 160 model 
 - Code sử dụng : [export_openvino_fp16.py](tools/export_openvino_fp16.py)

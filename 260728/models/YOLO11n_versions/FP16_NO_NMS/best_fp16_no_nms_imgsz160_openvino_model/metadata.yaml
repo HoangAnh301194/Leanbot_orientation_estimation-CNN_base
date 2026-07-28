@@ -1,6 +1,6 @@
 description: Ultralytics YOLO11n model trained on leanbot_data.yaml
 author: Ultralytics
-date: '2026-07-20T09:21:24.294729'
+date: '2026-07-28T10:40:56.273429'
 version: 8.4.33
 license: AGPL-3.0 License (https://ultralytics.com/license)
 docs: https://docs.ultralytics.com
@@ -8,8 +8,8 @@ stride: 32
 task: detect
 batch: 1
 imgsz:
-- 640
-- 640
+- 160
+- 160
 names:
   0: Leanbot_0
   1: Leanbot_p15

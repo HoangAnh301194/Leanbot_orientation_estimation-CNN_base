@@ -246,6 +246,20 @@ Kết quả prediction của model:
 
 ![Leanbot validation predictions](leanbot_colab/val_batch0_pred.jpg)
 
+### 3. Export FP16 OpenVINO static 640 & 160 model 
+- Code sử dụng : [export_openvino_fp16.py](tools/export_openvino_fp16.py)
+- Lệnh chạy : 
+
+**Export mô hình kích thước 640x640:**
+```bash
+python tools/export_openvino_fp16.py --model models/YOLO11n_versions/FP16_NO_NMS/best.pt --imgsz 640 --no-nms
+```
+
+**Export mô hình kích thước 160x160:**
+```bash
+python tools/export_openvino_fp16.py --model models/YOLO11n_versions/FP16_NO_NMS/best.pt --imgsz 160 --no-nms
+```
+- **Chạy inference với Leanbot chạy vòng tròn có các khối gỗ nhiễu.**
 
 
 ## B. Khó khăn  

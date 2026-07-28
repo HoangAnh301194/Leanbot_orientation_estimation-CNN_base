@@ -246,7 +246,63 @@ Kết quả prediction của model:
 
 ![Leanbot validation predictions](leanbot_colab/val_batch0_pred.jpg)
 
-### 3. Export FP16 OpenVINO static 640 & 160 model 
+### 3. Bổ sung code để hiển thị OpenCV UI 2 khung video realtime
+- Tách giao diện inference realtime thành hai cửa sổ độc lập để quan sát riêng vùng ROI tracking và kết quả nhận diện Leanbot.
+
+#### 3.1. Code sử dụng
+
+- Pipeline ROI tracking gốc: [`roi_tracking_baseline_infer.py`](tools/roi_tracking_baseline_infer.py).
+- Bản sao bổ sung giao diện hai cửa sổ: [`roi_tracking_dual_view_infer.py`](tools/roi_tracking_dual_view_infer.py).
+
+File `roi_tracking_baseline_infer.py` được giữ lại để đối chiếu. Toàn bộ thay đổi giao diện được thực hiện trong `roi_tracking_dual_view_infer.py`.
+
+#### 3.2. Nội dung chỉnh sửa
+
+| Cửa sổ | Kích thước hiển thị | Nội dung |
+| :--- | :---: | :--- |
+| `ROI View` | `640 x 360` | Hiển thị toàn frame, chỉ vẽ khung ROI màu vàng; FPS màu đỏ và kích thước ROI màu xanh dương đậm |
+| `Leanbot Detection` | `800 x 720` với nguồn `1280 x 720` | Center crop `62.5%` chiều rộng, giữ nguyên toàn bộ chiều cao; chỉ vẽ bbox Leanbot màu xanh lá, không vẽ khung ROI |
+
+Thông tin debug trên cửa sổ `Leanbot Detection` :
+- FPS màu đỏ.
+- Góc vector (`Vector angle`) màu xanh dương đậm.
+- Độ dài vector (`Vector length`) màu xanh dương đậm.
+
+Center crop của cửa sổ `Leanbot Detection` sử dụng cùng tỉ lệ với bước chuẩn bị dữ liệu và model Full: frame `1280 x 720` được crop giữa thành `800 x 720`. Ảnh crop được hiển thị ở đúng kích thước này, không resize về `640 x 360`.
+
+Hai OpenVINO model cùng sử dụng thiết bị được chọn qua `--device`; mặc định cố định `CPU` và dùng `PERFORMANCE_HINT=LATENCY` để benchmark ổn định. Model Full nhận đầu vào `640 x 640`; model ROI nhận đầu vào `160 x 160`.
+
+Các phím điều khiển:
+
+- `r`: bắt đầu hoặc dừng ghi log CSV.
+- `c`: lưu đồng thời ảnh `ROI View`, ảnh `Leanbot Detection` và frame gốc.
+- `q`: thoát chương trình.
+
+#### 3.3. Lệnh chạy
+
+```powershell
+python .\tools\roi_tracking_dual_view_infer.py `
+  --source 1 `
+  --mode roi `
+  --device CPU `
+  --width 1280 `
+  --height 720 `
+  --conf 0.0 `
+  --roi_conf 0.0 `
+  --topk 100 `
+  --iou 0.5 `
+  --mag-threshold 0.0 `
+  --log "roi_tracking_dual_cpu.csv" `
+  --show
+```
+
+#### 3.4. Kết quả hiển thị
+
+![OpenCV UI hai khung video realtime](image.png)
+
+Trong ảnh trên, cửa sổ bên trái hiển thị vùng ROI tracking; cửa sổ bên phải hiển thị center crop và bbox Leanbot cùng kết quả vector tính toán.
+
+### 4. Export FP16 OpenVINO static 640 & 160 model 
 - Code sử dụng : [export_openvino_fp16.py](tools/export_openvino_fp16.py)
 - Lệnh chạy : 
 
@@ -261,11 +317,25 @@ python tools/export_openvino_fp16.py --model models/YOLO11n_versions/FP16_NO_NMS
 ```
 - **Chạy inference với Leanbot chạy vòng tròn có các khối gỗ nhiễu.**
 
+  - Link csv log debug : [roi_tracking_cpu.csv](benchmark\roi_tracking_cpu.csv)
+  - Ảnh trực quan hóa log CSV :
+
+  ![roi_tracking_cpu](benchmark\roi_tracking_cpu.png)
+
+  - Quỹ đạo Oxy_center 
+
+  ![roi_tracking_cpu_oxy_trajectory](benchmark\roi_tracking_cpu_oxy_trajectory.png)
+
+  - Ảnh inference thực tế : 
+
+  ![alt text](image.png)
+
+> Kết quả tốt hơn hẳn và ít nhiễu  hơn hẳn các log csv trước đó mặc dù có nhiễu các khối gỗ em đặt khá nhiều. 
+
+
 
 ## B. Khó khăn  
-- Sau train thì em thấy ma trận nhầm lần (Confusion matrix) bị nhiễu ạ . 
 - Từ hôm qua tới giờ em bị lỗi không đăng nhập được lại vào git pythaverse mặc dù nhập đúng tên và Api key ạ 
 - Em xin phép báo cáo tạm bằng git cá nhân ạ 
 ## C. Công việc tiếp theo
-- Export model FP16 OpenVINO static 640 & 160
-- Chạy inference với Leanbot chạy vòng tròn có nhiễu gỗ và đánh giá kết quả.
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ .

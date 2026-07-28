@@ -448,7 +448,7 @@ def main():
 
     # Da bo tinh nang timeout
 
-
+    windows_positioned = False
     try:
         while True:
             ret, frame = cap.read()
@@ -472,6 +472,7 @@ def main():
             tracking_lost = 0
             lost_roi_input = None
             roi_w, roi_h = 0, 0
+            display_bbox = None
 
             if args.mode == "roi" and prev_roi is not None:
                 inference_mode = "ROI"
@@ -569,7 +570,7 @@ def main():
                     # Cap nhat ROI ngay sau moi frame detect thanh cong
                     prev_roi = calculate_roi(best_box, img_w, img_h)
 
-                cv2.rectangle(frame, (int(orig_x1), int(orig_y1)), (int(orig_x2), int(orig_y2)), (0, 255, 0), 6)
+                display_bbox = (int(orig_x1), int(orig_y1), int(orig_x2), int(orig_y2))
             else:
                 # Mat detect: ca ROI mode (lost tracking) lan FULL/baseline mode (no detection)
                 tracking_lost = 1
@@ -603,23 +604,40 @@ def main():
                     print(f"[INFO] Saved lost tracking ROI crop: {roi_path}")
 
             if not args.no_show:
+                roi_frame = orig_frame.copy()
+                detection_frame = orig_frame.copy()
+
                 if inference_mode == "ROI" and display_roi is not None:
                     rx, ry, rw, rh = display_roi
-                    cv2.rectangle(frame, (rx, ry), (rx+rw, ry+rh), (0, 255, 255), 6)
+                    cv2.rectangle(roi_frame, (rx, ry), (rx + rw, ry + rh), (0, 255, 255), 6)
 
-                display_frame = cv2.resize(frame, (640, 360))
+                if display_bbox is not None:
+                    x1, y1, x2, y2 = display_bbox
+                    cv2.rectangle(detection_frame, (x1, y1), (x2, y2), (0, 255, 0), 6)
 
-                rec_text = "REC" if recording else "IDLE"
-                rec_color = (0, 0, 255) if recording else (180, 180, 180)
-                cv2.putText(display_frame, f"Mode: {inference_mode} | Input: {input_w}x{input_h}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-                cv2.putText(display_frame, f"FPS: {fps:.1f} | CPU: {cpu_load}%", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-                cv2.putText(display_frame, f"Tracking Lost: {tracking_lost} | Vector Angle: {angle:.1f} | Conf: {best_conf:.2f}", (10, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-                cv2.putText(display_frame, f"{rec_text} | r: record | c: capture | q: quit", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, rec_color, 2)
+                detection_crop_w = max(1, int(img_w * 0.625))
+                detection_crop_x = (img_w - detection_crop_w) // 2
+                detection_frame = detection_frame[:, detection_crop_x:detection_crop_x + detection_crop_w]
+
+                roi_display = cv2.resize(roi_frame, (640, 360))
+                detection_display = detection_frame
+
+                cv2.putText(roi_display, f"FPS: {fps:.1f}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                cv2.putText(roi_display, f"ROI: {roi_w}x{roi_h}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 0, 0), 2)
+
+                cv2.putText(detection_display, f"FPS: {fps:.1f}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                cv2.putText(detection_display, f"Vector angle: {angle:.1f} deg", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 0, 0), 2)
+                cv2.putText(detection_display, f"Vector length: {vector_magnitude:.2f}", (10, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 0, 0), 2)
                 if recording and tracking_lost:
                     save_lost_tracking_images()
 
                 try:
-                    cv2.imshow("Tracking", display_frame)
+                    cv2.imshow("ROI View", roi_display)
+                    cv2.imshow("Leanbot Detection", detection_display)
+                    if not windows_positioned:
+                        cv2.moveWindow("ROI View", 0, 0)
+                        cv2.moveWindow("Leanbot Detection", 650, 0)
+                        windows_positioned = True
                     key = cv2.waitKey(1) & 0xFF
                     if key == ord('q'):
                         break
@@ -630,11 +648,13 @@ def main():
                             start_recording()
                     if key == ord('c'):
                         cap_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-                        ui_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_ui.png")
+                        roi_ui_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_roi_ui.png")
+                        detection_ui_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_detection_ui.png")
                         orig_path = os.path.join(manual_capture_dir, f"manual_cap_{frame_id}_{cap_time}_orig.png")
-                        cv2.imwrite(ui_path, display_frame)
+                        cv2.imwrite(roi_ui_path, roi_display)
+                        cv2.imwrite(detection_ui_path, detection_display)
                         cv2.imwrite(orig_path, orig_frame)
-                        print(f"\n[INFO] DA CHUP ANH THU CONG (Frame {frame_id}):\n       - UI: {ui_path}\n       - Goc: {orig_path}\n")
+                        print(f"\n[INFO] DA CHUP ANH THU CONG (Frame {frame_id}):\n       - ROI UI: {roi_ui_path}\n       - Detection UI: {detection_ui_path}\n       - Goc: {orig_path}\n")
                 except cv2.error as exc:
                     print(f"[WARN] OpenCV GUI khong kha dung, tu chuyen sang --no-show: {exc}")
                     args.no_show = True

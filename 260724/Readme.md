@@ -66,7 +66,8 @@ python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log r
 - Lệnh chạy ( tắt toàn bộ các ngưỡng lọc --conf, --mag-threshold --roi_conf chỉ để --topK và --iou ) : 
 
 ```bash
-python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log roi_tracking_redObstacle.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.00 --iou 0.5 --topk 100 --mag-threshold 0.0 --roi_conf 0.00
+python tools/roi_tracking_baseline_infer.py --show --source 1 --mode roi --log roi_tracking_redObstacle.csv --full-model models/YOLO11n_versions/FP16_NO_NMS/best_640_openvino_model --tracking-model models/YOLO11n_versions/FP16_NO_NMS/best_160_openvino_model --conf 0.00 --iou 0.5 --topk 100 --min-mag 0.0 --roi_conf 0.00
+
 ```
 
 - Ảnh chạy thực tế khi có nhiều khối gỗ đỏ , cam : 

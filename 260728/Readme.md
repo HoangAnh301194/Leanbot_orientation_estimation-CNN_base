@@ -1,10 +1,11 @@
-# Báo cáo công việc ngày 25/07/2026
+# Báo cáo công việc ngày 28/07/2026
 
 ## A. Công việc đã làm 
 - Chụp dataset ảnh nhiễu cho 24 class ( mỗi class 2 ảnh)
 - Build dataset 
 - Train lại model
-
+- Chạy inference và vẽ biểu đồ đánh giá 
+- Tách Opencv UI thành 2 khugn video realtime.
 ### 1. Chụp lại toàn bộ datasets.
 - Bổ sung dataset cho toàn bộ 24 class , mỗi class có 2 ảnh và 2 back ground tương ứng . 
 
@@ -317,14 +318,14 @@ python tools/export_openvino_fp16.py --model models/YOLO11n_versions/FP16_NO_NMS
 ```
 - **Chạy inference với Leanbot chạy vòng tròn có các khối gỗ nhiễu.**
 
-  - Link csv log debug : [roi_tracking_cpu.csv](benchmark\roi_tracking_cpu.csv)
+  - Link csv log debug : [roi_tracking_cpu.csv](benchmark/roi_tracking_cpu.csv)
   - Ảnh trực quan hóa log CSV :
 
-  ![roi_tracking_cpu](benchmark\roi_tracking_cpu.png)
+  ![roi_tracking_cpu](benchmark/roi_tracking_cpu.png)
 
   - Quỹ đạo Oxy_center 
 
-  ![roi_tracking_cpu_oxy_trajectory](benchmark\roi_tracking_cpu_oxy_trajectory.png)
+  ![roi_tracking_cpu_oxy_trajectory](benchmark/roi_tracking_cpu_oxy_trajectory.png)
 
   - Ảnh inference thực tế : 
 

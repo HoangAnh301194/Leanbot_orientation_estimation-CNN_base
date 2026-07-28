@@ -247,9 +247,9 @@ Kết quả prediction của model:
 ![Leanbot validation predictions](leanbot_colab/val_batch0_pred.jpg)
 
 
+
 ## B. Khó khăn  
 - Sau train thì em thấy ma trận nhầm lần (Confusion matrix) bị nhiễu ạ . 
-- Hiện tại vì ảnh ít nên ảnh Validate để hiệu chỉnh tham số model hiện chỉ có 1 ảnh, làm giảm hiệu quả học khi training, em có cần sửa lại tăng lên thành 2 ảnh và train lại không ạ ? 
 - Từ hôm qua tới giờ em bị lỗi không đăng nhập được lại vào git pythaverse mặc dù nhập đúng tên và Api key ạ 
 - Em xin phép báo cáo tạm bằng git cá nhân ạ 
 ## C. Công việc tiếp theo

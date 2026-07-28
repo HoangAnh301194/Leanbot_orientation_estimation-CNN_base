@@ -1,3 +1,6 @@
 260727/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 260727/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
 260727/**/*.png filter=lfs diff=lfs merge=lfs -text
+260728/raw_image/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+260728/raw_image/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+260728/raw_image/**/*.png filter=lfs diff=lfs merge=lfs -text

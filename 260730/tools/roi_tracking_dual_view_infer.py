@@ -369,6 +369,7 @@ def main():
     cap = cv2.VideoCapture(source)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, args.width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
+    cap.set(cv2.CAP_PROP_FPS, 15)
     
     if not cap.isOpened():
         print(f"[ERROR] Khong the mo nguon video: {source}")
@@ -607,8 +608,8 @@ def main():
 
                 detection_crop_w = max(1, int(img_w * 0.625))
                 detection_crop_x = (img_w - detection_crop_w) // 2
-                target_roi_w = 640
-                target_roi_h = 640
+                target_roi_w = 600
+                target_roi_h = 600
 
                 if lost_roi_input is not None and lost_roi_input.size > 0:
                     roi_display = cv2.resize(lost_roi_input, (target_roi_w, target_roi_h))

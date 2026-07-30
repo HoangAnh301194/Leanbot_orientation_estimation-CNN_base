@@ -291,11 +291,11 @@ python .\tools\roi_tracking_dual_view_infer.py `
   --width 1280 `
   --height 720 `
   --conf 0.0 `
-  --roi_conf 0.0 `
+  --roi_conf 0.0`
   --topk 100 `
   --iou 0.5 `
   --mag-threshold 0.0 `
-  --log "roi_tracking_dual_cpu.csv" `
+  --log "roi_tracking_dual_debug.csv" `
   --show
 ```
 

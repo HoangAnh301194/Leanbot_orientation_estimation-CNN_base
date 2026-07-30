@@ -13,7 +13,8 @@ import cv2
 DEFAULT_FRAME_WIDTH = 1920
 DEFAULT_FRAME_HEIGHT = 1080
 DEFAULT_DPI = 100
-DEFAULT_PADDING_RATIO = 0.08
+DEFAULT_PADDING_RATIO = 0.12
+ELLIPSE_AXIS_EXTENSION_RATIO = 0.05
 DEFAULT_FIGURE_SIZE = (12, 8)
 MARKDOWN_SUFFIXES = {'.md', '.markdown'}
 
@@ -95,15 +96,22 @@ def extract_csv_paths_from_markdown(markdown_path: Path):
 
 
 def calculate_zoom_limits(x_values, y_values, padding_ratio=DEFAULT_PADDING_RATIO):
-    """Tính giới hạn trục ôm sát dữ liệu, có khoảng đệm."""
+    """Tính viewport vuông theo span lớn nhất, có khoảng đệm quanh toàn bộ geometry."""
     x_min, x_max = float(np.min(x_values)), float(np.max(x_values))
     y_min, y_max = float(np.min(y_values)), float(np.max(y_values))
     span_x = x_max - x_min
     span_y = y_max - y_min
     reference_span = max(span_x, span_y, 10.0)
-    padding_x = max(span_x * padding_ratio, reference_span * 0.02, 1.0)
-    padding_y = max(span_y * padding_ratio, reference_span * 0.02, 1.0)
-    return x_min - padding_x, x_max + padding_x, y_min - padding_y, y_max + padding_y
+    padding = max(reference_span * padding_ratio, 1.0)
+    half_view_span = reference_span / 2.0 + padding
+    center_x = (x_min + x_max) / 2.0
+    center_y = (y_min + y_max) / 2.0
+    return (
+        center_x - half_view_span,
+        center_x + half_view_span,
+        center_y - half_view_span,
+        center_y + half_view_span,
+    )
 
 
 def apply_axis_limits(ax, x_values, y_values, cartesian, full_frame,
@@ -126,6 +134,9 @@ def apply_axis_limits(ax, x_values, y_values, cartesian, full_frame,
 
 def concise_path_label(csv_path: Path):
     """Tạo nhãn đủ phân biệt nhưng không quá dài cho chú giải và tên ảnh."""
+    runlr_match = re.search(r'runlr_(\d+)_(\d+)', csv_path.stem, re.IGNORECASE)
+    if runlr_match:
+        return f"LbMotion.runLR({runlr_match.group(1)}, {runlr_match.group(2)})"
     parts = csv_path.with_suffix('').parts[-3:]
     return '/'.join(parts)
 
@@ -156,6 +167,15 @@ def fit_ellipse_to_pts(x_pts, y_pts):
         rad = np.radians(angle)
         x_ellipse = cx + a * np.cos(t) * np.cos(rad) - b * np.sin(t) * np.sin(rad)
         y_ellipse = cy + a * np.cos(t) * np.sin(rad) + b * np.sin(t) * np.cos(rad)
+
+        major_direction = np.array([np.cos(rad), np.sin(rad)])
+        minor_direction = np.array([-np.sin(rad), np.cos(rad)])
+        center = np.array([cx, cy])
+        axis_scale = 1.0 + ELLIPSE_AXIS_EXTENSION_RATIO
+        major_axis = np.vstack((center - a * axis_scale * major_direction,
+                                center + a * axis_scale * major_direction))
+        minor_axis = np.vstack((center - b * axis_scale * minor_direction,
+                                center + b * axis_scale * minor_direction))
         
         # Calculate residual RMS distance error
         dx = x_pts - cx
@@ -172,11 +192,46 @@ def fit_ellipse_to_pts(x_pts, y_pts):
             'angle': angle,
             'eccentricity': np.sqrt(1 - (b / a)**2) if a > 0 else 0,
             'contour': (x_ellipse, y_ellipse),
+            'major_axis': major_axis,
+            'minor_axis': minor_axis,
             'rms_error': rms_error
         }
     except Exception as e:
         print(f"[WARN] Error fitting ellipse: {e}")
         return None
+
+
+def ellipse_plot_points(ellipse_info):
+    """Trả về toàn bộ điểm ellipse và hai trục để tính giới hạn hiển thị."""
+    contour_x, contour_y = ellipse_info['contour']
+    major_axis = ellipse_info['major_axis']
+    minor_axis = ellipse_info['minor_axis']
+    return (
+        np.concatenate((contour_x, major_axis[:, 0], minor_axis[:, 0])),
+        np.concatenate((contour_y, major_axis[:, 1], minor_axis[:, 1])),
+    )
+
+
+def draw_fitted_ellipse(ax, ellipse_info, contour_color='red', major_color='darkorange',
+                        minor_color='purple', alpha=1.0, show_labels=True):
+    """Vẽ ellipse fit, tâm, trục lớn và trục nhỏ."""
+    contour_x, contour_y = ellipse_info['contour']
+    major_axis = ellipse_info['major_axis']
+    minor_axis = ellipse_info['minor_axis']
+    center_x, center_y = ellipse_info['center']
+    semi_major, semi_minor = ellipse_info['axes']
+
+    ax.plot(contour_x, contour_y, '--', color=contour_color, linewidth=2,
+            alpha=alpha, zorder=4, label='Ellipse fit' if show_labels else None)
+    ax.plot(major_axis[:, 0], major_axis[:, 1], '-', color=major_color,
+            linewidth=2.2, alpha=alpha, zorder=5,
+            label=f'Major axis: {2 * semi_major:.1f} px' if show_labels else None)
+    ax.plot(minor_axis[:, 0], minor_axis[:, 1], '-', color=minor_color,
+            linewidth=2.2, alpha=alpha, zorder=5,
+            label=f'Minor axis: {2 * semi_minor:.1f} px' if show_labels else None)
+    ax.scatter(center_x, center_y, color='black' if show_labels else contour_color,
+               marker='+', s=120, linewidth=2, alpha=alpha, zorder=6,
+               label='Ellipse center' if show_labels else None)
 
 def plot_single_oxy(csv_path: Path, out_dir: Path = None, fit_ellipse: bool = True,
                     cartesian: bool = False, frame_width: int = DEFAULT_FRAME_WIDTH,
@@ -208,20 +263,26 @@ def plot_single_oxy(csv_path: Path, out_dir: Path = None, fit_ellipse: bool = Tr
 
     fig, ax = plt.subplots(figsize=DEFAULT_FIGURE_SIZE, dpi=dpi)
     
-    ax.plot(x, y, color='tab:blue', linewidth=2.0, alpha=0.85, zorder=2)
+    ax.plot(x, y, color='tab:blue', linewidth=2.0, alpha=0.85, zorder=2, label='Trajectory')
     ax.scatter(x, y, color='tab:blue', s=15, zorder=3, alpha=0.6, edgecolors='none')
     
     # Vẽ điểm Bắt đầu (Start) và Kết thúc (End)
-    ax.scatter(x[0], y[0], color='green', marker='o', s=120, zorder=5, edgecolors='black', linewidth=1.5)
-    ax.scatter(x[-1], y[-1], color='red', marker='X', s=140, zorder=5, edgecolors='black', linewidth=1.5)
+    ax.scatter(x[0], y[0], color='green', marker='o', s=120, zorder=7,
+               edgecolors='black', linewidth=1.5, label='Start')
+    ax.scatter(x[-1], y[-1], color='red', marker='X', s=140, zorder=7,
+               edgecolors='black', linewidth=1.5, label='End')
     
     # Fit Ellipse nếu được bật
     ellipse_info = None
+    limit_x = x
+    limit_y = y
     if fit_ellipse and len(x) >= 5:
         ellipse_info = fit_ellipse_to_pts(x, y)
         if ellipse_info:
-            ex, ey = ellipse_info['contour']
-            ax.plot(ex, ey, 'r--', linewidth=2, zorder=4)
+            draw_fitted_ellipse(ax, ellipse_info)
+            ellipse_x, ellipse_y = ellipse_plot_points(ellipse_info)
+            limit_x = np.concatenate((x, ellipse_x))
+            limit_y = np.concatenate((y, ellipse_y))
 
     # Thiết lập hệ trục Oxy
     ax.grid(True, linestyle='--', alpha=0.5)
@@ -249,14 +310,15 @@ def plot_single_oxy(csv_path: Path, out_dir: Path = None, fit_ellipse: bool = Tr
 
     apply_axis_limits(
         ax,
-        x,
-        y,
+        limit_x,
+        limit_y,
         cartesian=cartesian,
         full_frame=full_frame,
         frame_width=frame_width,
         frame_height=frame_height,
         padding_ratio=padding_ratio,
     )
+    ax.legend(loc='best', fontsize=9, framealpha=0.9)
 
     plt.tight_layout()
     
@@ -268,7 +330,7 @@ def plot_single_oxy(csv_path: Path, out_dir: Path = None, fit_ellipse: bool = Tr
         
     output_stem = output_name or csv_path.stem
     out_file = Path(out_dir) / f"{output_stem}_oxy_trajectory.png"
-    plt.savefig(out_file, dpi=dpi)
+    plt.savefig(out_file, dpi=dpi, bbox_inches='tight', pad_inches=0.15)
     print(f"[SUCCESS] Đã lưu đồ thị Oxy trajectory: {out_file}")
     plt.close(fig)
     
@@ -310,8 +372,18 @@ def plot_multi_oxy(csv_files: list, out_dir: Path, cartesian: bool = False,
             if fit_ellipse and len(x) >= 5:
                 e_info = fit_ellipse_to_pts(x, y)
                 if e_info:
-                    ex, ey = e_info['contour']
-                    ax.plot(ex, ey, '--', color=color, alpha=0.5, linewidth=1.2)
+                    draw_fitted_ellipse(
+                        ax,
+                        e_info,
+                        contour_color=color,
+                        major_color=color,
+                        minor_color=color,
+                        alpha=0.45,
+                        show_labels=False,
+                    )
+                    ellipse_x, ellipse_y = ellipse_plot_points(e_info)
+                    all_x.append(ellipse_x)
+                    all_y.append(ellipse_y)
                     
             all_x.append(x)
             all_y.append(y)
@@ -361,7 +433,7 @@ def plot_multi_oxy(csv_files: list, out_dir: Path, cartesian: bool = False,
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / "combined_multi_oxy_trajectory.png"
-    plt.savefig(out_file, dpi=dpi)
+    plt.savefig(out_file, dpi=dpi, bbox_inches='tight', pad_inches=0.15)
     print(f"[SUCCESS] Đã lưu đồ thị so sánh multi-log: {out_file}")
     plt.close(fig)
 
@@ -388,7 +460,7 @@ def main():
     parser.add_argument("--multi", action="store_true", help="Vẽ thêm ảnh tổng hợp khi đầu vào chứa nhiều CSV")
     parser.add_argument("--recursive", action="store_true", help="Tìm CSV trong toàn bộ thư mục con khi đầu vào là thư mục")
     parser.add_argument("--full-frame", action="store_true", help="Dùng giới hạn full-frame cũ thay cho auto-zoom")
-    parser.add_argument("--padding", type=float, default=DEFAULT_PADDING_RATIO, help="Khoảng đệm auto-zoom theo tỉ lệ, mặc định 0.08")
+    parser.add_argument("--padding", type=float, default=DEFAULT_PADDING_RATIO, help="Khoảng đệm auto-zoom theo span lớn nhất, mặc định 0.12")
     parser.add_argument("--frame-width", type=int, default=DEFAULT_FRAME_WIDTH, help="Chiều rộng frame khi dùng --full-frame")
     parser.add_argument("--frame-height", type=int, default=DEFAULT_FRAME_HEIGHT, help="Chiều cao frame khi dùng --full-frame")
     parser.add_argument("--dpi", type=int, default=DEFAULT_DPI, help="DPI ảnh đầu ra, mặc định 100")

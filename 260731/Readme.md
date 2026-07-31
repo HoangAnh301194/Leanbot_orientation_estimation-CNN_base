@@ -307,5 +307,5 @@ python tools/plot_zoom_segments.py benchmark --n-segments 3 --alphas 0.1,0.3,0.5
 - Hiện tại em vẫn chưa đăng nhập được Git để remote vào gitPythaverse nên chưa push code lên được ạ . Em có hỏi anh Thế Anh nhưng vẫn không tìm được nguyên nhân ạ. 
 - Em xin phép báo cáo bằng repo Git cá nhân ạ .
 ## C. Công việc tiếp theo
-- Vì em chưa hình dung rõ được các công việc kế tiếp sau khi đã phân tích được góc, vẽ được quỹ đạo thì sẽ trả qua các bước lớn nào để điều khiển được leanbot đi vào trạm sạc nên em xin phép nhận định hướng từ Thầy để em có thể tìm hiểu trước các phần đó song song với công việc Thầy giao khi làm trên công ty ạ . 
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ 
+- Làm mượt quỹ đạo bằng Ellipse Fitting + Phase Angle Regression
+

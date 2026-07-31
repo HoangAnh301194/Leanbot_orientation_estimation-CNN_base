@@ -5,7 +5,7 @@
 - Đo thời gian vẽ ra hình elipse và debug các điểm x,y_center.
 - Từ các điểm x,y_center nối tới tâm hình elipse và vẽ đồ thị góc 
 - Zoom các đoạn làm mượt và quan sát kết quả 
-- Làm mượt quỹ đạo bằng Ellipse Fitting + Phase Angle Regression
+
 ### 1. Các thuật toán làm mượt dữ liệu phổ biến
 
 #### 1.1. Đặc điểm của dữ liệu online và offline

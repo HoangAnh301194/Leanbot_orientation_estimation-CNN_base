@@ -129,8 +129,6 @@ Thuật toán bao gồm hai bước lọc liên tiếp:
 *   <var>y</var><sup>(b)</sup><sub>t</sub>: Tọa độ sau khi lọc lùi (kết quả quỹ đạo mượt cuối cùng).
 *   &alpha;: Hệ số làm mượt (0 &lt; &alpha; &le; 1). Giá trị càng nhỏ thì làm mượt càng mạnh nhưng độ nhạy thay đổi bị giảm.
 
-- Nguồn tham khảo: [Zero-phase digital filtering (Wikipedia)](https://en.wikipedia.org/wiki/Zero-phase_filtering)
-
 ##### 1.4.2. Code áp dụng
 Thuật toán được tích hợp trực tiếp vào tool khi vẽ đồ thị [`tools/plot_oxy_trajectory.py`](tools/plot_oxy_trajectory.py)
 
@@ -152,9 +150,6 @@ python tools/plot_oxy_trajectory.py benchmark/roi_tracking_runlr_2000_1300.csv -
 ```
 
 ##### 1.4.3. Kết quả khi chạy code
-- Hệ số alpha = 0 ( Chưa lọc )
-![Alpha 0 (Chưa lọc)](benchmark/ema_0/combined_multi_oxy_trajectory.png)
-
 - Hệ số alpha = 0.1
 ![Alpha 0.1](benchmark/ema_01/combined_multi_oxy_trajectory.png)
 
@@ -169,6 +164,9 @@ python tools/plot_oxy_trajectory.py benchmark/roi_tracking_runlr_2000_1300.csv -
 
 - Hệ số alpha = 0.9 
 ![Alpha 0.9](benchmark/ema_09/combined_multi_oxy_trajectory.png)
+
+- Hệ số alpha = 1 (Tương đương Chưa lọc)
+![Alpha 1](benchmark/ema_1/combined_multi_oxy_trajectory.png)
 ### 2. Đo thời gian vẽ hình ellipse và debug số điểm `x_center`, `y_center`
 
 #### 2.1. Code sử dụng

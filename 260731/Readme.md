@@ -254,19 +254,25 @@ phase_angle = np.mod(radial_angle - major_axis_angle, 360.0)
 
 ![Ellipse fit RunLR 2000 1000](benchmark/roi_tracking_runlr_2000_1000_oxy_trajectory.png)
 
-- Đồ thị góc theo thời gian: [`roi_tracking_runlr_2000_1000_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1000_ellipse_angle_over_time.png).
+- Đồ thị góc theo thời gian: 
+
+![`roi_tracking_runlr_2000_1000_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1000_ellipse_angle_over_time.png).
 
 **RunLR `2000 1300`**
 
 ![Ellipse fit RunLR 2000 1300](benchmark/roi_tracking_runlr_2000_1300_oxy_trajectory.png)
 
-- Đồ thị góc theo thời gian: [`roi_tracking_runlr_2000_1300_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1300_ellipse_angle_over_time.png).
+- Đồ thị góc theo thời gian: 
+
+![`roi_tracking_runlr_2000_1300_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1300_ellipse_angle_over_time.png).
 
 **RunLR `2000 1600`**
 
 ![Ellipse fit RunLR 2000 1600](benchmark/roi_tracking_runlr_2000_1600_oxy_trajectory.png)
 
-- Đồ thị góc theo thời gian: [`roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png).
+- Đồ thị góc theo thời gian: 
+
+![`roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png).
 
 
 ## B. Khó khăn 

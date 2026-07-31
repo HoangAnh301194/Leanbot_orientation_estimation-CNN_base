@@ -4,7 +4,8 @@
 - Tìm hiểu một số thuật toán làm mượt dữ liệu góc online và offline 
 - Đo thời gian vẽ ra hình elipse và debug các điểm x,y_center.
 - Từ các điểm x,y_center nối tới tâm hình elipse và vẽ đồ thị góc 
-
+- Zoom các đoạn làm mượt và quan sát kết quả 
+- Làm mượt quỹ đạo bằng Ellipse Fitting + Phase Angle Regression
 ### 1. Các thuật toán làm mượt dữ liệu phổ biến
 
 #### 1.1. Đặc điểm của dữ liệu online và offline
@@ -167,6 +168,7 @@ python tools/plot_oxy_trajectory.py benchmark/roi_tracking_runlr_2000_1300.csv -
 
 - Hệ số alpha = 1 (Tương đương Chưa lọc)
 ![Alpha 1](benchmark/ema_1/combined_multi_oxy_trajectory.png)
+
 ### 2. Đo thời gian vẽ hình ellipse và debug số điểm `x_center`, `y_center`
 
 #### 2.1. Code sử dụng
@@ -274,6 +276,32 @@ phase_angle = np.mod(radial_angle - major_axis_angle, 360.0)
 
 ![`roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png`](benchmark/roi_tracking_runlr_2000_1600_ellipse_angle_over_time.png).
 
+### 3. Zoom vào quan sát chi tiết kết quả làm mượt
+
+- Code sử dụng :  [`tools/plot_zoom_segments.py`](tools/plot_zoom_segments.py) , chọn ngẫu nhiên các đoạn 150 điểm (≈10 giây) và vẽ chồng quỹ đạo gốc (raw) với quỹ đạo đã làm mượt (α = 0.1, 0.3, 0.5) để dễ so sánh : 
+
+- Lệnh chạy code : 
+```bash
+python tools/plot_zoom_segments.py benchmark --n-segments 3 --alphas 0.1,0.3,0.5 --seed 42
+```
+
+**RunLR `2000 1000`**
+
+![Segment 1](benchmark/zoom_segments/roi_tracking_runlr_2000_1000_segment_1.png)
+![Segment 2](benchmark/zoom_segments/roi_tracking_runlr_2000_1000_segment_2.png)
+![Segment 3](benchmark/zoom_segments/roi_tracking_runlr_2000_1000_segment_3.png)
+
+**RunLR `2000 1300`**
+
+![Segment 1](benchmark/zoom_segments/roi_tracking_runlr_2000_1300_segment_1.png)
+![Segment 2](benchmark/zoom_segments/roi_tracking_runlr_2000_1300_segment_2.png)
+![Segment 3](benchmark/zoom_segments/roi_tracking_runlr_2000_1300_segment_3.png)
+
+**RunLR `2000 1600`**
+
+![Segment 1](benchmark/zoom_segments/roi_tracking_runlr_2000_1600_segment_1.png)
+![Segment 2](benchmark/zoom_segments/roi_tracking_runlr_2000_1600_segment_2.png)
+![Segment 3](benchmark/zoom_segments/roi_tracking_runlr_2000_1600_segment_3.png)
 
 ## B. Khó khăn 
 - Hiện tại em vẫn chưa đăng nhập được Git để remote vào gitPythaverse nên chưa push code lên được ạ . Em có hỏi anh Thế Anh nhưng vẫn không tìm được nguyên nhân ạ. 

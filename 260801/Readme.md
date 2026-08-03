@@ -164,7 +164,6 @@ Tổng cộng: **9 đoạn và 18 đồ thị**.
 
 ## 8. Hình ảnh kết quả
 
-
 ### 8.1. `roi_tracking_runlr_2000_1000.csv`
 
 #### Segment 1 — index `[130,175)`
@@ -173,29 +172,17 @@ Tổng cộng: **9 đoạn và 18 đồ thị**.
 |---|---|
 | ![1000 segment 1 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg1_phase_angle.png) | ![1000 segment 1 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg1_trajectory.png) |
 
-#### Segment 2 — index `[511,556)`
+#### Segment 2 — index `[856,901)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1000 segment 2 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg2_phase_angle.png) | ![1000 segment 2 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg2_trajectory.png) |
 
-#### Segment 3 — index `[614,659)` — RMS `0.7369`
+#### Segment 3 — index `[911,956)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1000 segment 3 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg3_phase_angle.png) | ![1000 segment 3 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg3_trajectory.png) |
-
-#### Segment 4 — index `[856,901)`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1000 segment 4 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg4_phase_angle.png) | ![1000 segment 4 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg4_trajectory.png) |
-
-#### Segment 5 — index `[911,956)`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1000 segment 5 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg5_phase_angle.png) | ![1000 segment 5 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1000_seg5_trajectory.png) |
 
 ### 8.2. `roi_tracking_runlr_2000_1300.csv`
 
@@ -205,63 +192,39 @@ Tổng cộng: **9 đoạn và 18 đồ thị**.
 |---|---|
 | ![1300 segment 1 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg1_phase_angle.png) | ![1300 segment 1 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg1_trajectory.png) |
 
-#### Segment 2 — index `[248,293)`
+#### Segment 2 — index `[1074,1119)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1300 segment 2 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg2_phase_angle.png) | ![1300 segment 2 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg2_trajectory.png) |
 
-#### Segment 3 — index `[1074,1119)`
+#### Segment 3 — index `[1129,1174)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1300 segment 3 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg3_phase_angle.png) | ![1300 segment 3 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg3_trajectory.png) |
 
-#### Segment 4 — index `[1129,1174)`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1300 segment 4 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg4_phase_angle.png) | ![1300 segment 4 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg4_trajectory.png) |
-
-#### Segment 5 — index `[1522,1567)`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1300 segment 5 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg5_phase_angle.png) | ![1300 segment 5 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1300_seg5_trajectory.png) |
-
 ### 8.3. `roi_tracking_runlr_2000_1600.csv`
 
-#### Segment 1 — index `[709,754)`
+#### Segment 1 — index `[1738,1783)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1600 segment 1 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg1_phase_angle.png) | ![1600 segment 1 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg1_trajectory.png) |
 
-#### Segment 2 — index `[1738,1783)`
+#### Segment 2 — index `[2180,2225)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1600 segment 2 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg2_phase_angle.png) | ![1600 segment 2 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg2_trajectory.png) |
 
-#### Segment 3 — index `[2114,2159)`
+#### Segment 3 — index `[2326,2371)`
 
 | Continuous phase angle | Quỹ đạo gốc và smooth |
 |---|---|
 | ![1600 segment 3 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg3_phase_angle.png) | ![1600 segment 3 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg3_trajectory.png) |
 
-#### Segment 4 — index `[2180,2225)`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1600 segment 4 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg4_phase_angle.png) | ![1600 segment 4 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg4_trajectory.png) |
-
-#### Segment 5 — index `[2661,2706)` — RMS `1.0438`
-
-| Continuous phase angle | Quỹ đạo gốc và smooth |
-|---|---|
-| ![1600 segment 5 phase](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg5_phase_angle.png) | ![1600 segment 5 trajectory](benchmark/ellipse_smooth_segments/roi_tracking_runlr_2000_1600_seg5_trajectory.png) |
-
-## B. Khó khăn 
-- Hình elipse được vẽ ra chỉ fit với đoạn dữ liệu, còn đối với toàn bộ  quỹ đạo thực tế thì không đúng . 
-## C. Công việc tiếp theo 
+## B. Khó khăn
+- Hình elipse được vẽ ra chỉ fit với đoạn dữ liệu, còn đối với toàn bộ quỹ đạo thực tế thì không đúng.
+## C. Công việc tiếp theo
 - Em xin phép nhận công việc tiếp theo từ Thầy ạ.

@@ -127,36 +127,36 @@ def plot_online_poly_log(csv_file: str, n_sample_segments: int = 3, poly_degree:
     fig_time, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True, dpi=150)
     fig_time.suptitle(f'Online Poly Smooth Log Analysis\n{csv_path.name}', fontsize=14, fontweight='bold')
 
-    # Subplot 1: Angle Unwrapped (nếu có)
+    # Subplot 1: Angle Unwrapped (Màu xanh dương - Blue 'b.-' giống plot_log.py)
     ax_ang = axes[0]
     if 'angle' in df.columns or 'group1_angle' in df.columns:
         ang_col = 'group1_angle' if 'group1_angle' in df.columns else 'angle'
         unwrapped_angle = np.degrees(np.unwrap(np.radians(df[ang_col])))
-        ax_ang.plot(df['frame_id'], unwrapped_angle, color='purple', linewidth=1.2, label='Unwrapped Angle (deg)')
-        ax_ang.set_ylabel('Angle (deg)')
-        ax_ang.grid(True, linestyle=':', alpha=0.6)
+        ax_ang.plot(df['frame_id'], unwrapped_angle, 'b.-', linewidth=1.2, markersize=3, label='Angle (degrees)')
+        ax_ang.set_ylabel('Degrees')
+        ax_ang.grid(True, linestyle='--', alpha=0.7)
         ax_ang.legend(loc='upper right')
-        ax_ang.set_title("Leanbot Heading Angle")
+        ax_ang.set_title("Angle (Unwrapped)")
 
-    # Subplot 2: X, Y Center (Raw vs Smooth)
+    # Subplot 2: X, Y Center (4 màu hoàn toàn khác biệt: Raw X đỏ, Smooth X xanh dương, Raw Y xanh lá, Smooth Y cam)
     ax_pos = axes[1]
-    ax_pos.plot(df['frame_id'], df['x_center'], color='red', linewidth=0.6, linestyle='--', alpha=0.5, label='Raw X')
-    ax_pos.plot(df['frame_id'], df['y_center'], color='orange', linewidth=0.6, linestyle='--', alpha=0.5, label='Raw Y')
+    ax_pos.plot(df['frame_id'], df['x_center'], 'r.-', linewidth=1.0, markersize=3, alpha=0.5, label='Raw X center')
+    ax_pos.plot(df['frame_id'], df['y_center'], 'g.-', linewidth=1.0, markersize=3, alpha=0.5, label='Raw Y center')
     if has_smooth:
-        ax_pos.plot(df['frame_id'], df['smooth_x'], color='blue', linewidth=1.5, label='Smooth X (Poly deg=3)')
-        ax_pos.plot(df['frame_id'], df['smooth_y'], color='green', linewidth=1.5, label='Smooth Y (Poly deg=3)')
-    ax_pos.set_ylabel('Coordinates (px)')
-    ax_pos.grid(True, linestyle=':', alpha=0.6)
+        ax_pos.plot(df['frame_id'], df['smooth_x'], color='#1f77b4', linewidth=1.6, label='Smooth X center')
+        ax_pos.plot(df['frame_id'], df['smooth_y'], color='#ff7f00', linewidth=1.6, label='Smooth Y center')
+    ax_pos.set_ylabel('Pixels')
+    ax_pos.grid(True, linestyle='--', alpha=0.7)
     ax_pos.legend(loc='upper right')
-    ax_pos.set_title("X & Y Position over Time (Raw vs Smooth)")
+    ax_pos.set_title("X, Y Center (Raw vs Smooth)")
 
-    # Subplot 3: End-to-End FPS & CPU Load
+    # Subplot 3: End-to-End FPS (Màu xanh dương giống plot_log.py)
     ax_fps = axes[2]
     if 'fps' in df.columns:
-        ax_fps.plot(df['frame_id'], df['fps'], color='darkgreen', linewidth=1.2, label='End-to-End FPS')
+        ax_fps.plot(df['frame_id'], df['fps'], 'b.-', linewidth=1.2, markersize=3, label='End-to-End FPS')
         ax_fps.set_ylabel('FPS')
         ax_fps.set_xlabel('Frame ID')
-        ax_fps.grid(True, linestyle=':', alpha=0.6)
+        ax_fps.grid(True, linestyle='--', alpha=0.7)
         ax_fps.legend(loc='upper right')
         ax_fps.set_title("System End-to-End FPS")
 

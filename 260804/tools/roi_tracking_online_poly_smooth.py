@@ -24,7 +24,7 @@ CLASS_ANGLE_MAP = {}
 ANGLE_PATTERN = re.compile(r"^Leanbot_(?:(?P<sign>[pm])(?P<value>\d+)|(?P<plain>\d+))$")
 
 SMOOTH_LENGTH = 30
-SMOOTH_ORDER = 3
+SMOOTH_ORDER = 2
 
 def parse_angle_from_class_name(class_name: str):
     """Returns the angle (float) encoded in the class name, or None if not an angle class."""
@@ -156,14 +156,9 @@ def select_best_vector_detection(compiled_model, image, names,
             angle = 0.0
         return box_xyxy, best_conf, angle, best_conf, 0.0, 0.0
 
-    # ------------------------------------------------------------------
-    # Nhánh No-NMS: full vector pipeline (giống webcam_vector_infer.py)
-    # Output raw: [x_c, y_c, w, h, score_cls0, ..., score_clsN]
-    # ------------------------------------------------------------------
     boxes_xywh = pred[:, :4]
     class_scores = pred[:, 4:4 + len(names)]
 
-    # 1. Confidence filter
     best_scores_per_anchor = class_scores.max(axis=1)
     conf_mask = best_scores_per_anchor > conf_thres
     filtered_indices = np.where(conf_mask)[0]
@@ -171,7 +166,6 @@ def select_best_vector_detection(compiled_model, image, names,
     if len(filtered_indices) == 0:
         return np.zeros(4, dtype=np.float32), 0.0, 0.0, 0.0, 0.0, 0.0
 
-    # 2. Top-K selection
     filtered_scores = best_scores_per_anchor[filtered_indices]
     topk_actual = min(topk, len(filtered_indices))
     topk_relative = np.argsort(filtered_scores)[-topk_actual:][::-1]
@@ -181,7 +175,6 @@ def select_best_vector_detection(compiled_model, image, names,
     top_class_scores = class_scores[topk_idx]
     best_conf = float(best_scores_per_anchor[topk_idx[0]])
 
-    # 3. Tính vector cho từng anchor
     rows = []
     for i in range(topk_actual):
         mag, ang = get_vector_from_scores(top_class_scores[i], names)
@@ -265,18 +258,20 @@ def calculate_roi(box_xyxy, img_w, img_h, target_size=160):
         y_min = img_h - side_32
     return x_min, y_min, side_32, side_32
 
-
 class OnlinePolySmoother:
-    """Sliding Window Online Polynomial Smoother.
-    Mỗi khi có 30 điểm raw (cx, cy) gần nhất, fit 2 đa thức bậc 3 x(t) và y(t),
-    tính tọa độ smooth cho duy nhất điểm thứ 30.
+    """Sliding Window Online Polynomial Smoother (bậc 2, length 30).
+    - Pre-compute trục thời gian t_norm chuẩn hóa về [0.0, 1.0] (29 / 29 = 1.0).
+    - Tính smooth_angle bằng góc của vector nối 2 điểm smooth liên tiếp.
     """
     def __init__(self, window_size=SMOOTH_LENGTH, poly_degree=SMOOTH_ORDER):
         self.window_size = window_size
         self.poly_degree = poly_degree
-        self.raw_window = []  # Lớp chứa tối đa 30 điểm (cx, cy) gần nhất
+        # Pre-compute mảng thời gian t chuẩn hóa 1 lần duy nhất trong [0.0, 1.0]
+        self.t_norm = np.linspace(0.0, 1.0, window_size)
+        self.raw_window = []         # Cửa sổ trượt 30 điểm raw gần nhất
         self.raw_trajectory = []     # Toàn bộ chuỗi raw (cx, cy)
         self.smooth_trajectory = []  # Toàn bộ chuỗi smooth (sx, sy)
+        self.smooth_angles = []      # Toàn bộ chuỗi smooth_angle (độ)
 
     def add_point(self, cx, cy):
         self.raw_trajectory.append((cx, cy))
@@ -289,42 +284,61 @@ class OnlinePolySmoother:
             pts = np.array(self.raw_window, dtype=float)
             x_seg = pts[:, 0]
             y_seg = pts[:, 1]
-            t_norm = np.arange(self.window_size, dtype=float) / float(self.window_size)
 
-            coeffs_x = np.polyfit(t_norm, x_seg, deg=self.poly_degree)
-            coeffs_y = np.polyfit(t_norm, y_seg, deg=self.poly_degree)
+            coeffs_x = np.polyfit(self.t_norm, x_seg, deg=self.poly_degree)
+            coeffs_y = np.polyfit(self.t_norm, y_seg, deg=self.poly_degree)
 
-            # Tính duy nhất điểm cuối (tương ứng t = (N-1)/N = 29/30)
-            t_last = (self.window_size - 1) / float(self.window_size)
-            sx = float(np.polyval(coeffs_x, t_last))
-            sy = float(np.polyval(coeffs_y, t_last))
+            # Tính duy nhất điểm mới nhất (tương ứng t = 1.0)
+            sx = float(np.polyval(coeffs_x, 1.0))
+            sy = float(np.polyval(coeffs_y, 1.0))
+
+            # Tính smooth_angle từ vector nối 2 điểm smooth liên tiếp (-dy cho hệ Đề-các chuẩn)
+            if len(self.smooth_trajectory) > 0:
+                prev_sx, prev_sy = self.smooth_trajectory[-1]
+                dx = sx - prev_sx
+                dy = sy - prev_sy
+                if math.hypot(dx, dy) > 1e-5:
+                    smooth_ang = math.degrees(math.atan2(-dy, dx))
+                else:
+                    smooth_ang = self.smooth_angles[-1] if self.smooth_angles else 0.0
+            else:
+                smooth_ang = 0.0
 
             self.smooth_trajectory.append((sx, sy))
-            return sx, sy
+            self.smooth_angles.append(smooth_ang)
+            return sx, sy, smooth_ang
         else:
-            # Chưa đủ 30 điểm thì dùng tạm giá trị raw
+            # Chưa đủ 30 điểm
             self.smooth_trajectory.append((cx, cy))
-            return cx, cy
+            if len(self.smooth_trajectory) > 1:
+                prev_sx, prev_sy = self.smooth_trajectory[-2]
+                dx = cx - prev_sx
+                dy = cy - prev_sy
+                smooth_ang = math.degrees(math.atan2(-dy, dx)) if math.hypot(dx, dy) > 1e-5 else 0.0
+            else:
+                smooth_ang = 0.0
+            self.smooth_angles.append(smooth_ang)
+            return cx, cy, smooth_ang
 
     def reset_buffer(self):
         self.raw_window = []
 
 
 def save_trajectory_plot(raw_traj, smooth_traj, output_path, title="Online Poly Smooth Trajectory"):
-    """Vẽ và xuất đồ thị quỹ đạo (Đường smooth phía dưới, đường raw đè lên trên)."""
+    """Vẽ và xuất đồ thị quỹ đạo 2D (Smooth điểm chữ X, Raw điểm tròn O)."""
     if not raw_traj or not smooth_traj:
         return
     raw_pts = np.array(raw_traj)
     smooth_pts = np.array(smooth_traj)
 
     plt.figure(figsize=(10, 8), dpi=150)
-    # 1. Đường smooth bên dưới (màu xanh dương)
-    plt.plot(smooth_pts[:, 0], smooth_pts[:, 1], color='blue', linewidth=2.5, label='Smooth Trajectory (Poly deg=3)', zorder=1)
-    plt.scatter(smooth_pts[:, 0], smooth_pts[:, 1], color='navy', s=12, alpha=0.6, zorder=2)
+    # 1. Đường smooth bên dưới (màu xanh dương, marker hình chữ X nhỏ s=8)
+    plt.plot(smooth_pts[:, 0], smooth_pts[:, 1], color='#1f77b4', linewidth=1.8, label='Smooth Trajectory (Poly deg=2)', zorder=1)
+    plt.scatter(smooth_pts[:, 0], smooth_pts[:, 1], color='#003366', s=8, marker='x', label='Smooth Points (X)', zorder=2)
 
-    # 2. Đường raw đè lên bên trên (màu đỏ)
-    plt.plot(raw_pts[:, 0], raw_pts[:, 1], color='red', linewidth=1.0, linestyle='--', alpha=0.7, label='Raw Trajectory', zorder=3)
-    plt.scatter(raw_pts[:, 0], raw_pts[:, 1], color='darkred', s=15, marker='o', label='Raw Points', zorder=4)
+    # 2. Đường raw đè lên bên trên (màu đỏ, marker hình tròn O)
+    plt.plot(raw_pts[:, 0], raw_pts[:, 1], color='#d62728', linewidth=0.9, linestyle='--', alpha=0.65, label='Raw Trajectory', zorder=3)
+    plt.scatter(raw_pts[:, 0], raw_pts[:, 1], color='#8b0000', s=5, marker='o', alpha=0.7, label='Raw Points (O)', zorder=4)
 
     plt.gca().invert_yaxis()  # Đảo ngược trục Y cho đúng hệ tọa độ ảnh OpenCV
     plt.title(title, fontsize=14, fontweight='bold')
@@ -424,7 +438,7 @@ def main():
     csv_header = [
         "frame_id", "timestamp", "mode", "input_width", "input_height", "roi_w", "roi_h",
         "inf_time_ms", "end_to_end_time_ms", "cpu_load_pct", "end_to_end_cpu_load_pct", "fps",
-        "x_center", "y_center", "smooth_x", "smooth_y", "width", "height", "iou_prev_bbox",
+        "x_center", "y_center", "smooth_x", "smooth_y", "smooth_angle", "width", "height", "iou_prev_bbox",
         "group1_magnitude", "group1_angle", "group2_magnitude", "group2_angle", "best_conf", "tracking_lost"
     ]
 
@@ -535,7 +549,7 @@ def main():
 
             detected = vector_magnitude > 0
             cx, cy, bw, bh = 0.0, 0.0, 0.0, 0.0
-            sx, sy = 0.0, 0.0
+            sx, sy, smooth_ang = 0.0, 0.0, 0.0
             iou_prev = 0.0
 
             if detected:
@@ -568,14 +582,13 @@ def main():
                 display_bbox = (int(orig_x1), int(orig_y1), int(orig_x2), int(orig_y2))
 
                 # --- Tính Online Polynomial Smooth ---
-                sx, sy = smoother.add_point(cx, cy)
+                sx, sy, smooth_ang = smoother.add_point(cx, cy)
 
             else:
                 tracking_lost = 1
                 prev_roi = None
                 prev_bbox_xyxy = None
                 iou_prev = 0.0
-                # Bỏ qua frame bị lost, giữ nguyên các điểm hợp lệ trước đó trong bộ đệm
 
             end_to_end_time_ms = (time.time() - t0) * 1000
             end_to_end_cpu_load_pct = current_process.cpu_percent() / psutil.cpu_count()
@@ -586,7 +599,7 @@ def main():
                     frame_id, timestamp, inference_mode, input_w, input_h, roi_w, roi_h,
                     f"{total_inf_time:.2f}", f"{end_to_end_time_ms:.2f}", cpu_load,
                     end_to_end_cpu_load_pct, f"{fps:.2f}",
-                    f"{cx:.2f}", f"{cy:.2f}", f"{sx:.2f}", f"{sy:.2f}", f"{bw:.2f}", f"{bh:.2f}", f"{iou_prev:.4f}",
+                    f"{cx:.2f}", f"{cy:.2f}", f"{sx:.2f}", f"{sy:.2f}", f"{smooth_ang:.2f}", f"{bw:.2f}", f"{bh:.2f}", f"{iou_prev:.4f}",
                     f"{vector_magnitude:.4f}", f"{angle:.4f}", f"{mag2:.4f}", f"{angle2:.4f}", f"{best_conf:.4f}", tracking_lost
                 ])
                 log_handle.flush()
@@ -609,7 +622,7 @@ def main():
                         bx1, by1, bx2, by2 = display_bbox
                         cv2.rectangle(display_frame, (bx1, by1), (bx2, by2), (0, 255, 0), 3) # Khung xanh lá quanh Leanbot
                     cv2.circle(display_frame, (int(cx), int(cy)), 4, (0, 0, 255), -1)  # raw point red
-                    cv2.circle(display_frame, (int(sx), int(sy)), 5, (255, 255, 0), -1) # smooth point cyan
+                    cv2.drawMarker(display_frame, (int(sx), int(sy)), (255, 255, 0), cv2.MARKER_CROSS, 7, 1) # smooth point cyan X nhỏ gọn
 
                 rec_status_str = "[REC ON]" if recording else "[REC OFF]"
                 rec_color = (0, 0, 255) if recording else (200, 200, 200)

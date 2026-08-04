@@ -2,7 +2,9 @@
 
 ## A. Công việc đã làm 
 - Thực hiện triển khai phương pháp **Polynomial Smooth (bậc 3, độ dài 30)** vào chạy online (real-time).
-
+- Thử giảm bậc đa thức xuống 2 và thử chạy Inference lại
+- Chuẩn hóa lại trục thời gian 
+- Tính và vẽ đồ thị Smooth angle so với Raw angle
 ## 1. File Code sử dụng
 
 - [`tools/roi_tracking_online_poly_smooth.py`](tools/roi_tracking_online_poly_smooth.py): Tool thực hiện ROI Tracking kết hợp làm mượt đa thức Online dạng Sliding Window.
@@ -121,6 +123,83 @@ Dữ liệu log: [`benchmark/3turn.csv`](benchmark/3turn.csv)
 
 #### c) Biểu đồ Chuỗi thời gian (Time-series Log)
 ![3Turn Time Series](benchmark/3turn_time_series.png)
+
+---
+
+## 5. Thử nghiệm giảm bậc đa thức Polynomial Smooth (SMOOTH_ORDER = 2)
+
+- Chuyển point smooth thành biểu tượng chữ `X` (`MARKER_CROSS` / `marker='x'`) để phân biệt trực quan hoàn toàn với **chấm tròn `O`** của điểm thô (Raw points).
+
+- Hạ từ `SMOOTH_ORDER = 3` xuống `SMOOTH_ORDER = 2` (Parabol) giúp nắn mượt tự nhiên, tránh rung lắc/uốn sóng cục bộ.
+
+- Pre-compute mảng mốc thời gian $t = \frac{[0, 1, \dots, 29]}{29.0} \in [0.0, 1.0]$ cố định 1 lần duy nhất trong `__init__` (không tính lại ở từng frame).
+
+- Tính & Vẽ đồ thị `smooth_angle`: Tính góc hướng di chuyển thực tế từ vector 2 điểm smooth liên tiếp $(\Delta x, \Delta y)$ qua hàm $\arctan2(-\Delta y, \Delta x)$, bổ sung cột `smooth_angle` vào log CSV và xuất đồ thị so sánh trực tiếp với `raw_angle`.
+
+---
+
+### Kết quả Inference & Đồ thị thực nghiệm bậc 2:
+
+#### 5.1. Leanbot chạy 1 vòng
+- File log CSV: [`1turn_polynomial_order2_length30.csv`](benchmark/1turn_polynomial_order2_length30.csv)
+
+##### a) Đồ thị Quỹ đạo 2D (Smooth điểm X vs Raw điểm O)
+![1Turn Order 2 2D Trajectory](benchmark/1turn_polynomial_order2_length30_2d_trajectory.png)
+
+##### b) Đồ thị Đa thức $f_x(t), f_y(t)$ theo các đoạn 30 điểm mẫu
+- **Segment 1:**
+![1turn order2 seg1](benchmark/1turn_polynomial_order2_length30_poly_components_seg1.png)
+
+- **Segment 2:**
+![1turn order2 seg2](benchmark/1turn_polynomial_order2_length30_poly_components_seg2.png)
+
+- **Segment 3:**
+![1turn order2 seg3](benchmark/1turn_polynomial_order2_length30_poly_components_seg3.png)
+
+##### c) Biểu đồ Chuỗi thời gian (So sánh Raw Angle vs Smooth Angle, Position & FPS)
+![1Turn Order 2 Time Series](benchmark/1turn_polynomial_order2_length30_time_series.png)
+
+---
+
+#### 5.2. Leanbot chạy 2 vòng liên tục
+- File log CSV: [`2turn_polynomial_order2_length30.csv`](benchmark/2turn_polynomial_order2_length30.csv)
+
+##### a) Đồ thị Quỹ đạo 2D (Smooth điểm X vs Raw điểm O)
+![2Turn Order 2 2D Trajectory](benchmark/2turn_polynomial_order2_length30_2d_trajectory.png)
+
+##### b) Đồ thị Đa thức $f_x(t), f_y(t)$ theo các đoạn 30 điểm mẫu
+- **Segment 1:**
+![2turn order2 seg1](benchmark/2turn_polynomial_order2_length30_poly_components_seg1.png)
+
+- **Segment 2:**
+![2turn order2 seg2](benchmark/2turn_polynomial_order2_length30_poly_components_seg2.png)
+
+- **Segment 3:**
+![2turn order2 seg3](benchmark/2turn_polynomial_order2_length30_poly_components_seg3.png)
+
+##### c) Biểu đồ Chuỗi thời gian (So sánh Raw Angle vs Smooth Angle, Position & FPS)
+![2Turn Order 2 Time Series](benchmark/2turn_polynomial_order2_length30_time_series.png)
+
+---
+
+#### 5.3. Leanbot chạy 3 vòng liên tục
+- File log CSV: [`3turn_polynomial_order2_length30.csv`](benchmark/3turn_polynomial_order2_length30.csv)
+
+##### a) Đồ thị Quỹ đạo 2D (Smooth điểm X vs Raw điểm O)
+![3Turn Order 2 2D Trajectory](benchmark/3turn_polynomial_order2_length30_2d_trajectory.png)
+
+##### b) Đồ thị Đa thức $f_x(t), f_y(t)$ theo các đoạn 30 điểm mẫu
+- **Segment 1:**
+![3turn order2 seg1](benchmark/3turn_polynomial_order2_length30_poly_components_seg1.png)
+
+- **Segment 2:**
+![3turn order2 seg2](benchmark/3turn_polynomial_order2_length30_poly_components_seg2.png)
+
+- **Segment 3:**
+![3turn order2 seg3](benchmark/3turn_polynomial_order2_length30_poly_components_seg3.png)
+
+##### c) Biểu đồ Chuỗi thời gian (So sánh Raw Angle vs Smooth Angle, Position & FPS)
+![3Turn Order 2 Time Series](benchmark/3turn_polynomial_order2_length30_time_series.png)
 
 ---
 

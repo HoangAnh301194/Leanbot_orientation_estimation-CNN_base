@@ -203,6 +203,85 @@ Dữ liệu log: [`benchmark/3turn.csv`](benchmark/3turn.csv)
 
 ---
 
+## 6. Báo cáo chi tiết Code & Chọn ngẫu nhiên 5 đoạn 30 điểm để phân tích
+
+### 6.1. Báo cáo chi tiết code 
+
+#### a) Thuật toán Online Polynomial Smooth (Bậc 2, Sliding Window 30 điểm)
+File code: [`tools/roi_tracking_online_poly_smooth.py`](tools/roi_tracking_online_poly_smooth.py)
+
+1. **Khởi tạo mảng thời gian chuẩn hóa $t$:**
+   ```python
+   # Pre-compute mảng mốc thời gian t thuộc [0.0, 1.0] cố định trong __init__
+   self.t_norm = np.linspace(0.0, 1.0, window_size)  # 30 điểm: [0, 1/29, ..., 29/29 = 1.0]
+   ```
+
+2. **Hồi quy Đa thức bậc 2 & Tính tọa độ điểm mượt mới nhất ($t = 1.0$):**
+   ```python
+   coeffs_x = np.polyfit(self.t_norm, x_seg, deg=2)
+   coeffs_y = np.polyfit(self.t_norm, y_seg, deg=2)
+
+   # Điểm mượt mới nhất tại frame thứ 30 ứng với t = 1.0
+   sx = float(np.polyval(coeffs_x, 1.0))
+   sy = float(np.polyval(coeffs_y, 1.0))
+   ```
+
+#### b) Thuật toán tính `smooth_angle` và Đổi hệ quy chiếu
+
+1. **Cách tính góc `smooth_angle`:**
+   - Khi Leanbot di chuyển trên sa bàn luôn có tính liên tục về động học, hình học quỹ đạo. Hướng chuyển động `smooth_angle` tại mỗi điểm là **vector tiếp tuyến nối 2 vị trí `smooth_point` liên tiếp**: $(sx_{i-1}, sy_{i-1})$ và $(sx_i, sy_i)$.
+   - Vector dịch chuyển smooth là :
+     $$\Delta x = sx_i - sx_{i-1}, \quad \Delta y_{image} = sy_i - sy_{i-1}$$
+
+2. **Chuyển đổi Hệ quy chiếu (Coordinate Transformation):**
+   - Trong hệ tọa độ ảnh OpenCV, gốc $(0,0)$ ở góc trên bên trái, trục $Y_{image}$ có chiều **tăng từ trên xuống dưới**.
+   - Trong khi đó, hệ tọa độ decaster chuẩn dùng cho `raw_angle` và hình học toán học có trục $Y_{cartesian}$ **tăng từ dưới lên trên**.
+   - **Cách chuyển đổi:** 
+     - Đổi dấu trục $Y$ từ hệ ảnh sang hệ decaster: $\Delta y_{cartesian} = -\Delta y_{image} = -(sy_i - sy_{i-1})$.
+     - Công thức tính góc smooth chuẩn decaster sẽ là:
+       $$\theta_{smooth} = \text{atan2}(-\Delta y_{image}, \Delta x) \times \frac{180}{\pi} \quad (\text{đơn vị: độ } [-180^\circ, 180^\circ])$$
+
+3. **Code trích dẫn trong file:** [`roi_tracking_online_poly_smooth.py`](tools/roi_tracking_online_poly_smooth.py)
+
+   ```python
+   # Tính vector dịch chuyển giữa 2 điểm mượt liên tiếp
+   dx = sx - prev_sx
+   dy = sy - prev_sy
+
+   # Dùng -dy để chuyển hệ tọa độ ảnh OpenCV (Y hướng xuống) -> Hệ tọa độ decaster (Y hướng lên)
+   if math.hypot(dx, dy) > 1e-5:
+       smooth_ang = math.degrees(math.atan2(-dy, dx))
+   else:
+       smooth_ang = self.smooth_angles[-1] if self.smooth_angles else 0.0
+   ```
+
+### 6.2. Đánh giá 5 đoạn 30 điểm ngẫu nhiên
+
+- Chọn ngẫu nhiên 5 đoạn 30 điểm từ file log [`3turn_polynomial_order2_length30.csv`](benchmark/3turn_polynomial_order2_length30.csv) để phân tích
+
+Lệnh chạy tạo đồ thị : 
+
+```bash
+python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30.csv --seed 42
+```
+
+#### Segment 1 — Frames `[279 .. 308]`
+![Random Segment 1](benchmark/3turn_polynomial_order2_length30_random_seg1.png)
+
+#### Segment 2 — Frames `[709 .. 738]`
+![Random Segment 2](benchmark/3turn_polynomial_order2_length30_random_seg2.png)
+
+#### Segment 3 — Frames `[769 .. 798]`
+![Random Segment 3](benchmark/3turn_polynomial_order2_length30_random_seg3.png)
+
+#### Segment 4 — Frames `[1024 .. 1053]`
+![Random Segment 4](benchmark/3turn_polynomial_order2_length30_random_seg4.png)
+
+#### Segment 5 — Frames `[1089 .. 1118]`
+
+![Random Segment 5](benchmark/3turn_polynomial_order2_length30_random_seg5.png)
+
+
 ## B. Khó khăn 
 - Không.
 

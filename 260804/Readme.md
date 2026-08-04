@@ -5,6 +5,8 @@
 - Thử giảm bậc đa thức xuống 2 và thử chạy Inference lại
 - Chuẩn hóa lại trục thời gian 
 - Tính và vẽ đồ thị Smooth angle so với Raw angle
+- Báo cáo chi tiết các phần tính toán 
+- Chọn ngẫu nhiên 5 đoạn 30 điểm và vẽ đồ thị smooth_angle và raw_angle
 ## 1. File Code sử dụng
 
 - [`tools/roi_tracking_online_poly_smooth.py`](tools/roi_tracking_online_poly_smooth.py): Tool thực hiện ROI Tracking kết hợp làm mượt đa thức Online dạng Sliding Window.

@@ -7,10 +7,9 @@
   - `smooth_angle` -> `smooth_angle_smooth`
 - Cập nhật biểu đồ để so sánh đồng thời bốn đường: Raw Angle, Smooth Angle, Raw Angle Smooth, Smooth Angle Smooth.
 - Chọn 5 đoạn ngẫu nhiên, mỗi đoạn 30 điểm từ log csv thử nghiệm Leanbot chạy 1 vòng và 3 vòng.
-- **Thử nghiệm nâng cao mới (Theo chỉ đạo từ Thầy Quang Định):**
-  - Thử nghiệm các mức cửa sổ trượt `SMOOTH_LENGTH` giảm từ `30` xuống **`24`** và **`18`** điểm.
-  - Thực hiện thuật toán **làm mịn vị trí 2 lần (Double Position Smoothing)**: $(raw\_x, raw\_y) \rightarrow (smooth\_x, smooth\_y) \rightarrow (smooth\_x2, smooth\_y2)$.
-  - Trích xuất góc tiếp tuyến từ tọa độ mượt 2 lần `smooth_angle2` và làm mượt tiếp thành `smooth_angle2_smooth`.
+- Thử nghiệm các mức cửa sổ trượt `SMOOTH_LENGTH` giảm từ `30` xuống **`24`** và **`18`** điểm.
+- Thực hiện thuật toán **làm mịn vị trí 2 lần (Double Position Smoothing)**: $(raw\_x, raw\_y) \rightarrow (smooth\_x, smooth\_y) \rightarrow (smooth\_x2, smooth\_y2)$.
+- Trích xuất góc tiếp tuyến từ tọa độ mượt 2 lần `smooth_angle2` và làm mượt tiếp thành `smooth_angle2_smooth`.
 
 ---
 

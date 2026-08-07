@@ -361,15 +361,6 @@ python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length18
 ![1 turn len18 seg4](benchmark/1turn_polynomial_order2_length18_random_seg4.png)
 ![1 turn len18 seg5](benchmark/1turn_polynomial_order2_length18_random_seg5.png)
 
-### 5.4. Đánh giá & Nhận xét so sánh
-
-1. **Ảnh hưởng của chiều dài cửa sổ trượt (`SMOOTH_LENGTH` = 30 vs 24 vs 18):**
-   - Khi giảm `SMOOTH_LENGTH` xuống 24 và 18 điểm, đường mượt phản ứng nhanh hơn với các biến đổi góc đột ngột ở khúc cua (giảm trễ pha).
-   - Độ mượt ở length = 24 đạt sự cân bằng tốt giữa tính mượt mà và khả năng đáp ứng nhanh ở các khúc ngoặt.
-
-2. **Hiệu quả của việc làm mịn vị trí 2 lần (Double Position Smoothing):**
-   - Đường `smooth_angle2_smooth` thu được từ vị trí mượt 2 lần $(smooth\_x2, smooth\_y2)$ triệt tiêu thêm các biến động răng cưa nhỏ còn sót lại của bước làm mượt 1 lần.
-   - Quỹ đạo $smooth\_x2, smooth\_y2$ liên tục và mịn hơn rõ rệt trên biểu đồ 2D.
 
 
 

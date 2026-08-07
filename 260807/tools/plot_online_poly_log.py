@@ -160,7 +160,13 @@ def plot_online_poly_log(csv_file: str, n_sample_segments: int = 3, poly_degree:
         smooth_angle_smooth = np.degrees(np.unwrap(np.radians(df['smooth_angle_smooth'])))
         if has_angle:
             smooth_angle_smooth = align_phase(smooth_angle_smooth, raw_unwrapped)
-        ax_ang.plot(df['frame_id'], smooth_angle_smooth, color='#9467bd', linewidth=2.0, linestyle='--', label='Smooth Angle Smooth (Poly)')
+        ax_ang.plot(df['frame_id'], smooth_angle_smooth, color='#9467bd', linewidth=1.8, linestyle='--', label='Smooth Angle Smooth (1st Pass)')
+
+    if 'smooth_angle2_smooth' in df.columns:
+        smooth_angle2_smooth = np.degrees(np.unwrap(np.radians(df['smooth_angle2_smooth'])))
+        if has_angle:
+            smooth_angle2_smooth = align_phase(smooth_angle2_smooth, raw_unwrapped)
+        ax_ang.plot(df['frame_id'], smooth_angle2_smooth, color='#e377c2', linewidth=2.0, linestyle=':', label='Smooth Angle2 Smooth (Double Pass)')
 
     ax_ang.set_ylabel('Degrees')
     ax_ang.grid(True, linestyle='--', alpha=0.7)

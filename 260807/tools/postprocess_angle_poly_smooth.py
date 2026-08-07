@@ -31,26 +31,51 @@ def resolve_raw_angle_column(dataframe):
     raise ValueError("CSV thi?u c?t raw angle: raw_angle, group1_angle ho?c angle.")
 
 
+def smooth_val_window(window, val, t_norm, poly_degree):
+    window.append(float(val))
+    if len(window) > len(t_norm):
+        window.pop(0)
+    if len(window) == len(t_norm):
+        coefficients = np.polyfit(t_norm, window, deg=poly_degree)
+        return float(np.polyval(coefficients, 1.0))
+    return float(val)
+
+
 def add_angle_smoothing(dataframe, window_size=SMOOTH_LENGTH, poly_degree=SMOOTH_ORDER):
     required_columns = {"smooth_x", "smooth_y"}
     missing_columns = required_columns.difference(dataframe.columns)
     if missing_columns:
-        raise ValueError(f"CSV thi?u c?t: {', '.join(sorted(missing_columns))}")
+        raise ValueError(f"CSV thiếu cột: {', '.join(sorted(missing_columns))}")
 
     output = dataframe.copy()
     raw_angle_column = resolve_raw_angle_column(output)
     raw_angle = output[raw_angle_column].astype(float)
     valid_mask = output["tracking_lost"].eq(0) if "tracking_lost" in output.columns else output["smooth_x"].notna() & output["smooth_y"].notna()
 
+    smooth_x2 = np.full(len(output), np.nan)
+    smooth_y2 = np.full(len(output), np.nan)
     smooth_angle = np.full(len(output), np.nan)
+    smooth_angle2 = np.full(len(output), np.nan)
     raw_angle_smooth = np.full(len(output), np.nan)
     smooth_angle_smooth = np.full(len(output), np.nan)
+    smooth_angle2_smooth = np.full(len(output), np.nan)
+
     t_norm = np.linspace(0.0, 1.0, window_size)
+    
+    smooth_x_window = []
+    smooth_y_window = []
     raw_angle_window = []
     smooth_angle_window_values = []
+    smooth_angle2_window_values = []
+
     previous_x = None
     previous_y = None
     previous_smooth_angle = 0.0
+
+    previous_x2 = None
+    previous_y2 = None
+    previous_smooth_angle2 = 0.0
+
     valid_count = 0
 
     for row_index in np.flatnonzero(valid_mask.to_numpy()):
@@ -58,6 +83,13 @@ def add_angle_smoothing(dataframe, window_size=SMOOTH_LENGTH, poly_degree=SMOOTH
         current_y = float(output.at[row_index, "smooth_y"])
         valid_count += 1
 
+        # Smooth position 2nd pass: (smooth_x, smooth_y) -> (smooth_x2, smooth_y2)
+        current_x2 = smooth_val_window(smooth_x_window, current_x, t_norm, poly_degree)
+        current_y2 = smooth_val_window(smooth_y_window, current_y, t_norm, poly_degree)
+        smooth_x2[row_index] = current_x2
+        smooth_y2[row_index] = current_y2
+
+        # 1st pass smooth_angle
         if previous_x is None:
             current_smooth_angle = 0.0
         else:
@@ -70,8 +102,23 @@ def add_angle_smoothing(dataframe, window_size=SMOOTH_LENGTH, poly_degree=SMOOTH
             else:
                 current_smooth_angle = 0.0
 
+        # 2nd pass smooth_angle2 (calculated from smooth_x2, smooth_y2)
+        if previous_x2 is None:
+            current_smooth_angle2 = 0.0
+        else:
+            delta_x2 = current_x2 - previous_x2
+            delta_y2 = current_y2 - previous_y2
+            if math.hypot(delta_x2, delta_y2) > 1e-5:
+                current_smooth_angle2 = math.degrees(math.atan2(-delta_y2, delta_x2))
+            elif valid_count >= window_size:
+                current_smooth_angle2 = previous_smooth_angle2
+            else:
+                current_smooth_angle2 = 0.0
+
         current_raw_angle = float(raw_angle.iloc[row_index])
         smooth_angle[row_index] = current_smooth_angle
+        smooth_angle2[row_index] = current_smooth_angle2
+
         raw_angle_smooth[row_index] = smooth_angle_window(raw_angle_window, current_raw_angle, t_norm, poly_degree)
         smooth_angle_smooth[row_index] = smooth_angle_window(
             smooth_angle_window_values,
@@ -79,18 +126,34 @@ def add_angle_smoothing(dataframe, window_size=SMOOTH_LENGTH, poly_degree=SMOOTH
             t_norm,
             poly_degree,
         )
+        smooth_angle2_smooth[row_index] = smooth_angle_window(
+            smooth_angle2_window_values,
+            current_smooth_angle2,
+            t_norm,
+            poly_degree,
+        )
+
         previous_x = current_x
         previous_y = current_y
         previous_smooth_angle = current_smooth_angle
 
+        previous_x2 = current_x2
+        previous_y2 = current_y2
+        previous_smooth_angle2 = current_smooth_angle2
+
+    output["smooth_x2"] = smooth_x2
+    output["smooth_y2"] = smooth_y2
     output["raw_angle"] = raw_angle
     output["raw_angle_smooth"] = raw_angle_smooth
     output["smooth_angle"] = smooth_angle
     output["smooth_angle_smooth"] = smooth_angle_smooth
+    output["smooth_angle2"] = smooth_angle2
+    output["smooth_angle2_smooth"] = smooth_angle2_smooth
 
-    angle_columns = ["raw_angle", "raw_angle_smooth", "smooth_angle", "smooth_angle_smooth"]
+    # Re-order columns nicely
+    cols_to_insert = ["smooth_x2", "smooth_y2", "raw_angle", "raw_angle_smooth", "smooth_angle", "smooth_angle_smooth", "smooth_angle2", "smooth_angle2_smooth"]
     insert_index = output.columns.get_loc("smooth_y") + 1
-    for column in angle_columns:
+    for column in cols_to_insert:
         values = output.pop(column)
         output.insert(insert_index, column, values)
         insert_index += 1

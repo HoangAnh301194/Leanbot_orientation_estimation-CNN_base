@@ -87,36 +87,45 @@ def plot_random_5segments(csv_file: str, num_segments: int = 5, seg_length: int 
         fig.suptitle(f'Random Segment {i+1} Zoom-in (Frames {frame_start} - {frame_end})\nFile: {csv_path.name}', fontsize=13, fontweight='bold')
 
         # ── Panel 1: 2D Trajectory Zoom-in (30 points) ──
-        # Smooth line & X markers
-        ax_traj.plot(seg['smooth_x'], seg['smooth_y'], color='#1f77b4', linewidth=1.8, label='Smooth Trajectory (Poly deg=2)', zorder=1)
-        ax_traj.scatter(seg['smooth_x'], seg['smooth_y'], color='#003366', s=25, marker='x', label='Smooth Points (X)', zorder=2)
+        # Smooth line & X markers (1st pass)
+        ax_traj.plot(seg['smooth_x'], seg['smooth_y'], color='#1f77b4', linewidth=1.5, label='Smooth Pos 1st Pass', zorder=1)
+        ax_traj.scatter(seg['smooth_x'], seg['smooth_y'], color='#003366', s=20, marker='x', label='Smooth 1st Points (X)', zorder=2)
+
+        if 'smooth_x2' in seg.columns and 'smooth_y2' in seg.columns:
+            ax_traj.plot(seg['smooth_x2'], seg['smooth_y2'], color='#2ca02c', linewidth=2.0, linestyle='-.', label='Smooth Pos 2nd Pass (Double)', zorder=3)
 
         # Raw line & O markers
-        ax_traj.plot(seg['x_center'], seg['y_center'], color='#d62728', linewidth=1.0, linestyle='--', alpha=0.65, label='Raw Trajectory', zorder=3)
-        ax_traj.scatter(seg['x_center'], seg['y_center'], color='#8b0000', s=15, marker='o', alpha=0.7, label='Raw Points (O)', zorder=4)
+        ax_traj.plot(seg['x_center'], seg['y_center'], color='#d62728', linewidth=1.0, linestyle='--', alpha=0.65, label='Raw Trajectory', zorder=4)
+        ax_traj.scatter(seg['x_center'], seg['y_center'], color='#8b0000', s=12, marker='o', alpha=0.7, label='Raw Points (O)', zorder=5)
 
         ax_traj.invert_yaxis()  # Image Y-axis upside down
-        ax_traj.set_title(f'2D Trajectory Zoom-in (30 points)', fontsize=11, fontweight='bold')
+        ax_traj.set_title(f'2D Trajectory Zoom-in ({seg_length} points)', fontsize=11, fontweight='bold')
         ax_traj.set_xlabel('X Center (px)')
         ax_traj.set_ylabel('Y Center (px)')
         ax_traj.grid(True, linestyle=':', alpha=0.6)
-        ax_traj.legend(loc='best', fontsize=9)
+        ax_traj.legend(loc='best', fontsize=8)
 
-        # Panel 2: Angle Comparison Zoom-in (4 đường angle)
+        # Panel 2: Angle Comparison Zoom-in
         ax_ang.plot(seg['frame_id'], raw_unwrapped, 'b.-', linewidth=1.0, markersize=4, alpha=0.4, label='Raw Angle')
-        ax_ang.plot(seg['frame_id'], smooth_unwrapped, 'x-', color='#ff7f00', linewidth=1.0, markersize=4, alpha=0.5, label='Smooth Angle')
+        ax_ang.plot(seg['frame_id'], smooth_unwrapped, 'x-', color='#ff7f00', linewidth=1.0, markersize=4, alpha=0.5, label='Smooth Angle (1st Pass)')
 
         if 'raw_angle_smooth' in seg.columns:
             raw_angle_smooth = np.degrees(np.unwrap(np.radians(seg['raw_angle_smooth'])))
             if ang_col:
                 raw_angle_smooth = align_phase(raw_angle_smooth, raw_unwrapped)
-            ax_ang.plot(seg['frame_id'], raw_angle_smooth, color='#2ca02c', linewidth=2.0, label='Raw Angle Smooth (Poly)')
+            ax_ang.plot(seg['frame_id'], raw_angle_smooth, color='#2ca02c', linewidth=1.8, label='Raw Angle Smooth')
 
         if 'smooth_angle_smooth' in seg.columns:
             smooth_angle_smooth = np.degrees(np.unwrap(np.radians(seg['smooth_angle_smooth'])))
             if ang_col:
                 smooth_angle_smooth = align_phase(smooth_angle_smooth, raw_unwrapped)
-            ax_ang.plot(seg['frame_id'], smooth_angle_smooth, color='#9467bd', linewidth=2.0, linestyle='--', label='Smooth Angle Smooth (Poly)')
+            ax_ang.plot(seg['frame_id'], smooth_angle_smooth, color='#9467bd', linewidth=1.8, linestyle='--', label='Smooth Angle Smooth (1st Pass)')
+
+        if 'smooth_angle2_smooth' in seg.columns:
+            smooth_angle2_smooth = np.degrees(np.unwrap(np.radians(seg['smooth_angle2_smooth'])))
+            if ang_col:
+                smooth_angle2_smooth = align_phase(smooth_angle2_smooth, raw_unwrapped)
+            ax_ang.plot(seg['frame_id'], smooth_angle2_smooth, color='#e377c2', linewidth=2.0, linestyle=':', label='Smooth Angle2 Smooth (Double Pass)')
 
         ax_ang.set_title('Heading Angle Zoom-in (4 Angles)', fontsize=11, fontweight='bold')
         ax_ang.set_xlabel('Frame ID')

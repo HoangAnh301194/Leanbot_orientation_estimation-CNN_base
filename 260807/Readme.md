@@ -7,6 +7,10 @@
   - `smooth_angle` -> `smooth_angle_smooth`
 - Cập nhật biểu đồ để so sánh đồng thời bốn đường: Raw Angle, Smooth Angle, Raw Angle Smooth, Smooth Angle Smooth.
 - Chọn 5 đoạn ngẫu nhiên, mỗi đoạn 30 điểm từ log csv thử nghiệm Leanbot chạy 1 vòng và 3 vòng.
+- **Thử nghiệm nâng cao mới (Theo chỉ đạo từ Thầy Quang Định):**
+  - Thử nghiệm các mức cửa sổ trượt `SMOOTH_LENGTH` giảm từ `30` xuống **`24`** và **`18`** điểm.
+  - Thực hiện thuật toán **làm mịn vị trí 2 lần (Double Position Smoothing)**: $(raw\_x, raw\_y) \rightarrow (smooth\_x, smooth\_y) \rightarrow (smooth\_x2, smooth\_y2)$.
+  - Trích xuất góc tiếp tuyến từ tọa độ mượt 2 lần `smooth_angle2` và làm mượt tiếp thành `smooth_angle2_smooth`.
 
 ---
 
@@ -101,50 +105,10 @@ python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30
 
 | Thí nghiệm | CSV gốc | Số frame | Frame ID | Tracking lost | CSV bốn angle |
 |---|---|---:|---|---:|---|
-| Leanbot chạy 1 vòng | [`benchmark/1turn.csv`](benchmark/1turn.csv) | 332 | 102-433 | 0 | [`benchmark/1turn_polynomial_order2_length30.csv`](benchmark/1turn_polynomial_order2_length30.csv) |
-| Leanbot chạy 2 vòng | [`benchmark/2turn.csv`](benchmark/2turn.csv) | 646 | 106-751 | 0 | [`benchmark/2turn_polynomial_order2_length30.csv`](benchmark/2turn_polynomial_order2_length30.csv) |
 | Leanbot chạy 3 vòng | [`benchmark/3turn.csv`](benchmark/3turn.csv) | 973 | 258-1230 | 0 | [`benchmark/3turn_polynomial_order2_length30.csv`](benchmark/3turn_polynomial_order2_length30.csv) |
+| Leanbot chạy 2 vòng | [`benchmark/2turn.csv`](benchmark/2turn.csv) | 646 | 106-751 | 0 | [`benchmark/2turn_polynomial_order2_length30.csv`](benchmark/2turn_polynomial_order2_length30.csv) |
+| Leanbot chạy 1 vòng | [`benchmark/1turn.csv`](benchmark/1turn.csv) | 332 | 102-433 | 0 | [`benchmark/1turn_polynomial_order2_length30.csv`](benchmark/1turn_polynomial_order2_length30.csv) |
 
-
-### Leanbot chạy 1 vòng
-
-![1 turn trajectory](benchmark/1turn_polynomial_order2_length30_2d_trajectory.png)
-
-![1 turn four angles](benchmark/1turn_polynomial_order2_length30_time_series.png)
-
-| Segment | Frame ID |
-|---|---|
-| 1 | 137-166 |
-| 2 | 182-211 |
-| 3 | 222-251 |
-| 4 | 257-286 |
-| 5 | 367-396 |
-
-![1 turn random segment 1](benchmark/1turn_polynomial_order2_length30_random_seg1.png)
-![1 turn random segment 2](benchmark/1turn_polynomial_order2_length30_random_seg2.png)
-![1 turn random segment 3](benchmark/1turn_polynomial_order2_length30_random_seg3.png)
-![1 turn random segment 4](benchmark/1turn_polynomial_order2_length30_random_seg4.png)
-![1 turn random segment 5](benchmark/1turn_polynomial_order2_length30_random_seg5.png)
-
-### Leanbot chạy 2 vòng
-
-![2 turn trajectory](benchmark/2turn_polynomial_order2_length30_2d_trajectory.png)
-
-![2 turn four angles](benchmark/2turn_polynomial_order2_length30_time_series.png)
-
-| Segment | Frame ID |
-|---|---|
-| 1 | 196-225 |
-| 2 | 286-315 |
-| 3 | 316-345 |
-| 4 | 371-400 |
-| 5 | 486-515 |
-
-![2 turn random segment 1](benchmark/2turn_polynomial_order2_length30_random_seg1.png)
-![2 turn random segment 2](benchmark/2turn_polynomial_order2_length30_random_seg2.png)
-![2 turn random segment 3](benchmark/2turn_polynomial_order2_length30_random_seg3.png)
-![2 turn random segment 4](benchmark/2turn_polynomial_order2_length30_random_seg4.png)
-![2 turn random segment 5](benchmark/2turn_polynomial_order2_length30_random_seg5.png)
 
 ### Leanbot chạy 3 vòng
 
@@ -166,10 +130,253 @@ python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30
 ![3 turn random segment 4](benchmark/3turn_polynomial_order2_length30_random_seg4.png)
 ![3 turn random segment 5](benchmark/3turn_polynomial_order2_length30_random_seg5.png)
 
+### Leanbot chạy 2 vòng
+
+![2 turn trajectory](benchmark/2turn_polynomial_order2_length30_2d_trajectory.png)
+
+![2 turn four angles](benchmark/2turn_polynomial_order2_length30_time_series.png)
+
+| Segment | Frame ID |
+|---|---|
+| 1 | 196-225 |
+| 2 | 286-315 |
+| 3 | 316-345 |
+| 4 | 371-400 |
+| 5 | 486-515 |
+
+![2 turn random segment 1](benchmark/2turn_polynomial_order2_length30_random_seg1.png)
+![2 turn random segment 2](benchmark/2turn_polynomial_order2_length30_random_seg2.png)
+![2 turn random segment 3](benchmark/2turn_polynomial_order2_length30_random_seg3.png)
+![2 turn random segment 4](benchmark/2turn_polynomial_order2_length30_random_seg4.png)
+![2 turn random segment 5](benchmark/2turn_polynomial_order2_length30_random_seg5.png)
+
+### Leanbot chạy 1 vòng
+
+![1 turn trajectory](benchmark/1turn_polynomial_order2_length30_2d_trajectory.png)
+
+![1 turn four angles](benchmark/1turn_polynomial_order2_length30_time_series.png)
+
+| Segment | Frame ID |
+|---|---|
+| 1 | 137-166 |
+| 2 | 182-211 |
+| 3 | 222-251 |
+| 4 | 257-286 |
+| 5 | 367-396 |
+
+![1 turn random segment 1](benchmark/1turn_polynomial_order2_length30_random_seg1.png)
+![1 turn random segment 2](benchmark/1turn_polynomial_order2_length30_random_seg2.png)
+![1 turn random segment 3](benchmark/1turn_polynomial_order2_length30_random_seg3.png)
+![1 turn random segment 4](benchmark/1turn_polynomial_order2_length30_random_seg4.png)
+![1 turn random segment 5](benchmark/1turn_polynomial_order2_length30_random_seg5.png)
+
+
+
+###
+
+---
+
+## 5. Thử giảm kích thước cửa sổ trượt từ 30 xuống 24, 18 điểm , vẽ biểu đồ đánh giá. 
+
+### 5.1. Các bước thực hiện `Double Position Smoothing` & `smooth_angle2`
+
+1. **Làm mịn vị trí Lần 1:**
+   $$(raw\_x, raw\_y) \xrightarrow{\text{Poly fit deg=2}} (smooth\_x, smooth\_y)$$
+2. **Làm mịn vị trí Lần 2 (Double Smooth):**
+   $$(smooth\_x, smooth\_y) \xrightarrow{\text{Poly fit deg=2}} (smooth\_x2, smooth\_y2)$$
+3. **Tính góc tiếp tuyến từ vị trí mượt 2 lần:**
+   $$\Delta x_2 = smooth\_x2_t - smooth\_x2_{t-1}, \quad \Delta y_2 = smooth\_y2_t - smooth\_y2_{t-1}$$
+   $$smooth\_angle2 = \text{math.degrees}\left(\text{math.atan2}(-\Delta y_2, \Delta x_2)\right)$$
+4. **Làm mịn góc tiếp tuyến 2 lần:**
+   $$smooth\_angle2 \xrightarrow{\text{Poly fit deg=2}} smooth\_angle2\_smooth$$
+
+### 5.2. Lệnh chạy 
+
+#### a) Thử nghiệm với Cửa sổ trượt Length = 30 (Có Double Position Smoothing)
+
+* **Bước 1: Hậu xử lý CSV (Double Position Smoothing & Window Length = 30)**
+```powershell
+python tools/postprocess_angle_poly_smooth.py benchmark/3turn.csv benchmark/2turn.csv benchmark/1turn.csv --window 30 --suffix _polynomial_order2_length30.csv
+```
+
+* **Bước 2: Vẽ đồ thị tổng hợp cho Length = 30**
+```powershell
+python tools/plot_online_poly_log.py benchmark/3turn_polynomial_order2_length30.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/2turn_polynomial_order2_length30.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/1turn_polynomial_order2_length30.csv --degree 2
+```
+
+* **Bước 3: Trích xuất 5 segment ngẫu nhiên cho Length = 30**
+```powershell
+python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30.csv --num 5 --seed 123
+python tools/plot_random_5segments.py benchmark/2turn_polynomial_order2_length30.csv --num 5 --seed 42
+python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length30.csv --num 5 --seed 99
+```
+
+#### b) Thử nghiệm với Cửa sổ trượt Length = 24
+
+* **Bước 1: Hậu xử lý CSV (Double Position Smoothing & Window Length = 24)**
+```powershell
+python tools/postprocess_angle_poly_smooth.py benchmark/3turn.csv benchmark/2turn.csv benchmark/1turn.csv --window 24 --suffix _polynomial_order2_length24.csv
+```
+
+* **Bước 2: Vẽ đồ thị tổng hợp cho Length = 24**
+```powershell
+python tools/plot_online_poly_log.py benchmark/3turn_polynomial_order2_length24.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/2turn_polynomial_order2_length24.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/1turn_polynomial_order2_length24.csv --degree 2
+```
+
+* **Bước 3: Trích xuất 5 segment ngẫu nhiên cho Length = 24**
+```powershell
+python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length24.csv --num 5 --seed 123
+python tools/plot_random_5segments.py benchmark/2turn_polynomial_order2_length24.csv --num 5 --seed 42
+python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length24.csv --num 5 --seed 99
+```
+
+#### c) Thử nghiệm với Cửa sổ trượt Length = 18
+
+* **Bước 1: Hậu xử lý CSV (Double Position Smoothing & Window Length = 18)**
+```powershell
+python tools/postprocess_angle_poly_smooth.py benchmark/3turn.csv benchmark/2turn.csv benchmark/1turn.csv --window 18 --suffix _polynomial_order2_length18.csv
+```
+
+* **Bước 2: Vẽ đồ thị tổng hợp cho Length = 18**
+```powershell
+python tools/plot_online_poly_log.py benchmark/3turn_polynomial_order2_length18.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/2turn_polynomial_order2_length18.csv --degree 2
+python tools/plot_online_poly_log.py benchmark/1turn_polynomial_order2_length18.csv --degree 2
+```
+
+* **Bước 3: Trích xuất 5 segment ngẫu nhiên cho Length = 18**
+```powershell
+python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length18.csv --num 5 --seed 123
+python tools/plot_random_5segments.py benchmark/2turn_polynomial_order2_length18.csv --num 5 --seed 42
+python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length18.csv --num 5 --seed 99
+```
+
+### 5.3. Kết quả so sánh các mức Cửa sổ trượt (30 vs 24 vs 18) & Double Smoothing
+
+#### a) Thử nghiệm với Cửa sổ trượt Length = 30 (Double Position Smoothing & Đồ thị 5 đường Angle)
+
+##### Leanbot chạy 3 vòng (Length = 30)
+
+![3 turn trajectory length 30](benchmark/3turn_polynomial_order2_length30_2d_trajectory.png)
+![3 turn five angles length 30](benchmark/3turn_polynomial_order2_length30_time_series.png)
+
+![3 turn len30 seg1](benchmark/3turn_polynomial_order2_length30_random_seg1.png)
+![3 turn len30 seg2](benchmark/3turn_polynomial_order2_length30_random_seg2.png)
+![3 turn len30 seg3](benchmark/3turn_polynomial_order2_length30_random_seg3.png)
+![3 turn len30 seg4](benchmark/3turn_polynomial_order2_length30_random_seg4.png)
+![3 turn len30 seg5](benchmark/3turn_polynomial_order2_length30_random_seg5.png)
+
+##### Leanbot chạy 2 vòng (Length = 30)
+
+![2 turn trajectory length 30](benchmark/2turn_polynomial_order2_length30_2d_trajectory.png)
+![2 turn five angles length 30](benchmark/2turn_polynomial_order2_length30_time_series.png)
+
+![2 turn len30 seg1](benchmark/2turn_polynomial_order2_length30_random_seg1.png)
+![2 turn len30 seg2](benchmark/2turn_polynomial_order2_length30_random_seg2.png)
+![2 turn len30 seg3](benchmark/2turn_polynomial_order2_length30_random_seg3.png)
+![2 turn len30 seg4](benchmark/2turn_polynomial_order2_length30_random_seg4.png)
+![2 turn len30 seg5](benchmark/2turn_polynomial_order2_length30_random_seg5.png)
+
+##### Leanbot chạy 1 vòng (Length = 30)
+
+![1 turn trajectory length 30](benchmark/1turn_polynomial_order2_length30_2d_trajectory.png)
+![1 turn five angles length 30](benchmark/1turn_polynomial_order2_length30_time_series.png)
+
+![1 turn len30 seg1](benchmark/1turn_polynomial_order2_length30_random_seg1.png)
+![1 turn len30 seg2](benchmark/1turn_polynomial_order2_length30_random_seg2.png)
+![1 turn len30 seg3](benchmark/1turn_polynomial_order2_length30_random_seg3.png)
+![1 turn len30 seg4](benchmark/1turn_polynomial_order2_length30_random_seg4.png)
+![1 turn len30 seg5](benchmark/1turn_polynomial_order2_length30_random_seg5.png)
+
+#### b) Thử nghiệm với Cửa sổ trượt Length = 24 (Double Position Smoothing & Đồ thị 5 đường Angle)
+
+##### Leanbot chạy 3 vòng (Length = 24)
+
+![3 turn trajectory length 24](benchmark/3turn_polynomial_order2_length24_2d_trajectory.png)
+![3 turn five angles length 24](benchmark/3turn_polynomial_order2_length24_time_series.png)
+
+![3 turn len24 seg1](benchmark/3turn_polynomial_order2_length24_random_seg1.png)
+![3 turn len24 seg2](benchmark/3turn_polynomial_order2_length24_random_seg2.png)
+![3 turn len24 seg3](benchmark/3turn_polynomial_order2_length24_random_seg3.png)
+![3 turn len24 seg4](benchmark/3turn_polynomial_order2_length24_random_seg4.png)
+![3 turn len24 seg5](benchmark/3turn_polynomial_order2_length24_random_seg5.png)
+
+##### Leanbot chạy 2 vòng (Length = 24)
+
+![2 turn trajectory length 24](benchmark/2turn_polynomial_order2_length24_2d_trajectory.png)
+![2 turn five angles length 24](benchmark/2turn_polynomial_order2_length24_time_series.png)
+
+![2 turn len24 seg1](benchmark/2turn_polynomial_order2_length24_random_seg1.png)
+![2 turn len24 seg2](benchmark/2turn_polynomial_order2_length24_random_seg2.png)
+![2 turn len24 seg3](benchmark/2turn_polynomial_order2_length24_random_seg3.png)
+![2 turn len24 seg4](benchmark/2turn_polynomial_order2_length24_random_seg4.png)
+![2 turn len24 seg5](benchmark/2turn_polynomial_order2_length24_random_seg5.png)
+
+##### Leanbot chạy 1 vòng (Length = 24)
+
+![1 turn trajectory length 24](benchmark/1turn_polynomial_order2_length24_2d_trajectory.png)
+![1 turn five angles length 24](benchmark/1turn_polynomial_order2_length24_time_series.png)
+
+![1 turn len24 seg1](benchmark/1turn_polynomial_order2_length24_random_seg1.png)
+![1 turn len24 seg2](benchmark/1turn_polynomial_order2_length24_random_seg2.png)
+![1 turn len24 seg3](benchmark/1turn_polynomial_order2_length24_random_seg3.png)
+![1 turn len24 seg4](benchmark/1turn_polynomial_order2_length24_random_seg4.png)
+![1 turn len24 seg5](benchmark/1turn_polynomial_order2_length24_random_seg5.png)
+
+#### c) Thử nghiệm với Cửa sổ trượt Length = 18 (Double Position Smoothing & Đồ thị 5 đường Angle)
+
+##### Leanbot chạy 3 vòng (Length = 18)
+
+![3 turn trajectory length 18](benchmark/3turn_polynomial_order2_length18_2d_trajectory.png)
+![3 turn five angles length 18](benchmark/3turn_polynomial_order2_length18_time_series.png)
+
+![3 turn len18 seg1](benchmark/3turn_polynomial_order2_length18_random_seg1.png)
+![3 turn len18 seg2](benchmark/3turn_polynomial_order2_length18_random_seg2.png)
+![3 turn len18 seg3](benchmark/3turn_polynomial_order2_length18_random_seg3.png)
+![3 turn len18 seg4](benchmark/3turn_polynomial_order2_length18_random_seg4.png)
+![3 turn len18 seg5](benchmark/3turn_polynomial_order2_length18_random_seg5.png)
+
+##### Leanbot chạy 2 vòng (Length = 18)
+
+![2 turn trajectory length 18](benchmark/2turn_polynomial_order2_length18_2d_trajectory.png)
+![2 turn five angles length 18](benchmark/2turn_polynomial_order2_length18_time_series.png)
+
+![2 turn len18 seg1](benchmark/2turn_polynomial_order2_length18_random_seg1.png)
+![2 turn len18 seg2](benchmark/2turn_polynomial_order2_length18_random_seg2.png)
+![2 turn len18 seg3](benchmark/2turn_polynomial_order2_length18_random_seg3.png)
+![2 turn len18 seg4](benchmark/2turn_polynomial_order2_length18_random_seg4.png)
+![2 turn len18 seg5](benchmark/2turn_polynomial_order2_length18_random_seg5.png)
+
+##### Leanbot chạy 1 vòng (Length = 18)
+
+![1 turn trajectory length 18](benchmark/1turn_polynomial_order2_length18_2d_trajectory.png)
+![1 turn five angles length 18](benchmark/1turn_polynomial_order2_length18_time_series.png)
+
+![1 turn len18 seg1](benchmark/1turn_polynomial_order2_length18_random_seg1.png)
+![1 turn len18 seg2](benchmark/1turn_polynomial_order2_length18_random_seg2.png)
+![1 turn len18 seg3](benchmark/1turn_polynomial_order2_length18_random_seg3.png)
+![1 turn len18 seg4](benchmark/1turn_polynomial_order2_length18_random_seg4.png)
+![1 turn len18 seg5](benchmark/1turn_polynomial_order2_length18_random_seg5.png)
+
+### 5.4. Đánh giá & Nhận xét so sánh
+
+1. **Ảnh hưởng của chiều dài cửa sổ trượt (`SMOOTH_LENGTH` = 30 vs 24 vs 18):**
+   - Khi giảm `SMOOTH_LENGTH` xuống 24 và 18 điểm, đường mượt phản ứng nhanh hơn với các biến đổi góc đột ngột ở khúc cua (giảm trễ pha).
+   - Độ mượt ở length = 24 đạt sự cân bằng tốt giữa tính mượt mà và khả năng đáp ứng nhanh ở các khúc ngoặt.
+
+2. **Hiệu quả của việc làm mịn vị trí 2 lần (Double Position Smoothing):**
+   - Đường `smooth_angle2_smooth` thu được từ vị trí mượt 2 lần $(smooth\_x2, smooth\_y2)$ triệt tiêu thêm các biến động răng cưa nhỏ còn sót lại của bước làm mượt 1 lần.
+   - Quỹ đạo $smooth\_x2, smooth\_y2$ liên tục và mịn hơn rõ rệt trên biểu đồ 2D.
+
+
 
 ## B. Khó khăn 
-
-- Không.
-
+- Em thưa Thầy. Việc làm mượt dữ liệu này thì đạt kết quả như thế nào thì mới có thể chấp nhận được và chuyển sang bước tiếp theo ạ ? 
+- Hiện tại em vẫn chưa rõ mục tiêu cần thực hiện là smooth dữ liệu góc, hay smooth quỹ đạo chuyển động ạ ? nếu chỉ để giảm nhiễu , spike đột ngột thì em nghĩ EMA cũng có thể đáp ứng được rồi ạ . 
 ## C. Công việc tiếp theo 
-- Em xin phép nhận công việc tiếp theo từ Thầy ạ .
+- Em sẽ tìm hiểu thêm các phương pháp khác trong bài toán làm mượt dữ liệu ạ .
+- Em xin phép nhận công việc tiếp theo từ Thầy để em thực hiện và báo cáo vào buổi lên Lab ngày mai ạ .

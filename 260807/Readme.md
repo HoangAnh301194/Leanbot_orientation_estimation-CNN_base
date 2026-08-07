@@ -5,7 +5,6 @@
 - Bổ sung polynomial smooth bậc 2, cửa sổ trượt 30 điểm cho hai chuỗi angle:
   - `raw_angle` -> `raw_angle_smooth`
   - `smooth_angle` -> `smooth_angle_smooth`
-- Bổ sung cột `raw_angle` cho CSV log mới. Giá trị này là alias của `group1_angle`.
 - Cập nhật biểu đồ để so sánh đồng thời bốn đường: Raw Angle, Smooth Angle, Raw Angle Smooth, Smooth Angle Smooth.
 - Chọn 5 đoạn ngẫu nhiên, mỗi đoạn 30 điểm từ log csv thử nghiệm Leanbot chạy 1 vòng và 3 vòng.
 

@@ -88,7 +88,7 @@ python tools/plot_online_poly_log.py benchmark/3turn_polynomial_order2_length30.
 ### Vẽ năm segment ngẫu nhiên
 
 ```powershell
-python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length30.csv --num 5 --seed 42
+python tools/plot_random_5segments.py benchmark/1turn_polynomial_order2_length30.csv --num 5 --seed 99
 python tools/plot_random_5segments.py benchmark/2turn_polynomial_order2_length30.csv --num 5 --seed 42
 python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30.csv --num 5 --seed 123
 ```
@@ -114,11 +114,11 @@ python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length30
 
 | Segment | Frame ID |
 |---|---|
-| 1 | 102-131 |
-| 2 | 167-196 |
-| 3 | 257-286 |
-| 4 | 332-361 |
-| 5 | 377-406 |
+| 1 | 137-166 |
+| 2 | 182-211 |
+| 3 | 222-251 |
+| 4 | 257-286 |
+| 5 | 367-396 |
 
 ![1 turn random segment 1](benchmark/1turn_polynomial_order2_length30_random_seg1.png)
 ![1 turn random segment 2](benchmark/1turn_polynomial_order2_length30_random_seg2.png)

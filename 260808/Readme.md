@@ -183,7 +183,7 @@ python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length18
 Mô hình xử lý dữ liệu chuẩn **Online Stream** (tại thời điểm $t$ chỉ dùng điểm dữ liệu hiện tại và trạng thái quá khứ $t-1$, không dùng dữ liệu tương lai $t+1, t+2, \dots$):
 
 #### a. Đối với dữ liệu Quỹ đạo 2D $(x, y)$:
-Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu trượt 30 điểm:
+Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu 30 điểm:
 
 $$S_{x, t} = \alpha \cdot x_t + (1 - \alpha) \cdot S_{x, t-1}$$
 

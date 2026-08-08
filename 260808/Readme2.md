@@ -1,4 +1,4 @@
-# Báo cáo nghiên cứu Lab ngày 08/08/2026 (Phiên bản Thử nghiệm Tinh gọn EMA)
+# Báo cáo nghiên cứu Lab ngày 08/08/2026 (Tiếp theo)
 
 ## A. Công việc đã làm 
 - Vẽ lại đồ thị góc và quỹ đạo: loại bỏ các đường smooth 1st, smooth 2nd và các đường EMA alpha = 0.1, 0.3.

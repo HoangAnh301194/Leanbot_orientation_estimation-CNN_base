@@ -96,6 +96,7 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
 
     # 1. Compute EMA streams for alphas 0.5, 0.7, 0.9
     for a in alphas:
+        # 1st Pass: EMA on coordinates & Raw Angle
         smoother = OnlineEMASmoother(alpha=a)
         ema_x, ema_y, ema_ang = [], [], []
         for _, row in valid_df.iterrows():
@@ -111,7 +112,7 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
         valid_df[f'ema_y_a{a}'] = ema_y
         valid_df[f'ema_angle_a{a}'] = ema_ang
 
-        # Compute Tangent Angle from EMA Trajectory (atan2(-dy, dx))
+        # Tangent Angle computed from EMA Trajectory (atan2(-dy, dx))
         dx = valid_df[f'ema_x_a{a}'].diff()
         dy = valid_df[f'ema_y_a{a}'].diff()
         ema_traj_ang = np.degrees(np.arctan2(-dy, dx))
@@ -119,16 +120,24 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
         ema_traj_ang = ema_traj_ang.bfill().ffill()
         valid_df[f'ema_traj_angle_a{a}'] = ema_traj_ang
 
+        # 2nd Pass: EMA Smooth on Trajectory Tangent Angle using matching alpha
+        smoother_angle = OnlineEMASmoother(alpha=a)
+        ema_smooth_traj_ang = []
+        for ang in valid_df[f'ema_traj_angle_a{a}']:
+            _, _, sang = smoother_angle.update(0, 0, float(ang))
+            ema_smooth_traj_ang.append(sang)
+        valid_df[f'ema_smooth_traj_angle_a{a}'] = ema_smooth_traj_ang
+
     out_dir = csv_path.parent
     base_name = csv_path.stem.split('_polynomial_order2_length')[0]
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 2. Đồ thị Quỹ đạo 2D (Chỉ gồm Raw + EMA Trajectory 0.5, 0.7, 0.9 - Tất cả nét liền '-')
+    # SECTION 3 IMAGES: SELECTIVE EMA (Raw + EMA Vector Angle + EMA Traj Angle)
     # ─────────────────────────────────────────────────────────────────────────
+    # 2D Trajectory
     fig_traj, ax_traj = plt.subplots(figsize=(10, 8), dpi=150)
     ax_traj.plot(valid_df['x_center'], valid_df['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.6, label='Raw Trajectory (O)', zorder=1)
     ax_traj.scatter(valid_df['x_center'], valid_df['y_center'], color='#8b0000', s=12, marker='o', alpha=0.8, zorder=2)
-
     for a in alphas:
         ax_traj.plot(valid_df[f'ema_x_a{a}'], valid_df[f'ema_y_a{a}'], color=alpha_colors[a], linewidth=1.8, linestyle='-', label=f'EMA Trajectory (alpha={a})', zorder=5)
 
@@ -143,21 +152,16 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
     out_traj_img = out_dir / f"{base_name}_ema_selective_2d_trajectory.png"
     fig_traj.savefig(out_traj_img, dpi=150)
     plt.close(fig_traj)
-    print(f"[SUCCESS] Đã lưu đồ thị quỹ đạo 2D selective tại: {out_traj_img}")
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # 3. Đồ thị Chuỗi Thời gian Góc (Tất cả đường dùng nét liền '-')
-    # ─────────────────────────────────────────────────────────────────────────
+    # Time Series (Section 3)
     fig_time, ax_ang = plt.subplots(figsize=(13, 7), dpi=150)
     raw_unwrapped = np.degrees(np.unwrap(np.radians(valid_df[ang_col])))
     ax_ang.plot(valid_df['frame_id'], raw_unwrapped, color='#8b0000', linewidth=2.5, linestyle='-', alpha=1.0, label='Raw Angle (Model)', zorder=10)
 
-    # 1. Vectorized EMA Angle (Solid line '-')
     for a in alphas:
         ema_ang_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(valid_df[f'ema_angle_a{a}']))) , raw_unwrapped)
         ax_ang.plot(valid_df['frame_id'], ema_ang_unwrapped, color=alpha_colors[a], linewidth=1.8, linestyle='-', label=f'EMA Vector Angle (alpha={a})')
 
-    # 2. Tangent Angle computed from EMA Trajectory (Solid line '-')
     for a in alphas:
         ema_traj_ang_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(valid_df[f'ema_traj_angle_a{a}']))) , raw_unwrapped)
         ax_ang.plot(valid_df['frame_id'], ema_traj_ang_unwrapped, color=traj_angle_colors[a], linewidth=1.6, linestyle='-', label=f'EMA Traj Tangent Angle (alpha={a})')
@@ -172,10 +176,51 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
     out_time_img = out_dir / f"{base_name}_ema_selective_time_series.png"
     fig_time.savefig(out_time_img, dpi=150)
     plt.close(fig_time)
-    print(f"[SUCCESS] Đã lưu đồ thị chuỗi thời gian góc selective tại: {out_time_img}")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 4. Trích xuất 3 Đoạn Zoom-in 30 điểm (Tất cả đường dùng nét liền '-')
+    # SECTION 4 IMAGES: DOUBLE SMOOTH (Hide Vector Angle, Show EMA Smooth Traj Angle)
+    # ─────────────────────────────────────────────────────────────────────────
+    # 2D Trajectory for Section 4
+    fig_traj4, ax_traj4 = plt.subplots(figsize=(10, 8), dpi=150)
+    ax_traj4.plot(valid_df['x_center'], valid_df['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.6, label='Raw Trajectory (O)', zorder=1)
+    ax_traj4.scatter(valid_df['x_center'], valid_df['y_center'], color='#8b0000', s=12, marker='o', alpha=0.8, zorder=2)
+    for a in alphas:
+        ax_traj4.plot(valid_df[f'ema_x_a{a}'], valid_df[f'ema_y_a{a}'], color=alpha_colors[a], linewidth=1.8, linestyle='-', label=f'EMA Trajectory (alpha={a})', zorder=5)
+
+    ax_traj4.invert_yaxis()
+    ax_traj4.set_title(f'2D Trajectory - Raw vs EMA Trajectory (alpha = 0.5, 0.7, 0.9)\nFile: {csv_path.name}', fontsize=14, fontweight='bold')
+    ax_traj4.set_xlabel('X Center (px)')
+    ax_traj4.set_ylabel('Y Center (px)')
+    ax_traj4.grid(True, linestyle=':', alpha=0.5)
+    ax_traj4.legend(loc='best')
+    plt.tight_layout()
+
+    out_traj4_img = out_dir / f"{base_name}_ema_double_smooth_2d_trajectory.png"
+    fig_traj4.savefig(out_traj4_img, dpi=150)
+    plt.close(fig_traj4)
+
+    # Time Series for Section 4 (HIDDEN EMA Vector Angle, SHOWING EMA Smooth Traj Angle)
+    fig_time4, ax_ang4 = plt.subplots(figsize=(13, 7), dpi=150)
+    ax_ang4.plot(valid_df['frame_id'], raw_unwrapped, color='#8b0000', linewidth=2.5, linestyle='-', alpha=1.0, label='Raw Angle (Model)', zorder=10)
+
+    # Show 2nd Pass EMA Smooth Trajectory Tangent Angle
+    for a in alphas:
+        ema_smooth_traj_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(valid_df[f'ema_smooth_traj_angle_a{a}']))) , raw_unwrapped)
+        ax_ang4.plot(valid_df['frame_id'], ema_smooth_traj_unwrapped, color=traj_angle_colors[a], linewidth=1.8, linestyle='-', label=f'EMA Smooth Traj Angle (alpha={a})')
+
+    ax_ang4.set_title(f'Heading Angle Time-Series - Raw Angle vs EMA Smooth Traj Angle (alpha = 0.5, 0.7, 0.9)\nFile: {csv_path.name}', fontsize=14, fontweight='bold')
+    ax_ang4.set_xlabel('Frame ID')
+    ax_ang4.set_ylabel('Degrees (Unwrapped)')
+    ax_ang4.grid(True, linestyle='--', alpha=0.6)
+    ax_ang4.legend(loc='best', fontsize=8)
+    plt.tight_layout()
+
+    out_time4_img = out_dir / f"{base_name}_ema_double_smooth_time_series.png"
+    fig_time4.savefig(out_time4_img, dpi=150)
+    plt.close(fig_time4)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Random Segments (Both Section 3 and Section 4)
     # ─────────────────────────────────────────────────────────────────────────
     n_points = len(valid_df)
     if n_points >= seg_length:
@@ -197,13 +242,12 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
             frame_start = int(seg['frame_id'].iloc[0])
             frame_end = int(seg['frame_id'].iloc[-1])
 
+            # Segment plot for Section 3
             fig_seg, (ax_st, ax_sa) = plt.subplots(1, 2, figsize=(16, 6.5), dpi=150)
             fig_seg.suptitle(f'Random Segment {idx_seg+1} Zoom-in ({seg_length} points: Frames {frame_start}-{frame_end})\nFile: {csv_path.name}', fontsize=13, fontweight='bold')
 
-            # Trajectory Zoom-in (Raw + EMA 0.5, 0.7, 0.9 - Solid lines '-')
             ax_st.plot(seg['x_center'], seg['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.7, label='Raw Trajectory (O)', zorder=1)
             ax_st.scatter(seg['x_center'], seg['y_center'], color='#8b0000', s=16, marker='o', alpha=0.8, zorder=2)
-
             for a in alphas:
                 ax_st.plot(seg[f'ema_x_a{a}'], seg[f'ema_y_a{a}'], color=alpha_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Trajectory (alpha={a})', zorder=5)
 
@@ -214,14 +258,11 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
             ax_st.grid(True, linestyle=':', alpha=0.6)
             ax_st.legend(loc='best', fontsize=8)
 
-            # Angle Zoom-in (Solid lines '-' for all angles)
             seg_raw_unwrapped = np.degrees(np.unwrap(np.radians(seg[ang_col])))
             ax_sa.plot(seg['frame_id'], seg_raw_unwrapped, color='#8b0000', linewidth=2.5, linestyle='-', alpha=1.0, label='Raw Angle (Model)', zorder=10)
-
             for a in alphas:
                 seg_ema_ang_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(seg[f'ema_angle_a{a}']))) , seg_raw_unwrapped)
                 ax_sa.plot(seg['frame_id'], seg_ema_ang_unwrapped, color=alpha_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Vector Angle (alpha={a})')
-
             for a in alphas:
                 seg_ema_traj_ang_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(seg[f'ema_traj_angle_a{a}']))) , seg_raw_unwrapped)
                 ax_sa.plot(seg['frame_id'], seg_ema_traj_ang_unwrapped, color=traj_angle_colors[a], linewidth=1.6, linestyle='-', label=f'EMA Traj Tangent Angle (alpha={a})')
@@ -231,16 +272,49 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
             ax_sa.set_ylabel('Degrees')
             ax_sa.grid(True, linestyle='--', alpha=0.6)
             ax_sa.legend(loc='best', fontsize=8)
-
             plt.tight_layout()
+
             out_seg_img = out_dir / f"{base_name}_ema_selective_seg{idx_seg+1}.png"
             fig_seg.savefig(out_seg_img, dpi=150)
             plt.close(fig_seg)
-            print(f"   --> Đã lưu đồ thị segment {idx_seg+1} selective tại: {out_seg_img}")
+
+            # Segment plot for Section 4 (HIDDEN Vector Angle, SHOWING 2nd pass EMA Smooth Traj Angle)
+            fig_seg4, (ax_st4, ax_sa4) = plt.subplots(1, 2, figsize=(16, 6.5), dpi=150)
+            fig_seg4.suptitle(f'Random Segment {idx_seg+1} Zoom-in (Frames {frame_start}-{frame_end}) - Double Smooth Trajectory Angle\nFile: {csv_path.name}', fontsize=13, fontweight='bold')
+
+            ax_st4.plot(seg['x_center'], seg['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.7, label='Raw Trajectory (O)', zorder=1)
+            ax_st4.scatter(seg['x_center'], seg['y_center'], color='#8b0000', s=16, marker='o', alpha=0.8, zorder=2)
+            for a in alphas:
+                ax_st4.plot(seg[f'ema_x_a{a}'], seg[f'ema_y_a{a}'], color=alpha_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Trajectory (alpha={a})', zorder=5)
+
+            ax_st4.invert_yaxis()
+            ax_st4.set_title(f'2D Trajectory Zoom-in ({seg_length} pts)', fontsize=11, fontweight='bold')
+            ax_st4.set_xlabel('X Center (px)')
+            ax_st4.set_ylabel('Y Center (px)')
+            ax_st4.grid(True, linestyle=':', alpha=0.6)
+            ax_st4.legend(loc='best', fontsize=8)
+
+            ax_sa4.plot(seg['frame_id'], seg_raw_unwrapped, color='#8b0000', linewidth=2.5, linestyle='-', alpha=1.0, label='Raw Angle (Model)', zorder=10)
+            for a in alphas:
+                seg_ema_smooth_traj_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(seg[f'ema_smooth_traj_angle_a{a}']))) , seg_raw_unwrapped)
+                ax_sa4.plot(seg['frame_id'], seg_ema_smooth_traj_unwrapped, color=traj_angle_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Smooth Traj Angle (alpha={a})')
+
+            ax_sa4.set_title(f'Heading Angle Zoom-in (Double Smooth Tangent Angle)', fontsize=11, fontweight='bold')
+            ax_sa4.set_xlabel('Frame ID')
+            ax_sa4.set_ylabel('Degrees')
+            ax_sa4.grid(True, linestyle='--', alpha=0.6)
+            ax_sa4.legend(loc='best', fontsize=8)
+            plt.tight_layout()
+
+            out_seg4_img = out_dir / f"{base_name}_ema_double_smooth_seg{idx_seg+1}.png"
+            fig_seg4.savefig(out_seg4_img, dpi=150)
+            plt.close(fig_seg4)
+
+    print(f"[SUCCESS] Đã lưu thành công bộ đồ thị Section 3 & Section 4 cho file {csv_path.name}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Selective EMA Plotting (Raw vs EMA 0.5, 0.7, 0.9 with Solid Lines)")
+    parser = argparse.ArgumentParser(description="Selective & Double Smooth EMA Plotting")
     parser.add_argument("csv_file", type=str, help="Path to input benchmark CSV file")
     parser.add_argument("--seg-len", type=int, default=30, help="Segment length (default 30)")
     parser.add_argument("--num-segs", type=int, default=3, help="Number of random segments (default 3)")

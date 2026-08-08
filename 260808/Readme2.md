@@ -4,6 +4,8 @@
 - Vẽ lại đồ thị góc và quỹ đạo: loại bỏ các đường smooth 1st, smooth 2nd và các đường EMA alpha = 0.1, 0.3.
 - Chỉ giữ lại dữ liệu gốc **Raw** và các đường **EMA với hệ số alpha = 0.5, 0.7, 0.9**.
 - Bổ sung đường biểu đồ góc tiếp tuyến được tính trực tiếp từ tọa độ mượt EMA của quỹ đạo.
+- **Tạm thời ẩn đường mượt `EMA Vector Angle` của raw_angle.**
+- **Thực hiện làm mượt EMA Lần 2 trên đường góc tiếp tuyến tính từ các đường mượt EMA quỹ đạo với hệ số alpha đồng bộ tương ứng.**
 
 ---
 
@@ -95,6 +97,53 @@ python tools/plot_ema_clean.py benchmark/3turn_polynomial_order2_length30.csv --
 ![1turn EMA Selective Seg 1](benchmark/1turn_ema_selective_seg1.png)
 ![1turn EMA Selective Seg 2](benchmark/1turn_ema_selective_seg2.png)
 ![1turn EMA Selective Seg 3](benchmark/1turn_ema_selective_seg3.png)
+
+---
+
+## 4. Thử nghiệm Smooth EMA Lần 2 trên Góc Tiếp tuyến (Tạm thời Ẩn EMA Vector Angle)
+
+### 4.1. Đặc điểm Thử nghiệm
+- **Tạm thời ẩn đường mượt góc `EMA Vector Angle`** (đường mượt trực tiếp từ raw_angle của model).
+- **Giữ đường `Raw Angle (Model)`** (đường màu đỏ đậm `linewidth=2.5`).
+- **Thực hiện Smooth EMA Lần 2 trên Góc Tiếp tuyến Quỹ đạo (`EMA Smooth Traj Angle`):**
+  - **Lần 1:** Làm mượt tọa độ (x, y) bằng EMA với hệ số alpha = 0.5, 0.7, 0.9 thu được tọa độ mượt (Sx_t, Sy_t).
+  - **Tính góc tiếp tuyến:** `traj_angle = atan2(-(Sy_t - Sy_{t-1}), Sx_t - Sx_{t-1})`.
+  - **Lần 2:** Áp dụng tiếp EMA làm mượt trên chuỗi góc tiếp tuyến này theo phương pháp Vector hóa (sin, cos) với đúng **hệ số alpha đồng bộ tương ứng** (0.5, 0.7, 0.9).
+
+---
+
+### 4.2. Biểu đồ Thử nghiệm (Section 4)
+
+#### a) Leanbot chạy 3 vòng (`3turn`)
+![3turn Double Smooth Trajectory](benchmark/3turn_ema_double_smooth_2d_trajectory.png)
+![3turn Double Smooth Time Series](benchmark/3turn_ema_double_smooth_time_series.png)
+
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Smooth Traj Angle):
+![3turn Double Smooth Seg 1](benchmark/3turn_ema_double_smooth_seg1.png)
+![3turn Double Smooth Seg 2](benchmark/3turn_ema_double_smooth_seg2.png)
+![3turn Double Smooth Seg 3](benchmark/3turn_ema_double_smooth_seg3.png)
+
+---
+
+#### b) Leanbot chạy 2 vòng (`2turn`)
+![2turn Double Smooth Trajectory](benchmark/2turn_ema_double_smooth_2d_trajectory.png)
+![2turn Double Smooth Time Series](benchmark/2turn_ema_double_smooth_time_series.png)
+
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Smooth Traj Angle):
+![2turn Double Smooth Seg 1](benchmark/2turn_ema_double_smooth_seg1.png)
+![2turn Double Smooth Seg 2](benchmark/2turn_ema_double_smooth_seg2.png)
+![2turn Double Smooth Seg 3](benchmark/2turn_ema_double_smooth_seg3.png)
+
+---
+
+#### c) Leanbot chạy 1 vòng (`1turn`)
+![1turn Double Smooth Trajectory](benchmark/1turn_ema_double_smooth_2d_trajectory.png)
+![1turn Double Smooth Time Series](benchmark/1turn_ema_double_smooth_time_series.png)
+
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Smooth Traj Angle):
+![1turn Double Smooth Seg 1](benchmark/1turn_ema_double_smooth_seg1.png)
+![1turn Double Smooth Seg 2](benchmark/1turn_ema_double_smooth_seg2.png)
+![1turn Double Smooth Seg 3](benchmark/1turn_ema_double_smooth_seg3.png)
 
 ---
 

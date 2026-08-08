@@ -185,7 +185,9 @@ Mô hình xử lý dữ liệu chuẩn **Online Stream** (tại thời điểm $
 #### a. Đối với dữ liệu Quỹ đạo 2D $(x, y)$:
 Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu trượt 30 điểm:
 $$S_{x, t} = \alpha \cdot x_t + (1 - \alpha) \cdot S_{x, t-1}$$
+
 $$S_{y, t} = \alpha \cdot y_t + (1 - \alpha) \cdot S_{y, t-1}$$
+
 với $S_{x, 0} = x_0$, $S_{y, 0} = y_0$ và hệ số làm mượt $\alpha \in \{0.1, 0.3, 0.5, 0.7, 0.9\}$.
 
 #### b. Đối với dữ liệu Góc (Angle Vectorization):

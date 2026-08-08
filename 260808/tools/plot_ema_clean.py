@@ -84,19 +84,19 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
     # ONLY ALPHAS 0.5, 0.7, 0.9
     alphas = [0.5, 0.7, 0.9]
 
-    # Distinct High-Contrast Color Palette per Alpha Family:
-    # - Alpha 0.5: Tím đậm (Smoothed) & Tím/Hồng nhạt (Unsmoothed Traj Angle)
-    # - Alpha 0.7: Xanh lá đậm (Smoothed) & Xanh lá nhạt (Unsmoothed Traj Angle)
-    # - Alpha 0.9: Cam đậm (Smoothed) & Vàng/Cam nhạt (Unsmoothed Traj Angle)
+    # Deep, Matte, High-Contrast Color Palette per Alpha Family:
+    # - Alpha 0.5: Tím đậm (Smoothed) & Tím/Hồng dịu (Unsmoothed Traj Angle)
+    # - Alpha 0.7: Xanh lá cây mờ/đậm (Smoothed) & Xanh lá nhạt dịu (Unsmoothed Traj Angle)
+    # - Alpha 0.9: Xanh Ngọc Teal đậm mờ (Smoothed) & Xanh Ngọc nhạt dịu (Unsmoothed Traj Angle)
     alpha_colors = {
         0.5: '#9467bd', # Deep Purple
         0.7: '#2ca02c', # Emerald Green
-        0.9: '#ff7f0e'  # Vibrant Dark Orange
+        0.9: '#0e7490'  # Deep Matte Teal (Khôn bị chói, dịu mắt, tương phản cao)
     }
     traj_angle_colors = {
-        0.5: '#e8a5e8', # Light Pink/Purple (Same purple family as alpha 0.5)
-        0.7: '#8cd98c', # Light Mint Green (Same green family as alpha 0.7)
-        0.9: '#ffc299'  # Light Peach/Orange (Same orange family as alpha 0.9)
+        0.5: '#e8a5e8', # Soft Pink/Purple
+        0.7: '#8cd98c', # Soft Mint Green
+        0.9: '#82c0c7'  # Soft Light Teal
     }
 
     # 1. Compute EMA streams for alphas 0.5, 0.7, 0.9
@@ -182,7 +182,7 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
     plt.close(fig_time)
 
     # ─────────────────────────────────────────────────────────────────────────
-    # SECTION 4 IMAGES: DOUBLE SMOOTH (High Contrast Color Palette: Purple, Green, Orange)
+    # SECTION 4 IMAGES: DOUBLE SMOOTH (Teal 0.9, Green 0.7, Purple 0.5)
     # ─────────────────────────────────────────────────────────────────────────
     fig_traj4, ax_traj4 = plt.subplots(figsize=(10, 8), dpi=150)
     ax_traj4.plot(valid_df['x_center'], valid_df['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.6, label='Raw Trajectory (O)', zorder=1)
@@ -203,18 +203,15 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
     plt.close(fig_traj4)
 
     # Time Series for Section 4:
-    # - Same Alpha shares SAME color family (Purple, Green, Orange):
-    #   * Dark Tone: EMA Smooth Traj Angle (2nd pass smoothed)
-    #   * Light Tone: EMA Traj Angle (1st pass unsmoothed)
     fig_time4, ax_ang4 = plt.subplots(figsize=(13, 7), dpi=150)
     ax_ang4.plot(valid_df['frame_id'], raw_unwrapped, color='#8b0000', linewidth=2.5, linestyle='-', alpha=1.0, label='Raw Angle (Model)', zorder=10)
 
-    # 1st Pass Tangent Angle (Unsmoothed Traj Angle - Light Tone of the Alpha Color Family)
+    # 1st Pass Tangent Angle (Light tone of alpha color family)
     for a in alphas:
         ema_traj_ang_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(valid_df[f'ema_traj_angle_a{a}']))) , raw_unwrapped)
         ax_ang4.plot(valid_df['frame_id'], ema_traj_ang_unwrapped, color=traj_angle_colors[a], linewidth=1.4, linestyle='-', label=f'EMA Traj Angle (Raw alpha={a})')
 
-    # 2nd Pass EMA Smooth Trajectory Tangent Angle (Smoothed Traj Angle - Dark Tone of the Alpha Color Family)
+    # 2nd Pass EMA Smooth Tangent Angle (Dark tone of alpha color family)
     for a in alphas:
         ema_smooth_traj_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(valid_df[f'ema_smooth_traj_angle_a{a}']))) , raw_unwrapped)
         ax_ang4.plot(valid_df['frame_id'], ema_smooth_traj_unwrapped, color=alpha_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Smooth Traj Angle (alpha={a})')
@@ -289,9 +286,9 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
             fig_seg.savefig(out_seg_img, dpi=150)
             plt.close(fig_seg)
 
-            # Segment plot for Section 4 (High Contrast Alpha Color Families: Purple, Green, Orange)
+            # Segment plot for Section 4 (Matte Deep Colors: Purple 0.5, Green 0.7, Teal 0.9)
             fig_seg4, (ax_st4, ax_sa4) = plt.subplots(1, 2, figsize=(16, 6.5), dpi=150)
-            fig_seg4.suptitle(f'Random Segment {idx_seg+1} Zoom-in (Frames {frame_start}-{frame_end}) - High Contrast Color Families\nFile: {csv_path.name}', fontsize=13, fontweight='bold')
+            fig_seg4.suptitle(f'Random Segment {idx_seg+1} Zoom-in (Frames {frame_start}-{frame_end}) - Matte Deep Color Palette\nFile: {csv_path.name}', fontsize=13, fontweight='bold')
 
             ax_st4.plot(seg['x_center'], seg['y_center'], color='#d62728', linewidth=1.2, linestyle='-', alpha=0.7, label='Raw Trajectory (O)', zorder=1)
             ax_st4.scatter(seg['x_center'], seg['y_center'], color='#8b0000', s=16, marker='o', alpha=0.8, zorder=2)
@@ -317,7 +314,7 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
                 seg_ema_smooth_traj_unwrapped = align_phase(np.degrees(np.unwrap(np.radians(seg[f'ema_smooth_traj_angle_a{a}']))) , seg_raw_unwrapped)
                 ax_sa4.plot(seg['frame_id'], seg_ema_smooth_traj_unwrapped, color=alpha_colors[a], linewidth=2.0, linestyle='-', label=f'EMA Smooth Traj Angle (alpha={a})')
 
-            ax_sa4.set_title(f'Heading Angle Zoom-in (Alpha Families: Purple 0.5, Green 0.7, Orange 0.9)', fontsize=11, fontweight='bold')
+            ax_sa4.set_title(f'Heading Angle Zoom-in (Alpha Families: Purple 0.5, Green 0.7, Teal 0.9)', fontsize=11, fontweight='bold')
             ax_sa4.set_xlabel('Frame ID')
             ax_sa4.set_ylabel('Degrees')
             ax_sa4.grid(True, linestyle='--', alpha=0.6)
@@ -328,11 +325,11 @@ def run_clean_ema_experiments(csv_file: str, seg_length: int = 30, num_segments:
             fig_seg4.savefig(out_seg4_img, dpi=150)
             plt.close(fig_seg4)
 
-    print(f"[SUCCESS] Đã lưu thành công bộ đồ thị Section 3 & Section 4 với các trường màu đối lập (Tím, Xanh lá, Cam) cho file {csv_path.name}")
+    print(f"[SUCCESS] Đã lưu thành công bộ đồ thị Section 3 & Section 4 với bảng màu dịu mắt (Tím, Xanh lá, Xanh Ngọc Teal) cho file {csv_path.name}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Selective & Double Smooth EMA Plotting with High Contrast Color Palette")
+    parser = argparse.ArgumentParser(description="Selective & Double Smooth EMA Plotting with Deep Matte Color Palette")
     parser.add_argument("csv_file", type=str, help="Path to input benchmark CSV file")
     parser.add_argument("--seg-len", type=int, default=30, help="Segment length (default 30)")
     parser.add_argument("--num-segs", type=int, default=3, help="Number of random segments (default 3)")

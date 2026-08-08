@@ -5,7 +5,8 @@
 - Chỉ giữ lại dữ liệu gốc **Raw** và các đường **EMA với hệ số alpha = 0.5, 0.7, 0.9**.
 - Bổ sung đường biểu đồ góc tiếp tuyến được tính trực tiếp từ tọa độ mượt EMA của quỹ đạo.
 - Tạm thời ẩn đường mượt `EMA Angle` của raw_angle.
-- Thực hiện làm mượt EMA Lần 2 trên đường góc tiếp tuyến tính từ các đường mượt EMA quỹ đạo với hệ số alpha đồng bộ tương ứng (giữ nguyên đường góc tiếp tuyến trước khi mượt Lần 2 để so sánh).
+- Thực hiện làm mượt EMA Lần 2 trên đường góc tiếp tuyến tính từ các đường mượt EMA quỹ đạo với hệ số alpha đồng bộ tương ứng.
+- **Chuẩn hóa trường màu đồng bộ theo từng hệ số alpha:** Cùng 1 mức alpha sẽ dùng chung 1 họ màu (Tông đậm = Đã mượt Lần 2; Tông nhạt = Chưa mượt Lần 2).
 
 ---
 
@@ -104,13 +105,16 @@ python tools/plot_ema_clean.py benchmark/3turn_polynomial_order2_length30.csv --
 
 ### 4.1. Biểu đồ Smooth EMA Lần 2 trên Góc Tiếp tuyến Quỹ đạo
 
-Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến trước khi mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến sau khi mượt Lần 2 (`EMA Smooth Traj Angle`)** đối với các hệ số alpha = 0.5, 0.7, 0.9.
+Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến chưa mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến đã mượt Lần 2 (`EMA Smooth Traj Angle`)** với **trường màu đồng bộ cho từng hệ số alpha**:
+- **Alpha = 0.5 (Trường màu Tím):** `EMA Traj Angle` (Tím/Hồng nhạt), `EMA Smooth Traj Angle` (Tím đậm).
+- **Alpha = 0.7 (Trường màu Xanh lá):** `EMA Traj Angle` (Xanh lá nhạt), `EMA Smooth Traj Angle` (Xanh lá đậm).
+- **Alpha = 0.9 (Trường màu Xanh lam):** `EMA Traj Angle` (Xanh lam nhạt), `EMA Smooth Traj Angle` (Xanh lam đậm).
 
 #### a) Leanbot chạy 3 vòng (`3turn`)
 ![3turn Double Smooth Trajectory](benchmark/3turn_ema_double_smooth_2d_trajectory.png)
 ![3turn Double Smooth Time Series](benchmark/3turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Traj Angle vs EMA Smooth Traj Angle):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
 ![3turn Double Smooth Seg 1](benchmark/3turn_ema_double_smooth_seg1.png)
 ![3turn Double Smooth Seg 2](benchmark/3turn_ema_double_smooth_seg2.png)
 ![3turn Double Smooth Seg 3](benchmark/3turn_ema_double_smooth_seg3.png)
@@ -121,7 +125,7 @@ Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angl
 ![2turn Double Smooth Trajectory](benchmark/2turn_ema_double_smooth_2d_trajectory.png)
 ![2turn Double Smooth Time Series](benchmark/2turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Traj Angle vs EMA Smooth Traj Angle):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
 ![2turn Double Smooth Seg 1](benchmark/2turn_ema_double_smooth_seg1.png)
 ![2turn Double Smooth Seg 2](benchmark/2turn_ema_double_smooth_seg2.png)
 ![2turn Double Smooth Seg 3](benchmark/2turn_ema_double_smooth_seg3.png)
@@ -132,7 +136,7 @@ Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angl
 ![1turn Double Smooth Trajectory](benchmark/1turn_ema_double_smooth_2d_trajectory.png)
 ![1turn Double Smooth Time Series](benchmark/1turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Raw Angle vs EMA Traj Angle vs EMA Smooth Traj Angle):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
 ![1turn Double Smooth Seg 1](benchmark/1turn_ema_double_smooth_seg1.png)
 ![1turn Double Smooth Seg 2](benchmark/1turn_ema_double_smooth_seg2.png)
 ![1turn Double Smooth Seg 3](benchmark/1turn_ema_double_smooth_seg3.png)

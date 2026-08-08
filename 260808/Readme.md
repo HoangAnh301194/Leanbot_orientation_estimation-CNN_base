@@ -184,6 +184,7 @@ Mô hình xử lý dữ liệu chuẩn **Online Stream** (tại thời điểm $
 
 #### a. Đối với dữ liệu Quỹ đạo 2D $(x, y)$:
 Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu trượt 30 điểm:
+
 $$S_{x, t} = \alpha \cdot x_t + (1 - \alpha) \cdot S_{x, t-1}$$
 
 $$S_{y, t} = \alpha \cdot y_t + (1 - \alpha) \cdot S_{y, t-1}$$
@@ -192,12 +193,18 @@ với $S_{x, 0} = x_0$, $S_{y, 0} = y_0$ và hệ số làm mượt $\alpha \in 
 
 #### b. Đối với dữ liệu Góc (Angle Vectorization):
 Để tránh góc khi tới biên bị giật, gãy khi xoay qua mốc $\pm 180^\circ$,cần áp dụng phương pháp **Vector hóa lượng giác $(\sin \theta, \cos \theta)$**:
+
 1. Chuyển góc $\theta_t$ thành 2 thành phần lượng giác:
+
    $$v_{\sin, t} = \sin(\theta_t), \quad v_{\cos, t} = \cos(\theta_t)$$
 2. Áp dụng EMA trên từng thành phần vector:
+
    $$S_{\sin, t} = \alpha \cdot v_{\sin, t} + (1 - \alpha) \cdot S_{\sin, t-1}$$
+
    $$S_{\cos, t} = \alpha \cdot v_{\cos, t} + (1 - \alpha) \cdot S_{\cos, t-1}$$
+
 3. Khôi phục góc mượt bằng hàm $\text{atan2}$:
+
    $$\theta_{\text{EMA}, t} = \text{math.degrees}\left(\text{atan2}(S_{\sin, t}, S_{\cos, t})\right)$$
 
 ---

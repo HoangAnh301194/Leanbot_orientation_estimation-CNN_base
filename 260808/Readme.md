@@ -3,15 +3,15 @@
 ## A. Công việc đã làm 
 
 - **Trả lời câu hỏi của Thầy:**
-  - Xác nhận tham số `SMOOTH_LENGTH` (mặc định 30 điểm) đang được dùng chung cho cả lần smooth 1 ($raw \rightarrow smooth$) và lần smooth 2 ($smooth \rightarrow smooth2$).
+  - Xác nhận tham số `SMOOTH_LENGTH` (mặc định 30 điểm) đang được dùng chung cho cả lần smooth 1 (raw -> smooth) và lần smooth 2 (smooth -> smooth2).
 - **Chỉnh sửa & Chuẩn hóa lại hiển thị Đồ thị Quỹ đạo 2D & Đồ thị Góc (Angle):**
   - **Raw Trajectory:** Dùng màu đỏ (`#d62728`), marker điểm tròn `o`, nét vẽ nối liền (`-`).
   - **Smooth 1st Pass:** Dùng màu xanh dương (`#1f77b4`), marker hình chữ `x`, nét vẽ nối liền (`-`).
   - **Smooth 2nd Pass:** Dùng màu xanh lá (`#2ca02c`), marker hình dấu cộng `+`, nét vẽ nối liền (`-`).
   - **Tất cả các đường Góc (Angle):** Đều được chuyển sang hiển thị bằng nét vẽ nối liền (`-`) đồng nhất.
 - **Khảo sát & Thử nghiệm phương pháp làm mượt quỹ đạo bằng EMA (Exponential Moving Average):**
-  - Thử công thức EMA làm mượt $(x, y)$:
-    $$S_t = \alpha \cdot X_t + (1 - \alpha) \cdot S_{t-1}$$
+  - Thử công thức EMA làm mượt (x, y).
+
 ---
 
 ## 1. File Code đã chỉnh sửa
@@ -180,32 +180,29 @@ python tools/plot_random_5segments.py benchmark/3turn_polynomial_order2_length18
 
 ### 5.1. Cách thức thực hiện EMA
 
-Mô hình xử lý dữ liệu chuẩn **Online Stream** (tại thời điểm $t$ chỉ dùng điểm dữ liệu hiện tại và trạng thái quá khứ $t-1$, không dùng dữ liệu tương lai $t+1, t+2, \dots$):
+Mô hình xử lý dữ liệu chuẩn **Online Stream** (tại thời điểm t chỉ dùng điểm dữ liệu hiện tại và trạng thái quá khứ t-1, không dùng dữ liệu tương lai t+1, t+2,...):
 
-#### a. Đối với dữ liệu Quỹ đạo 2D $(x, y)$:
-Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu 30 điểm:
+#### a. Đối với dữ liệu Quỹ đạo 2D (x, y):
+Áp dụng công thức EMA độc lập trên 2 trục tọa độ với cửa sổ dữ liệu 30 điểm và hệ số alpha = 0.1, 0.3, 0.5, 0.7, 0.9:
 
-$$S_{x, t} = \alpha \cdot x_t + (1 - \alpha) \cdot S_{x, t-1}$$
-
-$$S_{y, t} = \alpha \cdot y_t + (1 - \alpha) \cdot S_{y, t-1}$$
-
-với $S_{x, 0} = x_0$, $S_{y, 0} = y_0$ và hệ số làm mượt $\alpha \in \{0.1, 0.3, 0.5, 0.7, 0.9\}$.
+<p align="center">
+  <img src="formulas/formula_ema_xy_dark.png#gh-dark-mode-only" alt="Công thức EMA Tọa độ 2D" height="75" />
+  <img src="formulas/formula_ema_xy_light.png#gh-light-mode-only" alt="Công thức EMA Tọa độ 2D" height="75" />
+</p>
 
 #### b. Đối với dữ liệu Góc (Angle Vectorization):
-Để tránh góc khi tới biên bị giật, gãy khi xoay qua mốc $\pm 180^\circ$,cần áp dụng phương pháp **Vector hóa lượng giác $(\sin \theta, \cos \theta)$**:
+Để tránh góc khi tới biên bị giật, gãy khi xoay qua mốc 180 độ, cần áp dụng phương pháp **Vector hóa lượng giác (sin θ, cos θ)**:
 
-1. Chuyển góc $\theta_t$ thành 2 thành phần lượng giác:
-
-   $$v_{\sin, t} = \sin(\theta_t), \quad v_{\cos, t} = \cos(\theta_t)$$
-2. Áp dụng EMA trên từng thành phần vector:
-
-   $$S_{\sin, t} = \alpha \cdot v_{\sin, t} + (1 - \alpha) \cdot S_{\sin, t-1}$$
-
-   $$S_{\cos, t} = \alpha \cdot v_{\cos, t} + (1 - \alpha) \cdot S_{\cos, t-1}$$
-
-3. Khôi phục góc mượt bằng hàm $\text{atan2}$:
-
-   $$\theta_{\text{EMA}, t} = \text{math.degrees}\left(\text{atan2}(S_{\sin, t}, S_{\cos, t})\right)$$
+<p align="center">
+  <img src="formulas/formula_ema_vector_trig_dark.png#gh-dark-mode-only" alt="Vector hóa lượng giác" height="65" />
+  <img src="formulas/formula_ema_vector_trig_light.png#gh-light-mode-only" alt="Vector hóa lượng giác" height="65" />
+  <br/>
+  <img src="formulas/formula_ema_vector_smooth_dark.png#gh-dark-mode-only" alt="Làm mượt vector EMA" height="65" />
+  <img src="formulas/formula_ema_vector_smooth_light.png#gh-light-mode-only" alt="Làm mượt vector EMA" height="65" />
+  <br/>
+  <img src="formulas/formula_ema_vector_atan_dark.png#gh-dark-mode-only" alt="Khôi phục góc mượt atan2" height="65" />
+  <img src="formulas/formula_ema_vector_atan_light.png#gh-light-mode-only" alt="Khôi phục góc mượt atan2" height="65" />
+</p>
 
 ---
 
@@ -276,4 +273,4 @@ python tools/plot_ema_experiments.py benchmark/3turn_polynomial_order2_length30.
 - Không 
 
 ## C. Công việc tiếp theo
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.

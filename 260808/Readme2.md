@@ -6,7 +6,7 @@
 - Bổ sung đường biểu đồ góc tiếp tuyến được tính trực tiếp từ tọa độ mượt EMA của quỹ đạo.
 - Tạm thời ẩn đường mượt `EMA Angle` của raw_angle.
 - Thực hiện làm mượt EMA Lần 2 trên đường góc tiếp tuyến tính từ các đường mượt EMA quỹ đạo với hệ số alpha đồng bộ tương ứng.
-- **Chuẩn hóa trường màu đồng bộ theo từng hệ số alpha:** Cùng 1 mức alpha sẽ dùng chung 1 họ màu (Tông đậm = Đã mượt Lần 2; Tông nhạt = Chưa mượt Lần 2).
+- **Tối ưu bảng màu đối lập cao (High Contrast Color Palette):** Sử dụng 3 họ màu phân biệt rõ rệt **Tím ($\alpha=0.5$), Xanh lá ($\alpha=0.7$), Cam ($\alpha=0.9$)** giúp dễ quan sát và không bị nhầm lẫn giữa các đường.
 
 ---
 
@@ -105,10 +105,10 @@ python tools/plot_ema_clean.py benchmark/3turn_polynomial_order2_length30.csv --
 
 ### 4.1. Biểu đồ Smooth EMA Lần 2 trên Góc Tiếp tuyến Quỹ đạo
 
-Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến chưa mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến đã mượt Lần 2 (`EMA Smooth Traj Angle`)** với **trường màu đồng bộ cho từng hệ số alpha**:
-- **Alpha = 0.5 (Trường màu Tím):** `EMA Traj Angle` (Tím/Hồng nhạt), `EMA Smooth Traj Angle` (Tím đậm).
-- **Alpha = 0.7 (Trường màu Xanh lá):** `EMA Traj Angle` (Xanh lá nhạt), `EMA Smooth Traj Angle` (Xanh lá đậm).
-- **Alpha = 0.9 (Trường màu Xanh lam):** `EMA Traj Angle` (Xanh lam nhạt), `EMA Smooth Traj Angle` (Xanh lam đậm).
+Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến chưa mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến đã mượt Lần 2 (`EMA Smooth Traj Angle`)** với **bảng màu đối lập rõ rệt cho từng hệ số alpha**:
+- **Alpha = 0.5 (Trường màu Tím):** `EMA Traj Angle` (Tím/Hồng nhạt `#e8a5e8`), `EMA Smooth Traj Angle` (Tím đậm `#9467bd`).
+- **Alpha = 0.7 (Trường màu Xanh lá):** `EMA Traj Angle` (Xanh lá nhạt `#8cd98c`), `EMA Smooth Traj Angle` (Xanh lá đậm `#2ca02c`).
+- **Alpha = 0.9 (Trường màu Cam):** `EMA Traj Angle` (Cam/Vàng nhạt `#ffc299`), `EMA Smooth Traj Angle` (Cam đậm `#ff7f0e`).
 
 #### a) Leanbot chạy 3 vòng (`3turn`)
 ![3turn Double Smooth Trajectory](benchmark/3turn_ema_double_smooth_2d_trajectory.png)

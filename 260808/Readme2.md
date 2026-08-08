@@ -2,16 +2,15 @@
 
 ## A. Công việc đã làm 
 - Vẽ lại đồ thị góc và quỹ đạo: loại bỏ các đường smooth 1st, smooth 2nd và các đường EMA alpha = 0.1, 0.3.
-- Chỉ giữ lại dữ liệu gốc **Raw** và các đường **EMA với hệ số $\alpha \in \{0.5, 0.7, 0.9\}$**.
+- Chỉ giữ lại dữ liệu gốc **Raw** và các đường **EMA với hệ số alpha = 0.5, 0.7, 0.9**.
 - Bổ sung đường biểu đồ góc tiếp tuyến được tính trực tiếp từ tọa độ mượt EMA của quỹ đạo.
-
 
 ---
 
 ## 1. Phương pháp thực hiện
 
 ### a. Làm mượt Quỹ đạo 2D (x, y) bằng EMA
-Áp dụng công thức EMA độc lập trên 2 trục tọa độ với $\alpha \in \{0.5, 0.7, 0.9\}$:
+Áp dụng công thức EMA độc lập trên 2 trục tọa độ với hệ số alpha = 0.5, 0.7, 0.9:
 
 <p align="center">
   <img src="formulas/formula_ema_xy_dark.png#gh-dark-mode-only" alt="Công thức EMA Tọa độ 2D" height="75" />
@@ -33,7 +32,7 @@
 </p>
 
 ### c. Tính Góc Tiếp tuyến Quỹ đạo từ Tọa độ mượt EMA (EMA Trajectory Angle)
-Dựa trên vector dịch chuyển giữa 2 điểm tọa độ mượt EMA liên tiếp $(S_{x, t}, S_{y, t})$ và $(S_{x, t-1}, S_{y, t-1})$:
+Dựa trên vector dịch chuyển giữa 2 điểm tọa độ mượt EMA liên tiếp (Sx_t, Sy_t) và (Sx_{t-1}, Sy_{t-1}):
 
 <p align="center">
   <img src="formulas/formula_ema_traj_diff_dark.png#gh-dark-mode-only" alt="Vector dịch chuyển mượt" height="65" />

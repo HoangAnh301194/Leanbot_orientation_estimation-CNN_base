@@ -6,7 +6,6 @@
 - Bổ sung đường biểu đồ góc tiếp tuyến được tính trực tiếp từ tọa độ mượt EMA của quỹ đạo.
 - Tạm thời ẩn đường mượt `EMA Angle` của raw_angle.
 - Thực hiện làm mượt EMA Lần 2 trên đường góc tiếp tuyến tính từ các đường mượt EMA quỹ đạo với hệ số alpha đồng bộ tương ứng.
-- **Tối ưu bảng màu sâu dịu mắt (Deep Matte Palette):** Sử dụng 3 họ màu phân biệt rõ rệt **Tím ($\alpha=0.5$), Xanh lá ($\alpha=0.7$), Xanh Ngọc Teal ($\alpha=0.9$)** – giúp màu sắc dịu mắt, không bị chói phản xạ và cực kỳ dễ quan sát.
 
 ---
 
@@ -101,20 +100,16 @@ python tools/plot_ema_clean.py benchmark/3turn_polynomial_order2_length30.csv --
 
 ---
 
-## 4. Thử nghiệm Smooth EMA Lần 2 trên Góc Tiếp tuyến (Tạm thời Ẩn EMA Vector Angle)
-
+## 4. Thử nghiệm Smooth EMA Lần 2 trên Góc Tiếp tuyến 
 ### 4.1. Biểu đồ Smooth EMA Lần 2 trên Góc Tiếp tuyến Quỹ đạo
 
-Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến chưa mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến đã mượt Lần 2 (`EMA Smooth Traj Angle`)** với **bảng màu dịu mắt, tương phản rõ rệt**:
-- **Alpha = 0.5 (Trường màu Tím):** `EMA Traj Angle` (Tím/Hồng nhạt `#e8a5e8`), `EMA Smooth Traj Angle` (Tím đậm `#9467bd`).
-- **Alpha = 0.7 (Trường màu Xanh lá):** `EMA Traj Angle` (Xanh lá nhạt `#8cd98c`), `EMA Smooth Traj Angle` (Xanh lá đậm `#2ca02c`).
-- **Alpha = 0.9 (Trường màu Xanh Ngọc Teal):** `EMA Traj Angle` (Xanh Ngọc nhạt `#82c0c7`), `EMA Smooth Traj Angle` (Xanh Ngọc Teal đậm `#0e7490`).
+Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angle của model. So sánh đường **Raw Angle (Model)** với **Góc tiếp tuyến chưa mượt Lần 2 (`EMA Traj Angle`)** và **Góc tiếp tuyến đã mượt Lần 2 (`EMA Smooth Traj Angle`)** : 
 
 #### a) Leanbot chạy 3 vòng (`3turn`)
 ![3turn Double Smooth Trajectory](benchmark/3turn_ema_double_smooth_2d_trajectory.png)
 ![3turn Double Smooth Time Series](benchmark/3turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên:
 ![3turn Double Smooth Seg 1](benchmark/3turn_ema_double_smooth_seg1.png)
 ![3turn Double Smooth Seg 2](benchmark/3turn_ema_double_smooth_seg2.png)
 ![3turn Double Smooth Seg 3](benchmark/3turn_ema_double_smooth_seg3.png)
@@ -125,7 +120,8 @@ Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angl
 ![2turn Double Smooth Trajectory](benchmark/2turn_ema_double_smooth_2d_trajectory.png)
 ![2turn Double Smooth Time Series](benchmark/2turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên
+
 ![2turn Double Smooth Seg 1](benchmark/2turn_ema_double_smooth_seg1.png)
 ![2turn Double Smooth Seg 2](benchmark/2turn_ema_double_smooth_seg2.png)
 ![2turn Double Smooth Seg 3](benchmark/2turn_ema_double_smooth_seg3.png)
@@ -136,7 +132,7 @@ Tạm thời ẩn đường mượt góc `EMA Angle` trực tiếp từ raw_angl
 ![1turn Double Smooth Trajectory](benchmark/1turn_ema_double_smooth_2d_trajectory.png)
 ![1turn Double Smooth Time Series](benchmark/1turn_ema_double_smooth_time_series.png)
 
-##### Các đoạn Zoom-in 30 điểm ngẫu nhiên (Same Alpha = Same Color Family):
+##### Các đoạn Zoom-in 30 điểm ngẫu nhiên
 ![1turn Double Smooth Seg 1](benchmark/1turn_ema_double_smooth_seg1.png)
 ![1turn Double Smooth Seg 2](benchmark/1turn_ema_double_smooth_seg2.png)
 ![1turn Double Smooth Seg 3](benchmark/1turn_ema_double_smooth_seg3.png)

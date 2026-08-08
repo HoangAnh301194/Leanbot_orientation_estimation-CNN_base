@@ -10,7 +10,7 @@
   - **Smooth 2nd Pass:** Dùng màu xanh lá (`#2ca02c`), marker hình dấu cộng `+`, nét vẽ nối liền (`-`).
   - **Tất cả các đường Góc (Angle):** Đều được chuyển sang hiển thị bằng nét vẽ nối liền (`-`) đồng nhất.
 - **Khảo sát & Thử nghiệm phương pháp làm mượt quỹ đạo bằng EMA (Exponential Moving Average):**
-  - Thử công thức EMA làm mượt tọa độ $(x, y)$:
+  - Thử công thức EMA làm mượt $(x, y)$:
     $$S_t = \alpha \cdot X_t + (1 - \alpha) \cdot S_{t-1}$$
 ---
 

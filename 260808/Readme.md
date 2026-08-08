@@ -276,4 +276,4 @@ python tools/plot_ema_experiments.py benchmark/3turn_polynomial_order2_length30.
 - Không 
 
 ## C. Công việc tiếp theo
-- Chuẩn bị báo cáo thử nghiệm thực tế lên Lab với Thầy.
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

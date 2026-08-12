@@ -4,8 +4,8 @@
 - Thu thập dữ liệu Leanbot đi các quỹ đạo thẳng, tiến lùi với các góc chéo 0, 45, 90 độ (bổ sung thêm góc -45, 30, 60 độ)
 - Vẽ biểu đồ, bổ sung thêm đồ thị làm mượt bằng polynomial bậc 2 và 3. 
 - Chỉ vẽ biểu đồ trên các đoạn thẳng không đổi chiều vector vận tốc.
-- Vẽ lại biểu đồ, chỉ vẽ EMA của góc tính toán bởi vector tiếp tuyến, chỉ vẽ Polynomial bậc 2 cho quỹ đạo
-- Chọn 1 đoạn Leanbot đi trên sa bàn, cắt bớt 2 đầu chưa ổn định.
+- Vẽ lại biểu đồ chỉ vẽ EMA và Polynomial bậc 2 cho góc tính từ tiếp tuyến
+- Chọn 1 đoạn Leanbot đi trên sa bàn, cắt bớt 10 frame đầu và cuối khi chưa ổn định vận tốc.
 ---
 
 ## 1. File Code & Lệnh chạy

@@ -77,7 +77,7 @@ python tools/plot_ema_clean.py benchmark/90_degree.csv
 
 > Phương án có thể giải quyết vấn đề này là chỉ lấy vector của 2 điểm quỹ đạo mà có sự chênh lệnh nhau tối thiểu đạt --min_pixel_threshold ạ 
 
-> Ngoài ra việc dùng EMA nhìn chung toàn bộ đồ thị thì ko làm mượt hiệu quả , vẫn còn lên xuống zic zắc liên tục ạ .
+> Ngoài ra việc dùng EMA nhìn chung toàn bộ đồ thị thì làm mượt chưa hiệu quả , vẫn còn lên xuống zic zắc liên tục ạ . Và bước làm mượt EMA lần 2 cũng không cải thiện thêm ạ .
 
 ## B. Khó khăn 
 - Không 

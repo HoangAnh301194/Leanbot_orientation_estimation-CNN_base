@@ -342,11 +342,7 @@ Hàm xử lý được cả mảng một chiều và mảng nhiều chiều. V�
 | `mode` | `str`, mặc định `"interp"` | Phương pháp xử lý các mẫu ở hai biên của dữ liệu. |
 | `cval` | `scalar`, mặc định `0.0` | Giá trị dùng để mở rộng dữ liệu khi `mode="constant"`. |
 
-Các điều kiện quan trọng:
-
-$$
-\text{polyorder}<\text{window\_length}
-$$
+- `polyorder < window_length`
 
 Khi sử dụng `mode="interp"`, kích thước cửa sổ không được lớn hơn số phần tử của dữ liệu trên trục được lọc.
 
@@ -481,3 +477,6 @@ savgol_coeffs()
 - Không
 ## C. Công việc tiếp theo
 - Em xin phép xin xác nhận từ Thầy về thông tin đã tìm hiểu và các bước triển khai nhưu trên báo cáo đã phù hợp để triển khai và đánh giá luôn chưa ạ ? 
+- Tiếp tục tìm hiểu về `weight function for weighted sliding windows` : 
+    - Uniform Weight
+    - Linear Weight

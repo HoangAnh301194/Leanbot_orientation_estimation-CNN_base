@@ -141,15 +141,11 @@ $$
 Bài toán bình phương tối thiểu:
 
 $$
-\hat{\mathbf{a}}_x=
-\underset{\mathbf{a}_x}{\operatorname{argmin}}
-\left\|\mathbf{X}\mathbf{a}_x-\mathbf{x}_k\right\|_2^2
+\hat{\mathbf{a}}_x = \arg\min_{\mathbf{a}_x} \left\|\mathbf{X}\mathbf{a}_x - \mathbf{x}_k\right\|_2^2
 $$
 
 $$
-\hat{\mathbf{a}}_y=
-\underset{\mathbf{a}_y}{\operatorname{argmin}}
-\left\|\mathbf{X}\mathbf{a}_y-\mathbf{y}_k\right\|_2^2
+\hat{\mathbf{a}}_y = \arg\min_{\mathbf{a}_y} \left\|\mathbf{X}\mathbf{a}_y - \mathbf{y}_k\right\|_2^2
 $$
 
 Nghiệm lý thuyết, với $\mathbf{z}$ lần lượt là $\mathbf{x}_k$ và $\mathbf{y}_k$:
@@ -164,7 +160,7 @@ $$
 Leanbot cần kết quả tại thời điểm hiện tại nên chọn:
 
 $$
-t_{eval}=0
+t_{\text{eval}}=0
 $$
 
 Vị trí sau làm mượt:
@@ -212,7 +208,7 @@ $$
 Trong hệ tọa độ ảnh, trục $y$ hướng xuống. Khi chuyển sang quy ước Đề-các:
 
 $$
-\mathbf{v}^{cartesian}_k=\begin{bmatrix}x'(0)\\-y'(0)\end{bmatrix}
+\mathbf{v}^{\text{cartesian}}_k=\begin{bmatrix}x'(0)\\-y'(0)\end{bmatrix}
 $$
 
 ##### 2.4.7. Tính góc chuyển động
@@ -220,7 +216,7 @@ $$
 Góc tiếp tuyến của quỹ đạo:
 
 $$
-\theta_k=\operatorname{atan2}\left(-y'(0),x'(0)\right)
+\theta_k = \text{atan2}\left(-y'(0),x'(0)\right)
 $$
 
 Đổi sang độ:
@@ -237,7 +233,7 @@ $$
 $$
 
 $$
-\theta_k=\operatorname{atan2}(-\Delta y_k,\Delta x_k)
+\theta_k = \text{atan2}(-\Delta y_k,\Delta x_k)
 $$
 
 

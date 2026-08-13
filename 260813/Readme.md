@@ -133,9 +133,17 @@ $$
 Vector hệ số:
 
 $$
-\mathbf{a}_x=\begin{bmatrix}a_{x,0}\\a_{x,1}\\a_{x,2}\end{bmatrix},
+\mathbf{a}_x = \begin{bmatrix}
+a_{x,0} \\
+a_{x,1} \\
+a_{x,2}
+\end{bmatrix},
 \qquad
-\mathbf{a}_y=\begin{bmatrix}a_{y,0}\\a_{y,1}\\a_{y,2}\end{bmatrix}
+\mathbf{a}_y = \begin{bmatrix}
+a_{y,0} \\
+a_{y,1} \\
+a_{y,2}
+\end{bmatrix}
 $$
 
 Bài toán bình phương tối thiểu:
@@ -202,13 +210,19 @@ $$
 Vector tiếp tuyến tại mẫu hiện tại:
 
 $$
-\mathbf{v}_k=\begin{bmatrix}x'(0)\\y'(0)\end{bmatrix}
+\mathbf{v}_k = \begin{bmatrix}
+x'(0) \\
+y'(0)
+\end{bmatrix}
 $$
 
 Trong hệ tọa độ ảnh, trục $y$ hướng xuống. Khi chuyển sang quy ước Đề-các:
 
 $$
-\mathbf{v}^{\text{cartesian}}_k=\begin{bmatrix}x'(0)\\-y'(0)\end{bmatrix}
+\mathbf{v}^{\text{cartesian}}_k = \begin{bmatrix}
+x'(0) \\
+-y'(0)
+\end{bmatrix}
 $$
 
 ##### 2.4.7. Tính góc chuyển động

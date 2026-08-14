@@ -253,10 +253,11 @@
 #### 5.6. Quỹ đạo 90 độ (`90_degree.csv`)
 ![90 degree Estimated Speed Full](benchmark/estimated_speed/90_degree_estimated_speed_full.png)
 
-> **Nhận xét & Trả lời câu hỏi kiểm chứng**:
+> **Nhận xét**:
 > - Trên toàn bộ chu trình 6 lượt di chuyển tiến - lùi, đồ thị `Estimated Speed` thể hiện rõ các đường đồ thị tụt sát về 0, vận tốc cực tiểu tại các thời điểm robot giảm tốc, dừng lại ở mép sa bàn trước khi đổi hướng chạy ngược lại.
 > - Khi robot di chuyển ổn định trên sa bàn, vận tốc duy trì ở mức cao và tương đối phẳng, nhưng vẫn dao động vì nhiễu .
 
+> Khi Leanbot đi các đường chép thì các đồ thị vận tốc Estimation speed ở các đoạn di chuyển có xu hướng nghiên, chéo , vì thực tế trên frame ảnh , Leanbot ở càng xa thì số pixel dịch chuyển vị trí càng xa. , còn nếu Leanbot đi ngang góc 0 thì đường Estimation Speed mới có xu hướng thẳng.  Đường 90 độ về lí thuyết thì cũng sẽ thẳng, nhưng có thể trong quá trình lấy mẫu em đặt cam hơi nghiêng 1 chút nên sẽ có xu hướng chéo, nhưng nếu nhìn vào trục tung thì độ chênh lệch pixel giữa đầu và cuối đoạn di chuyển là nhỏ hơn nhiều so với các đường đi góc chéo khác nhưu 30, 45,...
 
 ## B. Khó khăn
 

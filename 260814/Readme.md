@@ -211,7 +211,7 @@
 
 > Từ các đồ thị có thể quan sát được nếu cửa sổ càng ngắn thì khả năng smooth giảm đi, các đỉnh nhiễu cao hơn so với Sliding windows = 18 .
 
-#### 5. 
+
 ## B. Khó khăn
 
 - Không

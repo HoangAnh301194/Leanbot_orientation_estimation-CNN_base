@@ -1,4 +1,4 @@
-# Báo cáo công việc ngày 12/08/2026
+# Báo cáo công việc ngày 13/08/2026
 
 ## A. Công việc đã làm 
 - Chuẩn hóa lại trục thời gian `[-1;0]`

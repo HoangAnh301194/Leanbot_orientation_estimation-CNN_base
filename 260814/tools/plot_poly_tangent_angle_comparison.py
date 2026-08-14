@@ -1,9 +1,10 @@
 """
-So sánh ba chuỗi góc trên một đoạn Leanbot chuyển động liên tục:
+So sánh 4 chuỗi góc trên một đoạn Leanbot chuyển động liên tục:
 
 1. Raw Angle từ model.
-2. Góc tiếp tuyến tại endpoint của đa thức cục bộ bậc hai.
-3. Góc của vector nối hai điểm làm mượt liên tiếp.
+2. Góc của vector nối hai điểm làm mượt liên tiếp (Consecutive Smoothed Points Angle).
+3. Góc tiếp tuyến tại endpoint của đa thức cục bộ bậc hai (Smooth 1 - Endpoint Tangent Angle).
+4. Góc tiếp tuyến được làm mượt lần 2 bằng đa thức cục bộ (Smooth 2 - Endpoint Tangent Angle Smooth2).
 
 Tool đồng thời vẽ quỹ đạo 2D, so sánh dữ liệu raw với các điểm endpoint
 thu được sau khi fit polynomial bằng Least Squares.
@@ -12,6 +13,8 @@ Ví dụ:
     python tools/plot_poly_tangent_angle_comparison.py benchmark
     python tools/plot_poly_tangent_angle_comparison.py benchmark/45_degree.csv
     python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 18 --poly-degree 2
+    python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 15 --poly-degree 2
+    python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 12 --poly-degree 2
 """
 
 import argparse
@@ -34,6 +37,7 @@ DEFAULT_DPI = 150
 
 RAW_ANGLE_COLOR = "#8b0000"
 POLY_TANGENT_COLOR = "#0055ff"
+SMOOTH2_TANGENT_COLOR = "#2ca02c"
 SMOOTH_POINT_COLOR = "#ff7f00"
 
 
@@ -173,6 +177,30 @@ def fit_causal_endpoint_polynomials(
     return smooth_x, smooth_y, tangent_x, tangent_y
 
 
+def fit_causal_endpoint_1d(
+    values: np.ndarray,
+    window_size: int,
+    poly_degree: int,
+) -> np.ndarray:
+    sample_count = len(values)
+    smoothed = np.full(sample_count, np.nan, dtype=float)
+    for index in range(sample_count):
+        window_start = max(0, index - window_size + 1)
+        window_end = index + 1
+        window_data = values[window_start:window_end]
+        finite_mask = np.isfinite(window_data)
+        if np.count_nonzero(finite_mask) < 2:
+            continue
+        valid_data = window_data[finite_mask]
+        current_degree = min(poly_degree, len(valid_data) - 1)
+        raw_indices = np.arange(len(window_data))[finite_mask]
+        time_normalized = (raw_indices - (len(window_data) - 1)) / max(1, len(window_data) - 1)
+
+        coefficients = np.polyfit(time_normalized, valid_data, deg=current_degree)
+        smoothed[index] = float(np.polyval(coefficients, 0.0))
+    return smoothed
+
+
 def unwrap_finite_degrees(angle_values: np.ndarray) -> np.ndarray:
     angle_values = np.asarray(angle_values, dtype=float)
     result = np.full(angle_values.shape, np.nan, dtype=float)
@@ -251,11 +279,18 @@ def calculate_angle_series(
         smooth_point_unwrapped, raw_unwrapped, period_degrees=180.0
     )
 
+    tangent_smooth2 = fit_causal_endpoint_1d(
+        tangent_aligned,
+        window_size=window_size,
+        poly_degree=poly_degree,
+    )
+
     return {
         "smooth_x": smooth_x,
         "smooth_y": smooth_y,
         "raw_angle": raw_unwrapped,
         "poly_tangent_angle": tangent_aligned,
+        "poly_tangent_smooth2": tangent_smooth2,
         "smooth_point_angle": smooth_point_aligned,
         "valid_start": valid_start,
     }
@@ -352,7 +387,7 @@ def save_trajectory_comparison(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / (
-        f"{csv_path.stem}_poly_least_squares_2d_trajectory.png"
+        f"{csv_path.stem}_poly_least_squares_2d_trajectory_w{window_size}.png"
     )
     figure.savefig(
         output_path,
@@ -360,9 +395,19 @@ def save_trajectory_comparison(
         bbox_inches="tight",
         pad_inches=0.15,
     )
+    if window_size == DEFAULT_WINDOW_SIZE:
+        default_path = output_dir / f"{csv_path.stem}_poly_least_squares_2d_trajectory.png"
+        figure.savefig(
+            default_path,
+            dpi=dpi,
+            bbox_inches="tight",
+            pad_inches=0.15,
+        )
+
     plt.close(figure)
     print(f"[SUCCESS] Đã lưu quỹ đạo: {output_path}")
     return output_path
+
 
 def plot_angle_comparison(
     csv_path: Path,
@@ -422,8 +467,20 @@ def plot_angle_comparison(
     plot_frames = frame_ids[valid_start:]
     raw_plot = angle_series["raw_angle"][valid_start:]
     tangent_plot = angle_series["poly_tangent_angle"][valid_start:]
+    tangent_smooth2_plot = angle_series["poly_tangent_smooth2"][valid_start:]
     smooth_point_plot = angle_series["smooth_point_angle"][valid_start:]
 
+def save_3line_angle_plot(
+    csv_path: Path,
+    output_dir: Path,
+    plot_frames: np.ndarray,
+    raw_plot: np.ndarray,
+    tangent_plot: np.ndarray,
+    smooth_point_plot: np.ndarray,
+    window_size: int,
+    poly_degree: int,
+    dpi: int,
+) -> Path:
     frame_start = int(plot_frames[0])
     frame_end = int(plot_frames[-1])
     figure, axis = plt.subplots(figsize=(12, 7), dpi=dpi)
@@ -473,23 +530,193 @@ def plot_angle_comparison(
     figure.tight_layout()
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    angle_output_path = output_dir / f"{csv_path.stem}_poly_tangent_angle_comparison.png"
-    figure.savefig(
-        angle_output_path,
-        dpi=dpi,
-        bbox_inches="tight",
-        pad_inches=0.15,
-    )
+    out_path = output_dir / f"{csv_path.stem}_poly_tangent_angle_comparison_3lines.png"
+    figure.savefig(out_path, dpi=dpi, bbox_inches="tight", pad_inches=0.15)
+    default_path = output_dir / f"{csv_path.stem}_poly_tangent_angle_comparison.png"
+    figure.savefig(default_path, dpi=dpi, bbox_inches="tight", pad_inches=0.15)
     plt.close(figure)
+    print(f"[SUCCESS] Đã lưu góc 3 đường: {out_path}")
+    return out_path
+
+
+def save_4line_angle_plot(
+    csv_path: Path,
+    output_dir: Path,
+    plot_frames: np.ndarray,
+    raw_plot: np.ndarray,
+    tangent_plot: np.ndarray,
+    tangent_smooth2_plot: np.ndarray,
+    smooth_point_plot: np.ndarray,
+    window_size: int,
+    poly_degree: int,
+    dpi: int,
+) -> Path:
+    frame_start = int(plot_frames[0])
+    frame_end = int(plot_frames[-1])
+    figure, axis = plt.subplots(figsize=(12, 7), dpi=dpi)
+    axis.plot(
+        plot_frames,
+        raw_plot,
+        color=RAW_ANGLE_COLOR,
+        linewidth=2.2,
+        linestyle="-",
+        alpha=0.75,
+        label="Raw Angle (Model)",
+        zorder=10,
+    )
+    axis.plot(
+        plot_frames,
+        smooth_point_plot,
+        color=SMOOTH_POINT_COLOR,
+        linewidth=1.5,
+        linestyle="-",
+        alpha=0.55,
+        label="Two Consecutive Smoothed Points Angle",
+        zorder=6,
+    )
+    axis.plot(
+        plot_frames,
+        tangent_plot,
+        color=POLY_TANGENT_COLOR,
+        linewidth=2.2,
+        linestyle="-",
+        alpha=0.9,
+        label=f"Polynomial Endpoint Tangent Angle (Smooth 1, W={window_size})",
+        zorder=7,
+    )
+    axis.plot(
+        plot_frames,
+        tangent_smooth2_plot,
+        color=SMOOTH2_TANGENT_COLOR,
+        linewidth=2.4,
+        linestyle="-",
+        alpha=0.95,
+        label=f"Polynomial Endpoint Tangent Angle Smooth2 (Smooth 2, W={window_size})",
+        zorder=8,
+    )
+
+    axis.set_title(
+        "Heading Angle Comparison: Raw Model vs Consecutive Smoothed Points "
+        "vs Endpoint Tangent vs Smooth2\n"
+        f"File: {csv_path.name} | Frames {frame_start}-{frame_end} | "
+        f"Causal W={window_size}, Polynomial Degree={poly_degree}",
+        fontsize=12,
+        fontweight="bold",
+    )
+    axis.set_xlabel("Frame ID", fontweight="bold")
+    axis.set_ylabel("Angle (Degrees)", fontweight="bold")
+    axis.grid(True, linestyle="--", alpha=0.6)
+    axis.legend(loc="best", fontsize=9)
+    set_robust_angle_limits(axis, [raw_plot, tangent_plot, tangent_smooth2_plot, smooth_point_plot])
+    figure.tight_layout()
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path = output_dir / f"{csv_path.stem}_poly_tangent_angle_comparison_w{window_size}.png"
+    figure.savefig(out_path, dpi=dpi, bbox_inches="tight", pad_inches=0.15)
+    plt.close(figure)
+    print(f"[SUCCESS] Đã lưu góc 4 đường: {out_path}")
+    return out_path
+
+
+def plot_angle_comparison(
+    csv_path: Path,
+    output_dir: Path,
+    window_size: int,
+    poly_degree: int,
+    seed: int,
+    buffer_frames: int,
+    min_speed: float,
+    min_block_length: int,
+    vector_epsilon: float,
+    dpi: int,
+) -> tuple[Path, Path]:
+    dataframe = load_valid_dataframe(csv_path)
+    angle_column = find_angle_column(dataframe)
+    segment = find_full_pass_moving_segment(
+        dataframe,
+        buffer_frames=buffer_frames,
+        seed=seed,
+        min_speed=min_speed,
+        min_block_length=min_block_length,
+    )
+    if len(segment) <= window_size:
+        raise ValueError(
+            f"đoạn chuyển động chỉ có {len(segment)} mẫu, cần hơn {window_size} mẫu"
+        )
+
+    x_values = segment["x_center"].to_numpy(dtype=float)
+    y_values = segment["y_center"].to_numpy(dtype=float)
+    raw_angles = segment[angle_column].to_numpy(dtype=float)
+    if "frame_id" in segment.columns:
+        frame_ids = segment["frame_id"].to_numpy(dtype=float)
+    else:
+        frame_ids = np.arange(len(segment), dtype=float)
+
+    angle_series = calculate_angle_series(
+        x_values,
+        y_values,
+        raw_angles,
+        window_size=window_size,
+        poly_degree=poly_degree,
+        vector_epsilon=vector_epsilon,
+    )
+    trajectory_output_path = save_trajectory_comparison(
+        csv_path=csv_path,
+        output_dir=output_dir,
+        x_values=x_values,
+        y_values=y_values,
+        smooth_x=angle_series["smooth_x"],
+        smooth_y=angle_series["smooth_y"],
+        frame_ids=frame_ids,
+        window_size=window_size,
+        poly_degree=poly_degree,
+        dpi=dpi,
+    )
+    valid_start = angle_series["valid_start"]
+    plot_frames = frame_ids[valid_start:]
+    raw_plot = angle_series["raw_angle"][valid_start:]
+    tangent_plot = angle_series["poly_tangent_angle"][valid_start:]
+    tangent_smooth2_plot = angle_series["poly_tangent_smooth2"][valid_start:]
+    smooth_point_plot = angle_series["smooth_point_angle"][valid_start:]
+
+    frame_start = int(plot_frames[0])
+    frame_end = int(plot_frames[-1])
+
+    # Lưu đồ thị 3 đường (dành cho Mục 2)
+    save_3line_angle_plot(
+        csv_path=csv_path,
+        output_dir=output_dir,
+        plot_frames=plot_frames,
+        raw_plot=raw_plot,
+        tangent_plot=tangent_plot,
+        smooth_point_plot=smooth_point_plot,
+        window_size=window_size,
+        poly_degree=poly_degree,
+        dpi=dpi,
+    )
+
+    # Lưu đồ thị 4 đường (dành cho Mục 3 và Mục 4)
+    angle_output_path = save_4line_angle_plot(
+        csv_path=csv_path,
+        output_dir=output_dir,
+        plot_frames=plot_frames,
+        raw_plot=raw_plot,
+        tangent_plot=tangent_plot,
+        tangent_smooth2_plot=tangent_smooth2_plot,
+        smooth_point_plot=smooth_point_plot,
+        window_size=window_size,
+        poly_degree=poly_degree,
+        dpi=dpi,
+    )
 
     print(
-        f"[INFO] {csv_path.name}: {len(segment)} mẫu, "
+        f"[INFO] {csv_path.name} (W={window_size}): {len(segment)} mẫu, "
         f"Frames {frame_start}-{frame_end}"
     )
     print_angle_summary("Raw Angle", raw_plot)
-    print_angle_summary("Polynomial Tangent", tangent_plot)
     print_angle_summary("Two Smoothed Points", smooth_point_plot)
-    print(f"[SUCCESS] Đã lưu góc: {angle_output_path}")
+    print_angle_summary(f"Polynomial Tangent (Smooth 1, W={window_size})", tangent_plot)
+    print_angle_summary(f"Polynomial Tangent Smooth2 (Smooth 2, W={window_size})", tangent_smooth2_plot)
     return trajectory_output_path, angle_output_path
 
 
@@ -504,8 +731,8 @@ def collect_csv_files(input_path: Path):
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description=(
-            "So sánh Raw Angle, góc tiếp tuyến đa thức tại endpoint và góc "
-            "từ hai điểm làm mượt liên tiếp."
+            "So sánh Raw Angle, Consecutive Smoothed Points, "
+            "Endpoint Tangent Angle và Endpoint Tangent Smooth2."
         )
     )
     parser.add_argument(
@@ -601,7 +828,7 @@ def main() -> int:
         default_output_root / "poly_tangent_comparison"
     )
 
-    print(f"[INFO] Tìm thấy {len(csv_files)} file CSV")
+    print(f"[INFO] Tìm thấy {len(csv_files)} file CSV (window-size={arguments.window_size})")
     failure_count = 0
     for csv_path in csv_files:
         try:

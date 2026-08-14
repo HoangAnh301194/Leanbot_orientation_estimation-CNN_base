@@ -1,13 +1,16 @@
 # Báo cáo công việc ngày 14/08/2026
 
 ## A. Công việc đã làm
-- Tính  Góc tiếp tuyến của quỹ đạo (Không dùng góc từ hai điểm đã làm mượt liên tiếp)
-    - Không cần  Quy đổi đạo hàm sang thời gian thực
-    - Chưa cần thử  Dạng convolution và tối ưu khi chạy realtime
+- Tính Góc tiếp tuyến của quỹ đạo (Không dùng góc từ hai điểm đã làm mượt liên tiếp)
+    - Không cần Quy đổi đạo hàm sang thời gian thực
+    - Chưa cần thử Dạng convolution và tối ưu khi chạy realtime
 - Vẽ đồ thị so sánh, các đường đồ thị cần vẽ :
     - tiếp tuyến của quỹ đạo
     - góc từ hai điểm đã làm mượt liên tiếp
     - Raw angle (Model)
+- Polyfit lần 2 để tính Endpoint Tangent Angle (Smooth2 tangent angle)
+- Thực nghiệm so sánh khi thay đổi độ dài cửa sổ trượt Sliding Windows W = 18 -> 15 -> 12
+
 ### 1. Thử nghiệm tính góc tiếp tuyến trực tiếp từ đa thức cục bộ
 
 - Tiếp tục sử dụng **Causal Sliding Window** gồm `N = 18` mẫu từ quá khứ đến hiện tại.
@@ -46,7 +49,7 @@
 ![0 degree 2D Trajectory](benchmark/poly_tangent_comparison/0_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![0 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison.png)
+![0 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison_3lines.png)
 
 ---
 
@@ -56,7 +59,7 @@
 ![30 degree 2D Trajectory](benchmark/poly_tangent_comparison/30_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![30 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison.png)
+![30 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison_3lines.png)
 
 ---
 
@@ -66,7 +69,7 @@
 ![45 degree 2D Trajectory](benchmark/poly_tangent_comparison/45_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![45 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison.png)
+![45 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison_3lines.png)
 
 ---
 
@@ -76,7 +79,7 @@
 ![60 degree 2D Trajectory](benchmark/poly_tangent_comparison/60_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![60 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison.png)
+![60 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison_3lines.png)
 
 ---
 
@@ -86,7 +89,7 @@
 ![90 degree 2D Trajectory](benchmark/poly_tangent_comparison/90_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![90 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison.png)
+![90 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison_3lines.png)
 
 ---
 
@@ -96,14 +99,126 @@
 ![m45 degree 2D Trajectory](benchmark/poly_tangent_comparison/m45_degree_poly_least_squares_2d_trajectory.png)
 
 ##### b) Đồ thị so sánh góc (Raw Model vs Fit Polynomial Tangent vs Hai điểm làm mượt liên tiếp)
-![m45 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison.png)
+![m45 degree Tangent Angle Comparison](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison_3lines.png)
 
+
+### 3. Polyfit lần 2 để tính Endpoint Tangent Angle (Smooth2 tangent angle)
+- **Code sử dụng**: [`plot_poly_tangent_angle_comparison.py`](tools/plot_poly_tangent_angle_comparison.py)
+- **Lệnh chạy**:
+  ```powershell
+  cd 260814
+  python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 18 --poly-degree 2 --seed 42
+  ```
+- **Đồ thị so sánh 4 đường** (`Raw Model`, `Consecutive smoothed Point`, `Endpoint Tangent`, `Endpoint Tangent Smooth2` với cửa sổ $W = 18$):
+
+#### 3.1. Góc 0 độ (`0_degree.csv`)
+![0 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison_w18.png)
+
+#### 3.2. Góc 30 độ (`30_degree.csv`)
+![30 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison_w18.png)
+
+#### 3.3. Góc 45 độ (`45_degree.csv`)
+![45 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison_w18.png)
+
+#### 3.4. Góc -45 độ (`m45_degree.csv`)
+![m45 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison_w18.png)
+
+#### 3.5. Góc 60 độ (`60_degree.csv`)
+![60 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison_w18.png)
+
+#### 3.6. Góc 90 độ (`90_degree.csv`)
+![90 degree 4 angles comparison W18](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison_w18.png)
+
+> Từ đồ thị có thể thấy đường smooth lần 2 mịn hơn , tuy nhiên những điểm có đỉnh đồ thị biến đổi thì đường smooth lần 2 cao hơn đường smooth polynomial 1 lần . 
+
+### 4. Thử thay đổi các cửa sổ Sliding Windows W = 18 -> 15 -> 12 
+
+- **Code sử dụng**: [`plot_poly_tangent_angle_comparison.py`](tools/plot_poly_tangent_angle_comparison.py)
+- **Param thay đổi**: `sliding windows length` (`--window-size 18`, `--window-size 15`, `--window-size 12`)
+- **Lệnh chạy**:
+  ```powershell
+  cd 260814
+  # Cửa sổ W = 18
+  python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 18 --poly-degree 2 --seed 42
+
+  # Cửa sổ W = 15
+  python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 15 --poly-degree 2 --seed 42
+
+  # Cửa sổ W = 12
+  python tools/plot_poly_tangent_angle_comparison.py benchmark --window-size 12 --poly-degree 2 --seed 42
+  ```
+
+
+- **Đồ thị so sánh các độ dài cửa sổ**:
+
+#### 4.1. Góc 0 độ (`0_degree.csv`)
+- **Sliding windows length = 18**:
+  ![0 degree W18](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![0 degree W15](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![0 degree W12](benchmark/poly_tangent_comparison/0_degree_poly_tangent_angle_comparison_w12.png)
+
+---
+
+#### 4.2. Góc 30 độ (`30_degree.csv`)
+- **Sliding windows length = 18**:
+  ![30 degree W18](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![30 degree W15](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![30 degree W12](benchmark/poly_tangent_comparison/30_degree_poly_tangent_angle_comparison_w12.png)
+
+---
+
+#### 4.3. Góc 45 độ (`45_degree.csv`)
+- **Sliding windows length = 18**:
+  ![45 degree W18](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![45 degree W15](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![45 degree W12](benchmark/poly_tangent_comparison/45_degree_poly_tangent_angle_comparison_w12.png)
+
+---
+
+#### 4.4. Góc -45 độ (`m45_degree.csv`)
+- **Sliding windows length = 18**:
+  ![m45 degree W18](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![m45 degree W15](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![m45 degree W12](benchmark/poly_tangent_comparison/m45_degree_poly_tangent_angle_comparison_w12.png)
+
+---
+
+#### 4.5. Góc 60 độ (`60_degree.csv`)
+- **Sliding windows length = 18**:
+  ![60 degree W18](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![60 degree W15](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![60 degree W12](benchmark/poly_tangent_comparison/60_degree_poly_tangent_angle_comparison_w12.png)
+
+---
+
+#### 4.6. Góc 90 độ (`90_degree.csv`)
+- **Sliding windows length = 18**:
+  ![90 degree W18](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison_w18.png)
+- **Sliding windows length = 15**:
+  ![90 degree W15](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison_w15.png)
+- **Sliding windows length = 12**:
+  ![90 degree W12](benchmark/poly_tangent_comparison/90_degree_poly_tangent_angle_comparison_w12.png)
+
+> Từ các đồ thị có thể quan sát được nếu cửa sổ càng ngắn thì khả năng smooth giảm đi, các đỉnh nhiễu cao hơn so với Sliding windows = 18 .
+
+#### 5. 
 ## B. Khó khăn
 
 - Không
 
 ## C. Công việc tiếp theo
-- Em có cần tiếp tục tìm hiểu thêm các phương pháp khác khôgn ạ ? `weight function for weighted sliding windows` :
+- Tiếp tục tìm hiểu thêm  `weight function for weighted sliding windows` :
     - Uniform Weight
     - Linear Weight
-- Em xin phép nhận công việc tiếp theo từ Thầy ạ.
+
+- Tính toán và vẽ đồ thị cho Estimation Speed = sqrt(dx * dx + dy * dy) cho 6 lần chạy .

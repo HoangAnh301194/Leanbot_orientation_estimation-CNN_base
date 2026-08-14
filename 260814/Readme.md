@@ -10,6 +10,7 @@
     - Raw angle (Model)
 - Polyfit lần 2 để tính Endpoint Tangent Angle (Smooth2 tangent angle)
 - Thực nghiệm so sánh khi thay đổi độ dài cửa sổ trượt Sliding Windows W = 18 -> 15 -> 12
+- Ước lượng vận tốc (Estimated Speed = sqrt(dx^2 + dy^2)) trên toàn bộ chu trình 6 lần chạy tiến - lùi
 
 ### 1. Thử nghiệm tính góc tiếp tuyến trực tiếp từ đa thức cục bộ
 
@@ -212,6 +213,51 @@
 > Từ các đồ thị có thể quan sát được nếu cửa sổ càng ngắn thì khả năng smooth giảm đi, các đỉnh nhiễu cao hơn so với Sliding windows = 18 .
 
 
+### 5. Ước lượng vận tốc (Estimated Speed) trên toàn bộ chu trình 6 lần chạy tiến - lùi
+
+- **Các bước tính toán**:
+  - Khi fit đa thức bậc hai trên cửa sổ trượt quá khứ $W = 18$ ($t \in [-1, 0]$), vector đạo hàm tại endpoint $t = 0$ là:
+    ```text
+    dx = x'(0)
+    dy = y'(0)
+    ```
+  - Độ lớn vận tốc chuyển động tức thời (Estimated Speed) được tính bằng:
+    ```text
+    Estimated Speed: v = sqrt(dx^2 + dy^2) = sqrt(dx * dx + dy * dy)
+    ```
+- Chạy trên **toàn bộ dữ liệu của file CSV** (đầy đủ cả 6 lượt di chuyển tiến - lùi.
+
+- **Code sử dụng**: [`plot_estimated_speed.py`](tools/plot_estimated_speed.py)
+- **Lệnh chạy**:
+  ```powershell
+  python tools/plot_estimated_speed.py benchmark --window-size 18 --poly-degree 2
+  ```
+
+- **Đồ thị kết quả theo từng góc đo**:
+
+#### 5.1. Quỹ đạo 0 độ (`0_degree.csv`)
+![0 degree Estimated Speed Full](benchmark/estimated_speed/0_degree_estimated_speed_full.png)
+
+#### 5.2. Quỹ đạo 30 độ (`30_degree.csv`)
+![30 degree Estimated Speed Full](benchmark/estimated_speed/30_degree_estimated_speed_full.png)
+
+#### 5.3. Quỹ đạo 45 độ (`45_degree.csv`)
+![45 degree Estimated Speed Full](benchmark/estimated_speed/45_degree_estimated_speed_full.png)
+
+#### 5.4. Quỹ đạo -45 độ (`m45_degree.csv`)
+![m45 degree Estimated Speed Full](benchmark/estimated_speed/m45_degree_estimated_speed_full.png)
+
+#### 5.5. Quỹ đạo 60 độ (`60_degree.csv`)
+![60 degree Estimated Speed Full](benchmark/estimated_speed/60_degree_estimated_speed_full.png)
+
+#### 5.6. Quỹ đạo 90 độ (`90_degree.csv`)
+![90 degree Estimated Speed Full](benchmark/estimated_speed/90_degree_estimated_speed_full.png)
+
+> **Nhận xét & Trả lời câu hỏi kiểm chứng**:
+> - Trên toàn bộ chu trình 6 lượt di chuyển tiến - lùi, đồ thị `Estimated Speed` thể hiện rõ các đường đồ thị tụt sát về 0, vận tốc cực tiểu tại các thời điểm robot giảm tốc, dừng lại ở mép sa bàn trước khi đổi hướng chạy ngược lại.
+> - Khi robot di chuyển ổn định trên sa bàn, vận tốc duy trì ở mức cao và tương đối phẳng, nhưng vẫn dao động vì nhiễu .
+
+
 ## B. Khó khăn
 
 - Không
@@ -221,4 +267,3 @@
     - Uniform Weight
     - Linear Weight
 
-- Tính toán và vẽ đồ thị cho Estimation Speed = sqrt(dx * dx + dy * dy) cho 6 lần chạy .

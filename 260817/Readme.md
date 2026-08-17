@@ -1,5 +1,21 @@
 # Báo cáo công việc ngày 17/08/2026
 
+## Mục lục
+- [A. Công việc đã làm](#a-công-việc-đã-làm)
+  - [1. Áp dụng Linear Weight vào Polynomial Least Squares](#1-áp-dụng-linear-weight-vào-polynomial-least-squares)
+  - [2. Áp dụng trọng số vào bài toán Least Squares Polynomial bậc 2](#2-áp-dụng-trọng-số-vào-bài-toán-least-squares-polynomial-bậc-2)
+  - [3. Các bước triển khai thuật toán](#3-các-bước-triển-khai-thuật-toán)
+  - [4. Các trường hợp thực nghiệm & So sánh](#4-các-trường-hợp-thực-nghiệm--so-sánh)
+  - [5. Kết quả thử nghiệm (Linear Weight 1:1.5, 1:2, 1:3)](#5-kết-quả-thử-nghiệm)
+- [6. Cập nhật phương pháp Linear Weight = [0, 1]](#6-cập-nhật-phương-pháp-linear-weight--0-1)
+- [7. Delayed Heading Angle tại index = -3 (Áp dụng Linear Weight [0, 1])](#7-delayed-heading-angle-tại-index---3-áp-dụng-linear-weight-0-1)
+- [8. Đánh giá độ mịn bằng sai số RMS so với đường Fit bậc 1](#8-đánh-giá-độ-mịn-bằng-sai-số-rms-so-với-đường-fit-bậc-1)
+  - [8.7. Bảng so sánh chất lượng độ mịn (RMS) giữa các phương án](#87-bảng-so-sánh-chất-lượng-độ-mịn-rms-giữa-các-phương-án)
+- [B. Khó khăn](#b-khó-khăn)
+- [C. Công việc tiếp theo](#c-công-việc-tiếp-theo)
+
+---
+
 ## A. Công việc đã làm
 
 - Tiếp tục tìm hiểu và thử nghiệm **Weight Function** cho bài toán **Polynomial Least Squares**:

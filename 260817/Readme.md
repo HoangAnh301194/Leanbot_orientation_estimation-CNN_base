@@ -8,6 +8,8 @@
     - `1:1.5`
     - `1:2`
     - `1:3`
+- Thử nghiệm phương án **Delayed Heading Angle** tại `index = -3` trên cửa sổ $W = 18$.
+- Đánh giá chất lượng độ mịn bằng sai số **RMS** so với đường Fit đa thức bậc 1 (Ground Truth reference) giữa các phương án: `Smooth 1 (index = 0)`, `Delayed Tangent (index = -3)` và `Smooth 2 (W2 = 36)`.
 
 ---
 
@@ -145,8 +147,6 @@
 
 ---
 
-### 5.6. Góc 90 độ (`90_degree.csv`)
-
 - **a) So sánh quỹ đạo 2D**:
   ![90 degree trajectory](benchmark/poly_tangent_linear_weight_comparison/90_degree_poly_tangent_linear_weight_2d_trajectory_w18.png)
 
@@ -162,87 +162,208 @@
 
 ---
 
-## 6. Thử nghiệm với Linear Weight = [0, 1]
+## 6. Cập nhật phương pháp Linear Weight = [0, 1]
+
+- **Quy tắc gán trọng số**:
+  - Với cửa sổ trượt quá khứ gồm $W = 18$ mẫu ($t \in [-1.0, 0.0]$):
+    $$\alpha_i = \frac{i}{W - 1}, \quad \text{với } i = 0, 1, \dots, W - 1$$
+  - Trong đó:
+    - **Frame cũ nhất** ($i = 0$): $\alpha_0 = 0.0$ (triệt tiêu hoàn toàn ảnh hưởng của dữ liệu cũ ngoài rìa cửa sổ).
+    - **Frame mới nhất** ($i = W - 1$): $\alpha_{W - 1} = 1.0$ (đạt trọng số cực đại tại thời điểm hiện tại).
+- **Đoạn mã tạo Linear Weight [0, 1] và xử lý chống suy biến SVD**:
+  ```python
+  def get_weights(window_length: int, weight_mode: str, ratio: float = 1.0) -> np.ndarray:
+      if weight_mode == "linear_0_to_1":
+          alpha = np.linspace(0.0, 1.0, window_length, dtype=float)
+          # Clip với epsilon 1e-6 để tránh ma trận suy biến ở các frame khởi đầu
+          return np.sqrt(np.clip(alpha, 1e-6, 1.0))
+  ```
+
+---
+
+## 7. Delayed Heading Angle tại index = -3 (Áp dụng Linear Weight [0, 1])
 
 - **Cấu hình thử nghiệm**:
-  - Trọng số tuyến tính tăng dần từ 0 (frame cũ nhất) đến 1 (frame mới nhất hiện tại).
-  - Đồ thị so sánh 3 đường:
-    - **Raw Angle (Model)**: Màu đỏ đậm `#8b0000`, nét liền.
-    - **Uniform Weight `1:1`**: Màu xanh dương `#0055ff`, nét liền.
-    - **Linear Weight `[0, 1]`**: Màu xanh lá `#2ca02c`, nét liền.
-- **Code sử dụng**: [`plot_poly_tangent_linear_weight_0_to_1.py`](tools/plot_poly_tangent_linear_weight_0_to_1.py)
+  - Cả hai cách tính tiếp tuyến đều áp dụng bộ trọng số **Linear Weight `[0, 1]`**:
+    - **Endpoint Tangent (index = 0)**: Tính tiếp tuyến tức thời tại điểm mới nhất $t = 0.0$.
+    - **Delayed Tangent (index = -3)**: Tính tiếp tuyến lùi lại 3 mẫu tại điểm $t_{delay} = \frac{-3}{W-1} \approx -0.1765$.
+- **Code sử dụng**: [`plot_poly_tangent_linear_weight.py`](tools/plot_poly_tangent_linear_weight.py)
 - **Lệnh chạy các file csv benchmark**:
   ```powershell
-  python tools/plot_poly_tangent_linear_weight_0_to_1.py benchmark --window-size 18 --poly-degree 2
+  python tools/plot_poly_tangent_linear_weight.py benchmark --mode delayed --window-size 18 --poly-degree 2
   ```
-- **Thư mục lưu ảnh kết quả**: `benchmark/poly_tangent_linear_weight_0_to_1/`
+- **Thư mục lưu ảnh kết quả**: `benchmark/poly_tangent_delayed_angle_comparison/`
 
 ---
 
-### 6.1. Góc 0 độ (`0_degree.csv`)
+### 7.1. Góc 0 độ (`0_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![0 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/0_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![0 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/0_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![0 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/0_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![0 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/0_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
-### 6.2. Góc 30 độ (`30_degree.csv`)
+### 7.2. Góc 30 độ (`30_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![30 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/30_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![30 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/30_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![30 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/30_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![30 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/30_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
-### 6.3. Góc 45 độ (`45_degree.csv`)
+### 7.3. Góc 45 độ (`45_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![45 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/45_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![45 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/45_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![45 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/45_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![45 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/45_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
-### 6.4. Góc -45 độ (`m45_degree.csv`)
+### 7.4. Góc -45 độ (`m45_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![m45 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/m45_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![m45 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/m45_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![m45 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/m45_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![m45 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/m45_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
-### 6.5. Góc 60 độ (`60_degree.csv`)
+### 7.5. Góc 60 độ (`60_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![60 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/60_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![60 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/60_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![60 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/60_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![60 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/60_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
-### 6.6. Góc 90 độ (`90_degree.csv`)
+### 7.6. Góc 90 độ (`90_degree.csv`)
 
 - **a) So sánh quỹ đạo 2D**:
-  ![90 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/90_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+  ![90 degree trajectory delayed](benchmark/poly_tangent_delayed_angle_comparison/90_degree_poly_tangent_delayed_2d_trajectory_w18.png)
 
 - **b) So sánh biểu đồ góc**:
-  ![90 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/90_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+  ![90 degree angle delayed](benchmark/poly_tangent_delayed_angle_comparison/90_degree_poly_tangent_delayed_angle_w18.png)
 
 ---
 
+> **Nhận xét**:
+> - Khi tính góc tiếp tuyến tại điểm lùi $\text{index} = -3$ thay vì điểm endpoint $\text{index} = 0$, đường góc tiếp tuyến (`Delayed Tangent`) có xu hướng ít nhiễu hơn đường góc tiếp tuyến tính tại điểm endpoint, các đỉnh nhiễu đồ thị thấp hơn và đường cong mượt hơn.
+
+---
+
+## 8. Đánh giá độ mịn bằng sai số RMS so với đường Fit bậc 1
+
+- **Các bước triển khai**:
+  - Với mỗi đoạn chạy thẳng ổn định (1 stable pass không đảo hướng), hướng thực tế của xe lý tưởng là một đường thẳng.
+  - Với từng phương án làm mượt, fit chuỗi góc $\theta(t)$ vào **1 đường đa thức bậc 1 (đường thẳng)** riêng biệt làm đường chuẩn Ground Truth Reference:
+    $$\hat{\theta}_{ref}(t) = a \cdot t + b$$
+  - Tính sai số bình phương trung bình căn **RMS (Root Mean Square)** giữa chuỗi góc và đường fit bậc 1 tương ứng:
+    $$\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \big(\theta_i - \hat{\theta}_{ref}(t_i)\big)^2}$$
+- **Hàm tính toán RMS và đường Fit bậc 1**:
+  ```python
+  def compute_linear_fit_and_rms(frame_ids: np.ndarray, angle_values: np.ndarray):
+      """
+      Fit đa thức bậc 1 (đường thẳng Ground Truth) và tính sai số RMS.
+      """
+      valid_mask = np.isfinite(angle_values)
+      if np.count_nonzero(valid_mask) < 2:
+          return np.full_like(angle_values, np.nan), np.nan
+
+      valid_frames = frame_ids[valid_mask]
+      valid_angles = angle_values[valid_mask]
+
+      # Fit đường đa thức bậc 1 (Ground Truth reference)
+      p1 = np.polyfit(valid_frames, valid_angles, deg=1)
+      ref_line = np.polyval(p1, frame_ids)
+
+      # Tính sai số bình phương trung bình căn RMS
+      residuals = valid_angles - np.polyval(p1, valid_frames)
+      rms_error = float(np.sqrt(np.mean(residuals ** 2)))
+      return ref_line, rms_error
+  ```
+- **Quy tắc hiển thị các đường trên biểu đồ**:
+  - **Đường Raw Angle (Model)**: Nét liền màu đỏ đậm `#8b0000` làm mốc so sánh với góc nhận diện gốc từ model.
+  - **Cặp 1 - Smooth 1 Linear [0, 1] (index = 0)**: Nét liền màu xanh dương `#0055ff` và đường Reference bậc 1 nét đứt `--` cùng tone màu xanh dương.
+  - **Cặp 2 - Delayed Tangent [0, 1] (index = -3)**: Nét liền màu cam `#ff7f0e` và đường Reference bậc 1 nét đứt `--` cùng tone màu cam.
+  - **Cặp 3 - Smooth 2 ($W_2 = 36$)**: Nét liền màu xanh lá `#2ca02c` và đường Reference bậc 1 nét đứt `--` cùng tone màu xanh lá.
+- **Code sử dụng**: [`plot_poly_tangent_linear_weight.py`](tools/plot_poly_tangent_linear_weight.py)
+- **Lệnh chạy các file csv benchmark**:
+  ```powershell
+  python tools/plot_poly_tangent_linear_weight.py benchmark --mode rms_compare --window-size 18 --poly-degree 2
+  ```
+- **Thư mục lưu ảnh kết quả**: `benchmark/rms_smoothing_comparison/`
+
+---
+
+### 8.1. Góc 0 độ (`0_degree.csv`)
+
+![0 degree rms](benchmark/rms_smoothing_comparison/0_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.2. Góc 30 độ (`30_degree.csv`)
+
+![30 degree rms](benchmark/rms_smoothing_comparison/30_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.3. Góc 45 độ (`45_degree.csv`)
+
+![45 degree rms](benchmark/rms_smoothing_comparison/45_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.4. Góc -45 độ (`m45_degree.csv`)
+
+![m45 degree rms](benchmark/rms_smoothing_comparison/m45_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.5. Góc 60 độ (`60_degree.csv`)
+
+![60 degree rms](benchmark/rms_smoothing_comparison/60_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.6. Góc 90 độ (`90_degree.csv`)
+
+![90 degree rms](benchmark/rms_smoothing_comparison/90_degree_rms_smoothing_comparison_w18.png)
+
+---
+
+### 8.7. Bảng so sánh chất lượng độ mịn (RMS) giữa các phương án
+
+| Tập dữ liệu benchmark | Smooth 1 Linear [0, 1] (index = 0) | Delayed Tangent [0, 1] (index = -3) | Smooth 2 ($W_2 = 36$) |
+| :--- | :---: | :---: | :---: |
+| **`0_degree.csv`** | 3.05° | **2.21°** | 3.48° |
+| **`30_degree.csv`** | 3.09° | **2.29°** | 3.97° |
+| **`45_degree.csv`** | 2.46° | **1.83°** | 2.42° |
+| **`60_degree.csv`** | 4.81° | **3.45°** | 4.78° |
+| **`90_degree.csv`** | 4.17° | **3.01°** | 4.52° |
+| **`m45_degree.csv`** | 4.87° | **3.35°** | 5.48° |
+
+> **Nhận xét**:
+> - Phương án **Delayed Heading Angle [0, 1] (index = -3)** cho chỉ số sai số RMS thấp hơn trên toàn bộ 6 góc benchmark ($1.83^\circ \to 3.45^\circ$).
+> - Giữa Smooth 1 và Smooth 2: Smooth 2 cho RMS hầu như là nhiễu RMS cao hơn smooth1 
 
 ## B. Khó khăn
 - Không
 
 ## C. Công việc tiếp theo
 - Em xin phép nhận công việc tiếp theo từ Thầy ạ.
+
+
+
+
+
 

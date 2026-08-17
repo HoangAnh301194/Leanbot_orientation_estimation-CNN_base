@@ -267,13 +267,13 @@
   - Với mỗi đoạn chạy thẳng ổn định (1 stable pass không đảo hướng), hướng thực tế của xe lý tưởng là một đường thẳng.
   - Với từng phương án làm mượt, fit chuỗi góc $\theta(t)$ vào **1 đường đa thức bậc 1 (đường thẳng)** riêng biệt làm đường chuẩn Ground Truth Reference:
 
-    $$\hat{\theta}_{ref}(t) = a \cdot t + b$$
+    - $$\hat{\theta}_{ref}(t) = a \cdot t + b$$
 
 
   - Tính sai số bình phương trung bình căn **RMS (Root Mean Square)** giữa chuỗi góc và đường fit bậc 1 tương ứng:
 
-    $$\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \big(\theta_i - \hat{\theta}_{ref}(t_i)\big)^2}$$
-    
+    - $$\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \big(\theta_i - \hat{\theta}_{ref}(t_i)\big)^2}$$
+
 - **Hàm tính toán RMS và đường Fit bậc 1**:
   ```python
   def compute_linear_fit_and_rms(frame_ids: np.ndarray, angle_values: np.ndarray):

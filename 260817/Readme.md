@@ -87,9 +87,10 @@
 - **Bước 3**: Lấy tọa độ làm mượt tại điểm cuối (Endpoint $t = 0$):
   $$x_{smooth} = x(0) = c_x, \quad y_{smooth} = y(0) = c_y$$
 - **Bước 4**: Tính vector vận tốc tiếp tuyến tại Endpoint ($t = 0$):
-  $$\frac{dx}{dt}\Big|_{t=0} = b_x, \quad \frac{dy}{dt}\Big|_{t=0} = b_y$$
+  $$x'(0) = \frac{dx}{dt}(0) = b_x, \quad y'(0) = \frac{dy}{dt}(0) = b_y$$
 - **Bước 5**: Xác định góc tiếp tuyến của quỹ đạo:
-  $$\theta = \operatorname{atan2}\left(-\frac{dy}{dt}\Big|_{t=0}, \frac{dx}{dt}\Big|_{t=0}\right)$$
+  $$\theta = \operatorname{atan2}\left(-y'(0), x'(0)\right) = \operatorname{atan2}(-b_y, b_x)$$
+
 
 ---
 

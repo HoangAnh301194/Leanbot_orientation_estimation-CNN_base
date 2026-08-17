@@ -160,9 +160,89 @@
 > - **Linear Weight (`1:1.5`, `1:2`, `1:3`)**: Đã ưu tiên trọng số lớn hơn cho các frame mới nhất gần thời điểm hiện tại.
 > - **Đánh giá thực nghiệm**: Với 3 tỷ lệ `1:1.5`, `1:2` và `1:3`, đường đồ thị góc tiếp tuyến bám sát quỹ đạo rất tốt, tuy nhiên độ chênh lệch giữa các mức trọng số này chưa tạo ra sự phân hóa quá rõ rệt trên biểu đồ toàn chu trình so với Uniform Weight.
 
+---
+
+## 6. Thử nghiệm với Linear Weight = [0, 1]
+
+- **Cấu hình thử nghiệm**:
+  - Trọng số tuyến tính tăng dần từ 0 (frame cũ nhất) đến 1 (frame mới nhất hiện tại).
+  - Đồ thị so sánh 3 đường:
+    - **Raw Angle (Model)**: Màu đỏ đậm `#8b0000`, nét liền.
+    - **Uniform Weight `1:1`**: Màu xanh dương `#0055ff`, nét liền.
+    - **Linear Weight `[0, 1]`**: Màu xanh lá `#2ca02c`, nét liền.
+- **Code sử dụng**: [`plot_poly_tangent_linear_weight_0_to_1.py`](tools/plot_poly_tangent_linear_weight_0_to_1.py)
+- **Lệnh chạy các file csv benchmark**:
+  ```powershell
+  python tools/plot_poly_tangent_linear_weight_0_to_1.py benchmark --window-size 18 --poly-degree 2
+  ```
+- **Thư mục lưu ảnh kết quả**: `benchmark/poly_tangent_linear_weight_0_to_1/`
+
+---
+
+### 6.1. Góc 0 độ (`0_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![0 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/0_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![0 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/0_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+### 6.2. Góc 30 độ (`30_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![30 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/30_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![30 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/30_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+### 6.3. Góc 45 độ (`45_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![45 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/45_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![45 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/45_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+### 6.4. Góc -45 độ (`m45_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![m45 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/m45_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![m45 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/m45_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+### 6.5. Góc 60 độ (`60_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![60 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/60_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![60 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/60_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+### 6.6. Góc 90 độ (`90_degree.csv`)
+
+- **a) So sánh quỹ đạo 2D**:
+  ![90 degree trajectory 0-1](benchmark/poly_tangent_linear_weight_0_to_1/90_degree_poly_tangent_linear_0_to_1_2d_trajectory_w18.png)
+
+- **b) So sánh biểu đồ góc**:
+  ![90 degree angle 0-1](benchmark/poly_tangent_linear_weight_0_to_1/90_degree_poly_tangent_linear_0_to_1_angle_w18.png)
+
+---
+
+
 ## B. Khó khăn
 - Không
 
 ## C. Công việc tiếp theo
-- Em có cần thử thêm các trọng số tỉ lệ Linear Weight khác không ạ ? 
 - Em xin phép nhận công việc tiếp theo từ Thầy ạ.
+

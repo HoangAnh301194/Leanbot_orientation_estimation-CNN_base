@@ -82,14 +82,14 @@
 - **Bước 1**: Chuẩn hóa trục thời gian $t$ của cửa sổ $W$ mẫu về đoạn:
   $$t \in [-1, 0]$$
 - **Bước 2**: Fit riêng hai đa thức bậc 2 theo phương pháp Weighted Least Squares:
-  $$x(t) = a_x t^2 + b_x t + c_x$$
-  $$y(t) = a_y t^2 + b_y t + c_y$$
+  $$x(t) = a_x t^2 + b_x t + c_x, \quad y(t) = a_y t^2 + b_y t + c_y$$
 - **Bước 3**: Lấy tọa độ làm mượt tại điểm cuối (Endpoint $t = 0$):
   $$x_{smooth} = x(0) = c_x, \quad y_{smooth} = y(0) = c_y$$
 - **Bước 4**: Tính vector vận tốc tiếp tuyến tại Endpoint ($t = 0$):
   $$x'(0) = \frac{dx}{dt}(0) = b_x, \quad y'(0) = \frac{dy}{dt}(0) = b_y$$
 - **Bước 5**: Xác định góc tiếp tuyến của quỹ đạo:
-  $$\theta = \operatorname{atan2}\left(-y'(0), x'(0)\right) = \operatorname{atan2}(-b_y, b_x)$$
+  $$\theta = \text{atan2}\left(-y'(0), x'(0)\right) = \text{atan2}(-b_y, b_x)$$
+
 
 
 ---

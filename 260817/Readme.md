@@ -266,9 +266,14 @@
 - **Các bước triển khai**:
   - Với mỗi đoạn chạy thẳng ổn định (1 stable pass không đảo hướng), hướng thực tế của xe lý tưởng là một đường thẳng.
   - Với từng phương án làm mượt, fit chuỗi góc $\theta(t)$ vào **1 đường đa thức bậc 1 (đường thẳng)** riêng biệt làm đường chuẩn Ground Truth Reference:
+
     $$\hat{\theta}_{ref}(t) = a \cdot t + b$$
+
+
   - Tính sai số bình phương trung bình căn **RMS (Root Mean Square)** giữa chuỗi góc và đường fit bậc 1 tương ứng:
+
     $$\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \big(\theta_i - \hat{\theta}_{ref}(t_i)\big)^2}$$
+    
 - **Hàm tính toán RMS và đường Fit bậc 1**:
   ```python
   def compute_linear_fit_and_rms(frame_ids: np.ndarray, angle_values: np.ndarray):
@@ -293,9 +298,9 @@
   ```
 - **Quy tắc hiển thị các đường trên biểu đồ**:
   - **Đường Raw Angle (Model)**: Nét liền màu đỏ đậm `#8b0000` làm mốc so sánh với góc nhận diện gốc từ model.
-  - **Cặp 1 - Smooth 1 Linear [0, 1] (index = 0)**: Nét liền màu xanh dương `#0055ff` và đường Reference bậc 1 nét đứt `--` cùng tone màu xanh dương.
-  - **Cặp 2 - Delayed Tangent [0, 1] (index = -3)**: Nét liền màu cam `#ff7f0e` và đường Reference bậc 1 nét đứt `--` cùng tone màu cam.
-  - **Cặp 3 - Smooth 2 ($W_2 = 36$)**: Nét liền màu xanh lá `#2ca02c` và đường Reference bậc 1 nét đứt `--` cùng tone màu xanh lá.
+  - **Cặp 1 - Smooth 1 Linear [0, 1] (index = 0)**
+  - **Cặp 2 - Delayed Tangent [0, 1] (index = -3)**
+  - **Cặp 3 - Smooth 2 ($W_2 = 36$)**
 - **Code sử dụng**: [`plot_poly_tangent_linear_weight.py`](tools/plot_poly_tangent_linear_weight.py)
 - **Lệnh chạy các file csv benchmark**:
   ```powershell

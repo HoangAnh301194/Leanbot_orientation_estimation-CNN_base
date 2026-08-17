@@ -296,11 +296,7 @@
       rms_error = float(np.sqrt(np.mean(residuals ** 2)))
       return ref_line, rms_error
   ```
-- **Chú thích các đường trên biểu đồ**:
-  - **Đường Raw Angle (Model)**: Nét liền màu đỏ đậm `#8b0000` làm mốc so sánh với góc nhận diện gốc từ model.
-  - **Cặp 1 - Smooth 1 Linear [0, 1] (index = 0)**
-  - **Cặp 2 - Delayed Tangent [0, 1] (index = -3)**
-  - **Cặp 3 - Smooth 2 ($W_2 = 36$)**
+
 - **Code sử dụng**: [`plot_poly_tangent_linear_weight.py`](tools/plot_poly_tangent_linear_weight.py)
 - **Lệnh chạy các file csv benchmark**:
   ```powershell

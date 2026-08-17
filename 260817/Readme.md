@@ -164,4 +164,5 @@
 - Không
 
 ## C. Công việc tiếp theo
+- Em có cần thử thêm các trọng số tỉ lệ Linear Weight khác không ạ ? 
 - Em xin phép nhận công việc tiếp theo từ Thầy ạ.

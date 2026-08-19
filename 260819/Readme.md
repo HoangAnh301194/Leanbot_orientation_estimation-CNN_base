@@ -3,7 +3,7 @@
 ## Mục lục
 - [A. Công việc đã làm](#a-công-việc-đã-làm)
 - [1. So sánh Delayed Tangent giữa Uniform Weight và Linear Weight [0, 1]](#1-so-sánh-delayed-tangent-giữa-uniform-weight-và-linear-weight-0-1)
-- [2. So sánh Smooth 1 Delayed (W = 18, index = -3) với Smooth 2 Delayed (W2 = 36, index = -3)](#2-so-sánh-smooth-1-delayed-w--18--index---3--với-smooth-2-delayed-w2--36-index---3)
+- [2. So sánh Smooth 1 Delayed (W = 18, index = -3) với Smooth 2 Delayed (W2 = 36, index = -3)](#2-so-sánh-smooth-1-delayed-w--18-index---3-với-smooth-2-delayed-w2--36-index---3)
 - [3. So sánh kích thước cửa sổ W = 18 vs W = 15 (Delayed [0, 1], index = -3)](#3-so-sánh-kích-thước-cửa-sổ-w--18-vs-w--15-delayed-0-1-index---3)
 - [4. So sánh các mức delay (-2, -3, -4) trên Linear Weight [0, 1] (W = 18)](#4-so-sánh-các-mức-delay--2--3--4-trên-linear-weight-0-1-w--18)
 - [5. Nhận xét tổng quan](#5-nhận-xét-tổng-quan)
@@ -79,7 +79,7 @@
 
 ---
 
-### 2. So sánh Smooth 1 Delayed (W = 18 , index = -3 ) với Smooth 2 Delayed (W2 = 36, index = -3)
+### 2. So sánh Smooth 1 Delayed (W = 18, index = -3) với Smooth 2 Delayed (W2 = 36, index = -3)
 
 - **Cấu hình**: W1 = 18, W2 = 36, đa thức bậc 2, cả Smooth 1 và Smooth 2 đều lấy tại điểm lùi `index = -3`.
 - **Lệnh chạy**:
@@ -446,11 +446,11 @@
 #### 9.5. Nhận xét đánh giá trên quỹ đạo vòng tròn:
 
 1. **Tính tương thích của thước đo RMS Poly Fit bậc 1**:
-   - Khi xe quay tròn đều, chuỗi góc sau khi unwrap tăng dốc tuyến tính theo thời gian ($\theta(t) \approx \omega t + \theta_0$), do đó đường Fit đa thức bậc 1 chính là **đường góc lý thuyết chuẩn theo thời gian**, nên vẫn có thể dùng RMS để đánh giá độ nhiễu, lệch so với đường bậc 1 tham chiếu.
+   - Khi xe quay tròn đều, chuỗi góc sau khi unwrap tăng dốc tuyến tính theo thời gian (theta(t) ≈ ω*t + theta_0), do đó đường Fit đa thức bậc 1 chính là **đường góc lý thuyết chuẩn theo thời gian**, nên vẫn có thể dùng RMS để đánh giá độ nhiễu, lệch so với đường bậc 1 tham chiếu.
 
 2. **Đánh giá hiệu quả làm mượt góc**:
    - **`Model Smooth 1`**: Duy trì độ ổn định cao qua nhiều vòng quay liên tiếp (RMS trung bình **4.25°** so với **4.64°** của Raw Model)
-   - **`Smooth 2 Tangent`**: Do cửa sổ trượt lớn ($W_1=18, W_2=36$), khi xe quay liên tục 360° thì vector tiếp tuyến quỹ đạo có độ trễ pha tự nhiên so với hướng đầu xe thực tế, dẫn đến RMS so với đường góc lý thuyết cao hơn (~8.39°).
+   - **`Smooth 2 Tangent`**: Do cửa sổ trượt lớn (W1=18, W2=36), khi xe quay liên tục 360° thì vector tiếp tuyến quỹ đạo có độ trễ pha tự nhiên so với hướng đầu xe thực tế, dẫn đến RMS so với đường góc lý thuyết cao hơn (~8.39°).
    - **Fused Angle** ở mức trung bình của Model Smooth 1 và Smooth 2 Tangent, giữ được độ bám của Model Smooth 1, giảm độ trễ của Smooth 2 Tangent.
 
 ---

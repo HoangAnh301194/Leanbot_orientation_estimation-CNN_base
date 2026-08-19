@@ -211,9 +211,27 @@
 
 ---
 
+### 5. Nhận xét tổng quan
+
+1. **Đối với phương pháp lùi vị trí index đạo hàm tính góc (Delayed Tangent $\text{index} = -k$)**:
+   - Việc tính tiếp tuyến lùi sâu vào bên trong cửa sổ trượt ($\text{index} = -2, -3, -4$) giúp giảm hiện tượng bất ổn định đạo hàm tại biên cửa sổ (endpoint derivative instability)
+   - Sai số RMS giảm khi tăng độ trễ: từ $\mathbf{3.12^\circ}$ (tại $-2$) $\to \mathbf{2.71^\circ}$ (tại $-3$) $\to \mathbf{2.33^\circ}$ (tại $-4$).
+
+2. **Về so sánh Uniform Weight vs Linear Weight $[0, 1]$**:
+   - Khi kết hợp điểm lùi $\text{index} = -3$, cả hai bộ trọng số đều cho chất lượng làm mượt tương đương nhau (RMS trung bình $\mathbf{2.69^\circ}$ vs $\mathbf{2.71^\circ}$).
+
+3. **Về phương án smooth thêm lần 2 - Smooth 2 Delayed ($W_2 = 36, \text{index} = -3$)**:
+   - Khi lớp làm mượt thứ hai (Smooth 2) cũng được cấu hình lấy trễ tại $\text{index} = -3$, cho thấy dữ liệu mượt hơn rõ rệt hơn : 
+   - Sai số RMS giảm $\mathbf{30.7\%}$ so với Smooth 1 (RMS trung bình giảm từ $\mathbf{2.67^\circ} \to \mathbf{1.85^\circ}$)
+
+4. **Về kích thước cửa sổ ($W = 18$ vs $W = 15$)**:
+   - Cửa sổ $W = 18$ đạt độ ổn định và giảm nhiễu tốt hơn $W = 15$ trên $5/6$ tập dữ liệu góc benchmark (RMS trung bình $\mathbf{2.71^\circ}$ so với $\mathbf{2.80^\circ}$).
+
+---
 
 ## B. Khó khăn
 - Không 
+
 ---
 
 ## C. Công việc tiếp theo

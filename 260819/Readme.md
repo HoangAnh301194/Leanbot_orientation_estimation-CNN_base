@@ -22,7 +22,7 @@
 - So sánh các mức delay (-2, -3, -4) đối với phương án Delayed Tangent với Linear Weight [0, 1] trên cùng cấu hình cửa sổ $W = 18$
 - Bổ sung RMS trung bình của tất cả lần chạy các đường góc khác nhau.
 - Thử nghiệm làm mượt 2 lớp cho góc Model Angle (Raw Model vs Model Smooth 1 vs Model Smooth 2 tại $\text{index} = -4$).
-- Đề xuất công thức hợp nhất góc thích ứng theo vận tốc $x(v) = \frac{K}{K + v}$ và $\text{fusedAngle} = x(v) \cdot \theta_{\text{model\_smooth1}} + (1 - x(v)) \cdot \theta_{\text{smooth2\_tangent}}$.
+- Đề xuất công thức hợp nhất góc thích ứng theo vận tốc $x(v) = \frac{K}{K + v}$ và $\theta_{\text{fused}} = x(v) \cdot \theta_{\text{model}} + (1 - x(v)) \cdot \theta_{\text{tangent}}$.
 - Thực nghiệm đánh giá góc hợp nhất FusedAngle trên toàn bộ 6 tập dữ liệu góc benchmark.
 
 ---
@@ -322,13 +322,13 @@
   $$x(v) = \frac{1}{1 + \dfrac{v}{K}} = \frac{K}{K + v}$$
 
 - **Công thức góc hợp nhất FusedAngle**:
-  $$\theta_{\text{fused}}(t) = x(v(t)) \cdot \theta_{\text{model\_smooth1}}(t) + \big(1 - x(v(t))\big) \cdot \theta_{\text{smooth2\_tangent}}(t)$$
+  $$\theta_{\text{fused}}(t) = x(v(t)) \cdot \theta_{\text{model}}(t) + \big(1 - x(v(t))\big) \cdot \theta_{\text{tangent}}(t)$$
 
 - **Ý nghĩa tham số $K$**:
   - Chọn cấu hình thực nghiệm: **$K = 3.0\text{ px/frame}$**.
-  - Khi $v \to 0 \implies x = 1.0 \implies \theta_{\text{fused}} = \theta_{\text{model\_smooth1}}$ (Dữ liệu có xu hướng lấy nhiều của model).
+  - Khi $v \to 0 \implies x = 1.0 \implies \theta_{\text{fused}} = \theta_{\text{model}}$ (Dữ liệu có xu hướng lấy nhiều của model).
   - Khi $v = K = 3.0\text{ px/frame} \implies x = 0.5 \implies$ dữ liệu trung bình cân bằng $50\% - 50\%$.
-  - Khi $v \gg K \implies x \to 0 \implies \theta_{\text{fused}} \to \theta_{\text{smooth2\_tangent}}$ (Dữ liệu có xu hướng lấy nhiều từ Smooth Tangent angle).
+  - Khi $v \gg K \implies x \to 0 \implies \theta_{\text{fused}} \to \theta_{\text{tangent}}$ (Dữ liệu có xu hướng lấy nhiều từ Smooth Tangent angle).
 
 ---
 

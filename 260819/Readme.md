@@ -25,7 +25,7 @@
 - Thử nghiệm làm mượt 2 lớp cho góc Model Angle (Raw Model vs Model Smooth 1 vs Model Smooth 2 tại index = -4).
 - Đề xuất công thức hợp nhất góc thích ứng theo vận tốc: `x(v) = K / (K + v)` và `fusedAngle = x(v) * Model_Smooth_1 + (1 - x(v)) * Smooth_2_Tangent`.
 - Thực nghiệm đánh giá góc hợp nhất FusedAngle trên toàn bộ 6 tập dữ liệu góc benchmark.
-- Đánh giá thuật toán FusedAngle trên các tập dữ liệu di chuyển vòng tròn (`1turn.csv`, `2turn.csv`, `3turn.csv`).
+- Tính góc FusedAngle trên các tập dữ liệu góc Benchmark ( đi tiến lùi, đi vòng tròn ) và vẽ đồ thị so sánh 3 đường  fusedAngled, raw Model Angle và smooth Angle
 
 ---
 

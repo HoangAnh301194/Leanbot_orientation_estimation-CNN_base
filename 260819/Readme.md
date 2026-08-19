@@ -118,7 +118,7 @@
 #### 2.7. Bảng tổng hợp sai số RMS: Smooth 1 Delayed vs Smooth 2 Delayed (index = -3)
 
 | Tập dữ liệu Benchmark | Smooth 1 Delayed [0, 1] (W1 = 18, -3) | Smooth 2 Delayed (W2 = 36, -3) | Mức độ cải thiện RMS |
-| :--- | :---: | :---: | :---: | :---: |
+| :--- | :---: | :---: | :---: |
 | **`0_degree.csv`** | 2.24° | **1.70°** | Giảm **24.1%** |
 | **`30_degree.csv`** | 2.29° | **1.91°** | Giảm **16.6%** |
 | **`45_degree.csv`** | 1.98° | **1.32°** | Giảm **33.3%** |
@@ -396,6 +396,7 @@
 ### 9. Đánh giá thuật toán trên quỹ đạo di chuyển vòng tròn (1turn, 2turn, 3turn)
 
 - **Cấu hình**: W1 = 18, W2 = 36, điểm lùi `index = -4`, hằng số `K = 3.0`.
+- **Phương pháp tham chiếu**: Do góc quay vòng tròn sau khi unwrap biến thiên tuyến tính liên tục theo thời gian (~ 360°/vòng), đường Fit đa thức bậc 1 (Poly Fit bậc 1) được sử dụng làm **đường góc tham chiếu theo thời gian** để tính sai số RMS.
 - **Lệnh chạy**:
   ```powershell
   python 260819/tools/plot_poly_tangent_linear_weight.py 260819/benchmark/1turn.csv --mode compare_fused_angle --K 3.0
@@ -404,33 +405,60 @@
   ```
 
 #### 9.1. Quỹ đạo 1 vòng (`1turn.csv`)
+
+##### a. Đồ thị toàn bộ chu trình quay 1 vòng (~ 360°)
 ![1 turn fused](benchmark/circular_motion_comparison/1turn_fused_angle_w18.png)
-*Ảnh phóng to đoạn 100 frame ngẫu nhiên (Frames 226 - 325):*
+
+##### b. Đồ thị phóng to đoạn 100 frame ngẫu nhiên (Frames 226 - 325)
 ![1 turn fused zoom 100](benchmark/circular_motion_comparison/1turn_fused_angle_w18_zoom100.png)
 
 ---
 
 #### 9.2. Quỹ đạo 2 vòng (`2turn.csv`)
+
+##### a. Đồ thị toàn bộ chu trình quay 2 vòng (~ 720°)
 ![2 turn fused](benchmark/circular_motion_comparison/2turn_fused_angle_w18.png)
-*Ảnh phóng to đoạn 100 frame ngẫu nhiên (Frames 233 - 332):*
+
+##### b. Đồ thị phóng to đoạn 100 frame ngẫu nhiên (Frames 233 - 332)
 ![2 turn fused zoom 100](benchmark/circular_motion_comparison/2turn_fused_angle_w18_zoom100.png)
 
 ---
 
 #### 9.3. Quỹ đạo 3 vòng (`3turn.csv`)
+
+##### a. Đồ thị toàn bộ chu trình quay 3 vòng (~ 1080°)
 ![3 turn fused](benchmark/circular_motion_comparison/3turn_fused_angle_w18.png)
-*Ảnh phóng to đoạn 100 frame ngẫu nhiên (Frames 382 - 481):*
+
+##### b. Đồ thị phóng to đoạn 100 frame ngẫu nhiên (Frames 382 - 481)
 ![3 turn fused zoom 100](benchmark/circular_motion_comparison/3turn_fused_angle_w18_zoom100.png)
 
-#### 9.4. Nhận xét đánh giá trên quỹ đạo vòng tròn
-- Khi Leanbot di chuyển quay tròn liên tục, chuỗi góc sau khi unwrap tăng dốc tuyến tính theo thời gian (~ 360°/vòng).
-- **`Model Smooth 1`** bám sát góc quay thực tế của thân xe tốt nhất và không bị trễ pha hình học.
-- **`Fused Angle`** làm phẳng các bước nhảy rung lắc rời rạc của góc Model, tạo ra đường góc quay tròn êm và trơn tru.
-- Trên quỹ đạo cong liên tục, góc tiếp tuyến quỹ đạo qua 2 lớp làm mượt (`Smooth 2 Tangent`) có độ trễ pha hình học nhẹ so với hướng đầu xe thực tế do độ rộng cửa sổ trượt (W1=18, W2=36), do đó sự kết hợp với Model Angle trong Fused Angle giúp kéo hướng góc về đúng với dáng thực của xe.
+---
+
+#### 9.4. Bảng tổng hợp sai số RMS: Đánh giá góc quay vòng tròn (Poly Fit bậc 1, K=3.0, index = -4)
+
+| Tập dữ liệu Benchmark | Raw Model Angle | Model Smooth 1 (W1=18) | Smooth 2 Tangent (W2=36) | Fused Angle (K=3.0) |
+| :--- | :---: | :---: | :---: | :---: |
+| **`1turn.csv`** (1 vòng ~ 360°) | 4.09° | 3.64° | 6.57° | **3.26°** |
+| **`2turn.csv`** (2 vòng ~ 720°) | 4.74° | **4.40°** | 9.40° | 5.27° |
+| **`3turn.csv`** (3 vòng ~ 1080°) | 5.10° | **4.70°** | 9.19° | 5.44° |
+| **Trung bình (Average)** | **4.64°** | **4.25°** | **8.39°** | **4.66°** |
+
+#### 9.5. Nhận xét đánh giá trên quỹ đạo vòng tròn:
+
+1. **Tính tương thích của thước đo RMS Poly Fit bậc 1**:
+   - Khi xe quay tròn đều, chuỗi góc sau khi unwrap tăng dốc tuyến tính theo thời gian ($\theta(t) \approx \omega t + \theta_0$), do đó đường Fit đa thức bậc 1 chính là **đường góc lý thuyết chuẩn theo thời gian**, nên vẫn có thể dùng RMS để đánh giá độ nhiễu, lệch so với đường bậc 1 tham chiếu.
+
+2. **Đánh giá hiệu quả làm mượt góc**:
+   - **`Model Smooth 1`**: Duy trì độ ổn định cao qua nhiều vòng quay liên tiếp (RMS trung bình **4.25°** so với **4.64°** của Raw Model)
+   - **`Smooth 2 Tangent`**: Do cửa sổ trượt lớn ($W_1=18, W_2=36$), khi xe quay liên tục 360° thì vector tiếp tuyến quỹ đạo có độ trễ pha tự nhiên so với hướng đầu xe thực tế, dẫn đến RMS so với đường góc lý thuyết cao hơn (~8.39°).
+   - **Fused Angle** ở mức trung bình của Model Smooth 1 và Smooth 2 Tangent, giữ được độ bám của Model Smooth 1, giảm độ trễ của Smooth 2 Tangent.
 
 ---
 
 ## B. Khó khăn
 - Không
+
+---
+
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ .

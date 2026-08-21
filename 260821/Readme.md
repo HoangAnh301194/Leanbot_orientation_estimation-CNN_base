@@ -11,46 +11,50 @@
 ### 1. Cấu hình thực nghiệm 
 
 #### 1.1. Cấu hình
-- **Kích thước cửa sổ trượt**: $W = 18$ mẫu.
+- **Kích thước cửa sổ trượt**: `W = 18` mẫu.
 - **Trọng số**: `Uniform Weight` (trọng số đều).
-- **Điểm đánh giá độ trễ**: $\text{index} = -4$ ($t_{eval} = \frac{-4}{17} \approx -0.235$)
-- **Số lần làm mượt**: **1 lần duy nhất (Single-pass Smooth)** với poly bậc 1 và bậc 2 
-- **Hệ số phụ thuộc vận tốc để tính FusedAngle**: $K = 3.0\text{ px/frame}$.
-
+- **Điểm đánh giá độ trễ**: `index = -4` (`t_eval = -4/17 ≈ -0.235`).
+- **Số lần làm mượt**: **1 lần duy nhất (Single-pass Smooth)** với poly bậc 1 và bậc 2.
+- **Hệ số phụ thuộc vận tốc để tính FusedAngle**: `K = 3.0 px/frame`.
 
 #### 1.2. Hai nhánh thực nghiệm
 Chạy độc lập và song song 2 nhánh, ngoài bậc polynomial thì toàn bộ các tham số khác giống nhau tuyệt đối:
-- **Nhánh 1**: `poly_degree = 1` .
-- **Nhánh 2**: `poly_degree = 2` .
+- **Nhánh 1**: `poly_degree = 1`.
+- **Nhánh 2**: `poly_degree = 2`.
 
 ---
 
 #### 1.3. Các dữ liệu thử nghiệm
 
 1. **Góc Model (`Model Angle`)**:
-   - `RawModelAngle`: Chuỗi `raw_angle` từ CSV, chỉ unwrap pha $\pm 360^\circ$, không làm mượt.
-   - **Nhánh Bậc 1**: $\text{ModelAngleDegree1} = \text{smooth\_1d}(\text{RawModelAngle}, \text{degree}=1, W=18, \text{index}=-4)$
-   - **Nhánh Bậc 2**: $\text{ModelAngleDegree2} = \text{smooth\_1d}(\text{RawModelAngle}, \text{degree}=2, W=18, \text{index}=-4)$
+   - `RawModelAngle`: Chuỗi `raw_angle` từ CSV, chỉ unwrap pha `±360°`, không làm mượt.
+   - **Nhánh Bậc 1**: `ModelAngleDegree1 = smooth_1d(RawModelAngle, degree=1, W=18, index=-4)`
+   - **Nhánh Bậc 2**: `ModelAngleDegree2 = smooth_1d(RawModelAngle, degree=2, W=18, index=-4)`
 
 2. **Góc từ Quỹ đạo (`Trajectory Tangent Angle`)**:
-   - Đầu vào: Tọa độ tâm $(x_{center}, y_{center})$.
-   - Fit đúng **1 lần** đa thức 2D trên $(x(t), y(t))$ với $W = 18, \text{index} = -4$:
-     - **Nhánh Bậc 1**: Fit bậc 1 $\to$ đạo hàm $\dot{x}_1, \dot{y}_1 \to \text{TrajectoryAngleDegree1} = \text{degrees}(\text{atan2}(-\dot{y}_1, \dot{x}_1))$
-     - **Nhánh Bậc 2**: Fit bậc 2 $\to$ đạo hàm $\dot{x}_2, \dot{y}_2 \to \text{TrajectoryAngleDegree2} = \text{degrees}(\text{atan2}(-\dot{y}_2, \dot{x}_2))$
-   - Unwrap chuỗi góc và căn chỉnh pha $180^\circ$ theo góc Model.
+   - Đầu vào: Tọa độ tâm `(x_center, y_center)`.
+   - Fit đúng **1 lần** đa thức 2D trên `(x(t), y(t))` với `W = 18`, `index = -4`:
+     - **Nhánh Bậc 1**: Fit bậc 1 -> đạo hàm `(dx1, dy1)` -> `TrajectoryAngleDegree1 = degrees(atan2(-dy1, dx1))`
+     - **Nhánh Bậc 2**: Fit bậc 2 -> đạo hàm `(dx2, dy2)` -> `TrajectoryAngleDegree2 = degrees(atan2(-dy2, dx2))`
+   - Unwrap chuỗi góc và căn chỉnh pha `180°` theo góc Model.
 
 3. **Vận tốc ước lượng (`Estimated Speed`)**:
-   - Lấy trực tiếp từ đạo hàm quỹ đạo $W = 18$ ở bước trên:
-     $$v_1(t) = \frac{\sqrt{\dot{x}_1^2 + \dot{y}_1^2}}{W - 1}, \quad v_2(t) = \frac{\sqrt{\dot{x}_2^2 + \dot{y}_2^2}}{W - 1}$$
+   - Lấy trực tiếp từ đạo hàm quỹ đạo `W = 18` ở bước trên:
+     - `v1(t) = sqrt(dx1^2 + dy1^2) / (W - 1)`
+     - `v2(t) = sqrt(dx2^2 + dy2^2) / (W - 1)`
 
 4. **Góc hợp nhất (`Fused Angle`)**:
    - Tính riêng cho từng nhánh không qua bước làm mượt phụ:
-     $$x_1(t) = \frac{K}{K + v_1(t)}, \quad \text{FusedAngleDegree1} = x_1 \cdot \text{ModelAngleDegree1} + (1 - x_1) \cdot \text{TrajectoryAngleDegree1}$$
-     $$x_2(t) = \frac{K}{K + v_2(t)}, \quad \text{FusedAngleDegree2} = x_2 \cdot \text{ModelAngleDegree2} + (1 - x_2) \cdot \text{TrajectoryAngleDegree2}$$
+     - `x1(t) = K / (K + v1(t))`
+     - `FusedAngleDegree1 = x1 * ModelAngleDegree1 + (1 - x1) * TrajectoryAngleDegree1`
+     - `x2(t) = K / (K + v2(t))`
+     - `FusedAngleDegree2 = x2 * ModelAngleDegree2 + (1 - x2) * TrajectoryAngleDegree2`
+
+---
 
 ## 2. Kết quả thực nghiệm trên 6 tập dữ liệu góc Benchmark
 
-- **Cấu hình thực nghiệm**: $W = 18$, $\text{index} = -4$, $K = 3.0$.
+- **Cấu hình thực nghiệm**: `W = 18`, `index = -4`, `K = 3.0`.
 - **Lệnh chạy**:
   ```powershell
   python 260821/tools/compare_poly_degree_single_smooth.py 260821/benchmark --window-size 18 --eval-index -4 --K 3.0
@@ -105,7 +109,7 @@ Chạy độc lập và song song 2 nhánh, ngoài bậc polynomial thì toàn b
 #### b) So sánh góc Quỹ đạo (Degree 1 vs Degree 2)
 ![m45 deg traj](benchmark/poly_degree_single_smooth_comparison/m45_degree_trajectory_degree1_vs_degree2.png)
 
-#### c) So sánh trực diện Fused Angle (Degree 1 vs Degree 2)
+#### c) So sánh Fused Angle (Degree 1 vs Degree 2)
 ![m45 deg fused](benchmark/poly_degree_single_smooth_comparison/m45_degree_fused_degree1_vs_degree2.png)
 
 ---
@@ -148,15 +152,17 @@ Chạy độc lập và song song 2 nhánh, ngoài bậc polynomial thì toàn b
 | **`90_degree.csv`** | 2.00° | 1.46° | 1.51° | **1.59°** | 2.64° | **1.08°** | 1.53° |
 | **Trung bình (Average)** | **3.27°** | **2.56°** | **2.65°** | **1.46°** | **2.37°** | **1.51°** | **1.89°** |
 
-
 >
-- Sai số RMS: Bậc 1 cho RMS trung bình thấp hơn Bậc 2 ở cả 3 loại dữ liệu góc . 
+- Sai số RMS: Bậc 1 cho RMS trung bình thấp hơn Bậc 2 ở cả 3 loại dữ liệu góc.
 - Góc Quỹ đạo: Bậc 1 phù hợp với chuyển động thẳng nhờ tiếp tuyến hằng số; Bậc 2 nhạy hơn với sai số bounding box do có thêm thành phần độ cong.
 - Góc Hợp nhất: Fused Bậc 1 giảm 53.8% độ lệch so với góc Model thô (từ 3.27° xuống 1.51°).
+
+---
 
 ## B. Khó khăn
 - Không.
 
+---
 
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.

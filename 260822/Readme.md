@@ -7,7 +7,7 @@
 ---
 
 ### 1. Cấu hình làm mượt tối ưu tích hợp vào hệ thống
-Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối cùng để thử nghiệm với RMS thấp nhất nhưu sau : 
+Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối cùng để thử nghiệm với RMS thấp nhất như sau : 
 
 | Tham số / Luồng xử lý | Cấu hình triển khai | Ý nghĩa |
 | :--- | :--- | :--- |
@@ -33,12 +33,12 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
   * **Trọng số**: Trọng số đều (`Uniform Weight`).
 
 * **Các bước xử lý dữ liệu**:
-  1. **Trích xuất góc thô (`raw_angle`)**
+  1. **Trích xuất góc thô (`raw_angle`)**: Tính vector trung bình có trọng số từ phân bố xác suất của toàn bộ các class góc thông qua hàm `get_vector_from_scores()` trong [leanbotCameraController.py](LeanbotTinyRC/leanbotCameraController.py).
   2. **Unwrap góc $\pm 360^\circ$ (`_unwrap_angle`)**: Khử hiện tượng gián đoạn góc khi vượt qua các mốc biên $\pm 180^\circ$ hoặc $360^\circ \leftrightarrow 0^\circ$ để tạo chuỗi dữ liệu pha liên tục:
-     $$\Delta \theta = (\theta_{\text{new}} - \theta_{\text{prev}} + 180^\circ) \pmod{360^\circ} - 180^\circ \implies \theta_{\text{unwrapped}} = \theta_{\text{prev}} + \Delta \theta$$
-  3. **Lưu trữ vào hàng đợi cửa sổ trượt**: Đẩy $\theta_{\text{unwrapped}}$ vào buffer `raw_angle_buffer` với cửa số sliding window w = 18 ;
+     $$\Delta \theta = (\theta_{\text{new}} - \theta_{\text{prev}} + 180^\circ) \bmod 360^\circ - 180^\circ \implies \theta_{\text{unwrapped}} = \theta_{\text{prev}} + \Delta \theta$$
+  3. **Lưu trữ vào hàng đợi cửa sổ trượt**: Đẩy $\theta_{\text{unwrapped}}$ vào buffer `raw_angle_buffer` với cửa số sliding window $W = 18$.
   4. **Poly fit với hàm Bậc 1 (`_smooth_1d_poly`)**: Chuẩn hóa trục thời gian $t \in [-1, 0]$ trên các mẫu hợp lệ (`finite_mask`), khớp phương trình đường thẳng $\theta(t) = a_1 t + a_0$ bằng `np.polyfit`.
-  5. **Tính toán góc làm mượt**: Đánh giá đa thức tại thời điểm $t_{\text{eval}}$ bằng `np.polyval()`. Ouput là dữ liệu góc raw từ model đã được smooth 
+  5. **Tính toán góc làm mượt**: Đánh giá đa thức tại thời điểm $t_{\text{eval}}$ bằng `np.polyval()`. Output là dữ liệu góc raw từ model đã được smooth (`model_angle_smooth`).
 
 ---
 
@@ -59,7 +59,7 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
      * Đạo hàm bậc 1 tại $t_{\text{eval}}$ qua `np.polyder()`:
        $$\dot{x} = \left.\frac{dx}{dt}\right|_{t_{\text{eval}}}, \quad \dot{y} = \left.\frac{dy}{dt}\right|_{t_{\text{eval}}}$$
      * Vận tốc di chuyển pixel ước lượng: $v = \frac{\sqrt{\dot{x}^2 + \dot{y}^2}}{W-1}$.
-     * Góc tiếp tuyến hình học: $\theta_{\text{traj\_raw}} = \operatorname{atan2}(-\dot{y}, \dot{x}) \cdot \frac{180^\circ}{\pi}$ (lấy $-\dot{y}$ do trục tọa độ $Y$ của ảnh camera hướng xuống).
+     * Góc tiếp tuyến hình học: $\theta_{\text{traj\_raw}} = \text{atan2}(-\dot{y}, \dot{x}) \cdot \frac{180^\circ}{\pi}$ (lấy $-\dot{y}$ do trục tọa độ $Y$ của ảnh camera hướng xuống).
   4. **Căn chỉnh pha tiếp tuyến $180^\circ$ (`_align_trajectory_phase`)**: Do tiếp tuyến đạo hàm có tính lưỡng cực đối xứng $\pm 180^\circ$ (tiến/lùi), thuật toán so sánh với góc tham chiếu `model_angle_smooth` và bù $\pm k \cdot 180^\circ$ để chọn góc đồng pha nhất:
      $$\theta_{\text{aligned}} = \theta_{\text{traj}} - k \cdot 180^\circ \quad \text{sao cho } |\theta_{\text{aligned}} - \theta_{\text{ref}}| \to \min$$
   5. **Làm mượt góc tiếp tuyến 1D Bậc 1**: Đưa $\theta_{\text{aligned}}$ vào `traj_angle_buffer` và khớp đa thức 1D Bậc 1 tại `eval_index = -4` để lọc nhiễu góc tiếp tuyến, thu được `trajectory_angle_smooth`.
@@ -78,7 +78,6 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
 
 ![diagram](image.png)
 
-
 * **Code thuật toán PID điều khiển**: [PID_controller.py](LeanbotTinyRC/PID_controller.py)
 
 * **Các bước tính toán chi tiết**:
@@ -91,7 +90,7 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
   * **Bước 2: Tính sai số góc ngắn nhất trên không gian $\mathbb{S}^1$ (Shortest Path Angular Error)**:
     Do góc xoay mang tính chu kỳ $360^\circ$, sai số giữa góc đặt và góc hiện tại được chuẩn hóa về đoạn $[-180^\circ, +180^\circ]$ bằng hàm `wrap_to_180`:
 
-    $$e_k = \operatorname{wrap\_to\_180}(\theta_{\text{target}} - \theta_{\text{fused}, k}) = ((\theta_{\text{target}} - \theta_{\text{fused}, k} + 180^\circ) \bmod 360^\circ) - 180^\circ$$
+    $$e_k = \text{wrap\_to\_180}(\theta_{\text{target}} - \theta_{\text{fused}, k}) = ((\theta_{\text{target}} - \theta_{\text{fused}, k} + 180^\circ) \bmod 360^\circ) - 180^\circ$$
     
     > Leanbot luôn tự động chọn chiều quay có cung góc nhỏ nhất 
 
@@ -105,11 +104,11 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
        $$P_k = K_p \cdot e_k \quad (K_p = 15.0)$$
        Tạo mô-men xoay tức thời tỉ lệ thuận với độ lệch góc hiện tại.
     2. **Khâu tích phân (Integral Term - I) với bộ khử bão hòa (Anti-Windup Clamping)**:
-       $$\Sigma_{I, k} = \operatorname{clamp}(\Sigma_{I, k-1} + e_k \cdot \Delta t_k, -300.0, +300.0)$$
+       $$\Sigma_{I, k} = \text{clamp}(\Sigma_{I, k-1} + e_k \cdot \Delta t_k, -300.0, +300.0)$$
        $$I_k = K_i \cdot \Sigma_{I, k} \quad (K_i = 0.0)$$
        Giới hạn tích lũy sai số trong dải $[-300, +300]$ để chống bão hòa tích phân khi góc lệch ban đầu lớn.
     3. **Khâu vi phân (Derivative Term - D) với hiệu chỉnh pha**:
-       $$\Delta e_k = \operatorname{wrap\_to\_180}(e_k - e_{k-1})$$
+       $$\Delta e_k = \text{wrap\_to\_180}(e_k - e_{k-1})$$
        $$D_k = K_d \cdot \frac{\Delta e_k}{\Delta t_k} \quad (K_d = 0.0)$$
        Đo lường tốc độ biến thiên của sai số để tạo lực hãm khi xe quay nhanh về gần đích, giảm thiểu vọt lố.
 
@@ -121,7 +120,7 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
   * **Bước 6: Bù vùng chết ma sát tĩnh (Deadband Friction Compensation)**:
     Động cơ và bánh xe thực tế luôn có ngưỡng ma sát tĩnh nghỉ $v_{\min} = 10$. Nếu tín hiệu $|u_k| < v_{\min}$ thì xe không đủ lực để chuyển động:
 
-    $$\text{Khi } 0 < |u_k| < v_{\min} \implies u_k = \operatorname{sgn}(u_k) \cdot v_{\min}$$
+    $$\text{Khi } 0 < |u_k| < v_{\min} \implies u_k = \text{sgn}(u_k) \cdot v_{\min}$$
 
     > Hiện tại em để vận tốc min là `10 step/sec`
 
@@ -133,7 +132,7 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
   * **Bước 8: Giới hạn bão hòa vận tốc (Velocity Saturation)**:
     Giới hạn vận tốc đầu ra của bộ PID về vận tốc tối đa $v_{\max} = 1000$ (trong khoảng $[-v_{\max}, +v_{\max}]$):
 
-    $$v_{L, k} = \operatorname{clamp}(v_{L, k}, -1000, 1000), \quad v_{R, k} = \operatorname{clamp}(v_{R, k}, -1000, 1000)$$
+    $$v_{L, k} = \text{clamp}(v_{L, k}, -1000, 1000), \quad v_{R, k} = \text{clamp}(v_{R, k}, -1000, 1000)$$
 
   * **Bước 9: Cơ chế ổn định dừng (Hold Time Verification)**:
     Khi robot duy trì sai số trong vùng chết ($|e_k| \le 1.0^\circ$) liên tục trong khoảng thời gian $\ge 100\text{ms}$ (`args.hold_ms`), bộ điều khiển chuyển sang trạng thái hoàn thành (`is_pid_completed = True`), ngắt động cơ gửi tốc độ $(0, 0)$ và khóa điều khiển tránh kích hoạt lại do nhiễu tức thời dẫn tới Leanbot lắc, nhích qua lại tại chỗ liên tục.
@@ -143,14 +142,16 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
     - Trong đó `v_L` và `v_R` là vận tốc 2 bánh xe, là đầu ra của bộ PID.
     - Hàm `send_speed` trong [leanbotCameraController.py](LeanbotTinyRC/leanbotCameraController.py) được sử dụng để đóng gói lệnh và gửi cho Leanbot qua BLE.
 
+---
+
 #### 2.4. Ghi dữ liệu CSV và đánh giá đồ thị điều khiển PID Leanbot
 
 * **Cấu trúc lưu trữ Log CSV**:
-  * File log được lưu trong thư mục [benchmark_logs](../LeanbotTinyRC/benchmark_logs) với các trường để vẽ đồ thị đánh giá như : 
+  * File log được lưu trong thư mục [benchmark_logs](LeanbotTinyRC/benchmark_logs) với các trường để vẽ đồ thị đánh giá như : 
   `raw_angle`, `model_angle_smooth`, `trajectory_angle_smooth`, `estimated_speed`, `fused_angle`, `target_angle`, `angle_error`, `ble_speed_left`, `ble_speed_right`.
 
 * **Tools vẽ đồ thị góc, tín hiện vận tốc điều khiển**:
-  * script [plot_pid_navigation_log.py](../LeanbotTinyRC/plot_pid_navigation_log.py) tự động trích xuất dữ liệu CSV và vẽ 3 biểu đồ:
+  * script [plot_pid_navigation_log.py](LeanbotTinyRC/plot_pid_navigation_log.py) tự động trích xuất dữ liệu CSV và vẽ 3 biểu đồ:
 
     1. **Biểu đồ góc**: Góc thô (`raw_angle`), Góc mượt mô hình (`model_smooth`), Góc quỹ đạo (`traj_smooth`), Góc hợp nhất (`fused_angle`) so với Góc mục tiêu (`target_angle`).
     2. **Biểu đồ sai số**: Sai số góc $\text{Angle Error} (^\circ)$ tiệm cận về 0.
@@ -189,16 +190,14 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
 | :--- | :--- | :--- |
 | **Độ mượt của tín hiệu góc** | fused angle biến thiên đều, mượt| Góc `fused_angle` lọc bỏ tốt xung nhiễu $\pm 2^\circ \sim 3^\circ$ của góc thô `raw_angle` và góc tiếp tuyến quỹ đạo |
 | **Thời gian xác lập ($t_s$)** | $\approx 5.5\text{ giây}$ | Robot quay ở tốc độ tối đa $\pm 1000$, giảm tốc tốt khi tới gần mục tiêu. |
-| **Độ vọt lố (Overshoot)** | **$0.0^\circ$ ($0\%$)** | Không xảy ra hiện tượng vượt lố với kp =  15|
+| **Độ vọt lố (Overshoot)** | **$0.0^\circ$ ($0\%$)** | Không xảy ra hiện tượng vượt lố với kp = 15 |
 | **Sai số xác lập ($e_{ss}$)** | **$< 0.5^\circ$** | nằm trong vùng chết cho phép ($\pm 1.0^\circ$). |
-
 
 ---
 
 #### 2.5. Video kiểm thử
 
-  ![Leanbot PID Rotation Demo](LeanbotTinyRC/benchmark_logs/leanbot_pid_demo.gif)
-
+![Leanbot PID Rotation Demo](LeanbotTinyRC/benchmark_logs/leanbot_pid_demo.gif)
 
 ---
 

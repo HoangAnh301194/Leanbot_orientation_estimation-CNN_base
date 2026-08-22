@@ -59,14 +59,14 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
      * Đạo hàm bậc 1 tại $t_{\text{eval}}$ qua `np.polyder()`:
        $$\dot{x} = \left.\frac{dx}{dt}\right|_{t_{\text{eval}}}, \quad \dot{y} = \left.\frac{dy}{dt}\right|_{t_{\text{eval}}}$$
      * Vận tốc di chuyển pixel ước lượng: $v = \frac{\sqrt{\dot{x}^2 + \dot{y}^2}}{W-1}$.
-     * Góc tiếp tuyến hình học: $\theta_{\text{traj\_raw}} = \text{atan2}(-\dot{y}, \dot{x}) \cdot \frac{180^\circ}{\pi}$ (lấy $-\dot{y}$ do trục tọa độ $Y$ của ảnh camera hướng xuống).
+     * Góc tiếp tuyến hình học: $\theta_{\text{traj}} = \text{atan2}(-\dot{y}, \dot{x}) \cdot \frac{180^\circ}{\pi}$ (lấy $-\dot{y}$ do trục tọa độ $Y$ của ảnh camera hướng xuống).
   4. **Căn chỉnh pha tiếp tuyến $180^\circ$ (`_align_trajectory_phase`)**: Do tiếp tuyến đạo hàm có tính lưỡng cực đối xứng $\pm 180^\circ$ (tiến/lùi), thuật toán so sánh với góc tham chiếu `model_angle_smooth` và bù $\pm k \cdot 180^\circ$ để chọn góc đồng pha nhất:
      $$\theta_{\text{aligned}} = \theta_{\text{traj}} - k \cdot 180^\circ \quad \text{sao cho } |\theta_{\text{aligned}} - \theta_{\text{ref}}| \to \min$$
   5. **Làm mượt góc tiếp tuyến 1D Bậc 1**: Đưa $\theta_{\text{aligned}}$ vào `traj_angle_buffer` và khớp đa thức 1D Bậc 1 tại `eval_index = -4` để lọc nhiễu góc tiếp tuyến, thu được `trajectory_angle_smooth`.
   6. **Hợp nhất góc (Fused Angle)**:
      * Trọng số suy giảm theo vận tốc: $x(v) = \frac{K}{K + v}$ với $K = 3.0\text{ px/frame}$.
      * Tính toán góc hợp nhất điều khiển:
-       $$\theta_{\text{fused}} = x(v) \cdot \theta_{\text{model\_smooth}} + (1 - x(v)) \cdot \theta_{\text{traj\_smooth}}$$
+       $$\theta_{\text{fused}} = x(v) \cdot \theta_{\text{model}} + (1 - x(v)) \cdot \theta_{\text{traj}}$$
        
      > Khi robot đứng yên hoặc chỉ xoay tại chỗ ($v \approx 0 \implies x(v) \to 1.0$), hệ thống tin cậy $100\%$ vào góc Model; khi robot di chuyển tịnh tiến nhanh ($v \gg 0 \implies x(v) \to 0$), hệ thống ưu tiên góc tiếp tuyến quỹ đạo để triệt tiêu rung lắc góc do model detect .
 
@@ -90,14 +90,14 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
   * **Bước 2: Tính sai số góc ngắn nhất trên không gian $\mathbb{S}^1$ (Shortest Path Angular Error)**:
     Do góc xoay mang tính chu kỳ $360^\circ$, sai số giữa góc đặt và góc hiện tại được chuẩn hóa về đoạn $[-180^\circ, +180^\circ]$ bằng hàm `wrap_to_180`:
 
-    $$e_k = \text{wrap\_to\_180}(\theta_{\text{target}} - \theta_{\text{fused}, k}) = ((\theta_{\text{target}} - \theta_{\text{fused}, k} + 180^\circ) \bmod 360^\circ) - 180^\circ$$
+    $$e_k = \text{wrap180}(\theta_{\text{target}} - \theta_{\text{fused}, k}) = ((\theta_{\text{target}} - \theta_{\text{fused}, k} + 180^\circ) \bmod 360^\circ) - 180^\circ$$
     
     > Leanbot luôn tự động chọn chiều quay có cung góc nhỏ nhất 
 
   * **Bước 3: Tạo vùng Deadzone**:
     Thiết lập vùng chết sai số góc $\epsilon = 1.0^\circ$:
 
-    $$\text{Khi } |e_k| \le 1.0^\circ \implies \begin{cases} u_k = 0 \\ \Sigma_{I, k} = 0 \\ \text{is\_aligned} = \text{True} \end{cases}$$
+    $$\text{Khi } |e_k| \le 1.0^\circ \implies \begin{cases} u_k = 0 \\ \Sigma_{I, k} = 0 \\ \text{isAligned} = \text{True} \end{cases}$$
 
   * **Bước 4: Tính toán các khâu P, I, D**:
     1. **Khâu tỉ lệ (Proportional Term - P)**:
@@ -108,7 +108,7 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
        $$I_k = K_i \cdot \Sigma_{I, k} \quad (K_i = 0.0)$$
        Giới hạn tích lũy sai số trong dải $[-300, +300]$ để chống bão hòa tích phân khi góc lệch ban đầu lớn.
     3. **Khâu vi phân (Derivative Term - D) với hiệu chỉnh pha**:
-       $$\Delta e_k = \text{wrap\_to\_180}(e_k - e_{k-1})$$
+       $$\Delta e_k = \text{wrap180}(e_k - e_{k-1})$$
        $$D_k = K_d \cdot \frac{\Delta e_k}{\Delta t_k} \quad (K_d = 0.0)$$
        Đo lường tốc độ biến thiên của sai số để tạo lực hãm khi xe quay nhanh về gần đích, giảm thiểu vọt lố.
 

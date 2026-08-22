@@ -85,58 +85,63 @@ Dựa vào các thống kê, khảo sát trước đó thì cấu hình cuối c
 
   * **Bước 1: Xác định chu kỳ lấy mẫu thời gian thực ($\Delta t$)**:
     Sử dụng bộ đếm thời gian độ phân giải cao `time.perf_counter()` để đo lường biến thiên thời gian thực tế giữa các khung hình:
-    $$\Delta t_k = \max\left(0.001, t_k - t_{k-1}\right) \quad (\text{mặc định } \Delta t \approx 0.033\text{s tương ứng } 30\text{ FPS})$$
+
+    $$\Delta t_k = \max(0.001, t_k - t_{k-1}) \quad (\text{mặc định } \Delta t \approx 0.033\text{s tương ứng } 30\text{ FPS})$$
 
   * **Bước 2: Tính sai số góc ngắn nhất trên không gian $\mathbb{S}^1$ (Shortest Path Angular Error)**:
-    Do góc xoay mang tính chu kỳ $360^\circ$, sai số giữa góc đặt và góc hiện tại được chuẩn hóa về đoạn $[ -180^\circ, +180^\circ ]$ bằng hàm `wrap_to_180`:
+    Do góc xoay mang tính chu kỳ $360^\circ$, sai số giữa góc đặt và góc hiện tại được chuẩn hóa về đoạn $[-180^\circ, +180^\circ]$ bằng hàm `wrap_to_180`:
+
     $$e_k = \operatorname{wrap\_to\_180}(\theta_{\text{target}} - \theta_{\text{fused}, k}) = ((\theta_{\text{target}} - \theta_{\text{fused}, k} + 180^\circ) \bmod 360^\circ) - 180^\circ$$
     
-    >Leanbot luôn tự động chọn chiều quay có cung góc nhỏ nhất 
+    > Leanbot luôn tự động chọn chiều quay có cung góc nhỏ nhất 
 
   * **Bước 3: Tạo vùng Deadzone**:
-    - Thiết lập vùng chết sai số góc $\epsilon = 1.0^\circ$:
-    $$\text{Nếu } |e_k| \le \epsilon \implies \begin{cases} u_k = 0 \\ \Sigma_{I, k} = 0 \quad (\text{reset bộ tích phân}) \\ \text{Trạng thái: } \text{is\_aligned} = \text{True} \end{cases}$$
+    Thiết lập vùng chết sai số góc $\epsilon = 1.0^\circ$:
 
-  * **Bước 4: Tính toán $P$, $I$, $D$**:
-    1. **Khâu tỉ lệ (Proportional Term - $P$)**:
+    $$\text{Khi } |e_k| \le 1.0^\circ \implies \begin{cases} u_k = 0 \\ \Sigma_{I, k} = 0 \\ \text{is\_aligned} = \text{True} \end{cases}$$
+
+  * **Bước 4: Tính toán các khâu P, I, D**:
+    1. **Khâu tỉ lệ (Proportional Term - P)**:
        $$P_k = K_p \cdot e_k \quad (K_p = 15.0)$$
        Tạo mô-men xoay tức thời tỉ lệ thuận với độ lệch góc hiện tại.
-    2. **Khâu tích phân (Integral Term - $I$) với bộ khử bão hòa (Anti-Windup Clamping)**:
-       $$\Sigma_{I, k} = \operatorname{clamp}\left(\Sigma_{I, k-1} + e_k \cdot \Delta t_k, -I_{\max}, +I_{\max}\right) \quad (I_{\max} = 300.0)$$
+    2. **Khâu tích phân (Integral Term - I) với bộ khử bão hòa (Anti-Windup Clamping)**:
+       $$\Sigma_{I, k} = \operatorname{clamp}(\Sigma_{I, k-1} + e_k \cdot \Delta t_k, -300.0, +300.0)$$
        $$I_k = K_i \cdot \Sigma_{I, k} \quad (K_i = 0.0)$$
-       Giới hạn tích lũy sai số trong dải $[-300, +300]$ để chống bão hòa tích phân (integral windup) khi góc lệch ban đầu lớn.
-    3. **Khâu vi phân (Derivative Term - $D$) với hiệu chỉnh pha**:
+       Giới hạn tích lũy sai số trong dải $[-300, +300]$ để chống bão hòa tích phân khi góc lệch ban đầu lớn.
+    3. **Khâu vi phân (Derivative Term - D) với hiệu chỉnh pha**:
        $$\Delta e_k = \operatorname{wrap\_to\_180}(e_k - e_{k-1})$$
        $$D_k = K_d \cdot \frac{\Delta e_k}{\Delta t_k} \quad (K_d = 0.0)$$
        Đo lường tốc độ biến thiên của sai số để tạo lực hãm khi xe quay nhanh về gần đích, giảm thiểu vọt lố.
 
-       > Hiện tại theo yêu cầu thử nghiệm của Thầy nên hệ số kD Ki em để là `0` , coi nhưu khôgn sử dụng. 
+       > Hiện tại theo yêu cầu thử nghiệm của Thầy nên hệ số kD, Ki em để là `0`, coi như không sử dụng.
 
   * **Bước 5: Tổng hợp tín hiệu điều khiển xoay $u_k$**:
-    $$u_k = P_k + I_k + D_k$$ 
+    $$u_k = P_k + I_k + D_k$$
 
   * **Bước 6: Bù vùng chết ma sát tĩnh (Deadband Friction Compensation)**:
     Động cơ và bánh xe thực tế luôn có ngưỡng ma sát tĩnh nghỉ $v_{\min} = 10$. Nếu tín hiệu $|u_k| < v_{\min}$ thì xe không đủ lực để chuyển động:
-    $$\text{Nếu } 0 < |u_k| < v_{\min} \implies u_k = \operatorname{sgn}(u_k) \cdot v_{\min}$$ 
+
+    $$\text{Khi } 0 < |u_k| < v_{\min} \implies u_k = \operatorname{sgn}(u_k) \cdot v_{\min}$$
+
     > Hiện tại em để vận tốc min là `10 step/sec`
 
   * **Bước 7: Mô hình động học robot 2 bánh vi sai (Differential Drive Mapping)**:
     Quy đổi tín hiệu điều khiển xoay $u_k$ và vận tốc tịnh tiến $v_{\text{base}}$ ($v_{\text{base}} = 0$ khi xoay góc tại chỗ) ra vận tốc 2 bánh xe trái/phải:
+
     $$\begin{cases} v_{L, k} = v_{\text{base}} - u_k = -u_k \\ v_{R, k} = v_{\text{base}} + u_k = +u_k \end{cases}$$
 
   * **Bước 8: Giới hạn bão hòa vận tốc (Velocity Saturation)**:
-    Giới hạn vận tốc đầu ra của bộ PID về vận tốc max = 1000 : 
-      
-    $[-v_{\max}, +v_{\max}]$ ($v_{\max} = 1000$):
-    $$v_{L, k} = \operatorname{clamp}\left(v_{L, k}, -1000, 1000\right), \quad v_{R, k} = \operatorname{clamp}\left(v_{R, k}, -1000, 1000\right)$$
+    Giới hạn vận tốc đầu ra của bộ PID về vận tốc tối đa $v_{\max} = 1000$ (trong khoảng $[-v_{\max}, +v_{\max}]$):
+
+    $$v_{L, k} = \operatorname{clamp}(v_{L, k}, -1000, 1000), \quad v_{R, k} = \operatorname{clamp}(v_{R, k}, -1000, 1000)$$
 
   * **Bước 9: Cơ chế ổn định dừng (Hold Time Verification)**:
-    Khi robot duy trì sai số trong vùng chết ($|e_k| \le 1.0^\circ$) liên tục trong khoảng thời gian $\ge 100\text{ms}$ (`args.hold_ms`), bộ điều khiển chuyển sang trạng thái hoàn thành (`is_pid_completed = True`), ngắt động cơ gửi tốc độ $(0, 0)$ và khóa điều khiển tránh kích hoạt lại do nhiễu tức thời dẫn tới Leanbot lắc, nhích qua lại tại chỗ liên tục . 
+    Khi robot duy trì sai số trong vùng chết ($|e_k| \le 1.0^\circ$) liên tục trong khoảng thời gian $\ge 100\text{ms}$ (`args.hold_ms`), bộ điều khiển chuyển sang trạng thái hoàn thành (`is_pid_completed = True`), ngắt động cơ gửi tốc độ $(0, 0)$ và khóa điều khiển tránh kích hoạt lại do nhiễu tức thời dẫn tới Leanbot lắc, nhích qua lại tại chỗ liên tục.
 
-  * **Bước 10: Đóng gói lệnh runLR và truyền thông BLE cho Leanbot
-   - Lệnh điều khiển động cơ được đóng gói dạng chuỗi : `r/v_L/v_R\n`
-   - Trong đó v_L và v_R là vận tốc 2 bánh xe, là đầu ra của bộ PID.
-   - Hàm `send_motor_command` trong `leanbotCameraController.py` được sử dụng để đóng gói lệnh và gửi cho Leanbot.
+  * **Bước 10: Đóng gói lệnh runLR và truyền thông BLE cho Leanbot**:
+    - Lệnh điều khiển động cơ được đóng gói dạng chuỗi: `r/v_L/v_R\n`
+    - Trong đó `v_L` và `v_R` là vận tốc 2 bánh xe, là đầu ra của bộ PID.
+    - Hàm `send_speed` trong [leanbotCameraController.py](LeanbotTinyRC/leanbotCameraController.py) được sử dụng để đóng gói lệnh và gửi cho Leanbot qua BLE.
 
 #### 2.4. Ghi dữ liệu CSV và đánh giá đồ thị điều khiển PID Leanbot
 

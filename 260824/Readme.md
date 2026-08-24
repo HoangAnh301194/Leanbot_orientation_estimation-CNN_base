@@ -44,14 +44,18 @@ Luồng điều khiển được triển khai theo chu trình phản hồi liên
 - Khi nhấn **chuột trái**, tọa độ trên cửa sổ hiển thị được quy đổi về hệ tọa độ ảnh gốc:
 
   
-```math
+
+$$
 s_x = \frac{W_{image}}{W_{display}}, \qquad s_y = \frac{H_{image}}{H_{display}}
-```
+$$
+
 
   
-```math
+
+$$
 x_{target} = x_{click} \cdot s_x, \qquad y_{target} = y_{click} \cdot s_y
-```
+$$
+
 
 - Sau khi chọn mục tiêu mới, hệ thống thực hiện:
   - Lưu `target_pos = (target_x, target_y)`.
@@ -69,23 +73,29 @@ x_{target} = x_{click} \cdot s_x, \qquad y_{target} = y_{click} \cdot s_y
   Sử dụng `time.perf_counter()` để đo thời gian giữa hai lần cập nhật liên tiếp. Giá trị nhỏ nhất được giới hạn ở `0.001 s`; frame đầu tiên sử dụng giá trị mặc định `0.033 s`, tương ứng khoảng `30 FPS`:
 
   
-```math
+
+$$
 \Delta t_k = \max(0.001, t_k - t_{k-1})
-```
+$$
+
 
 * **Bước 2: Tính vector sai lệch và khoảng cách tới đích**
 
   Với vị trí hiện tại $(x_k, y_k)$ và vị trí mục tiêu $(x_t, y_t)$:
 
   
-```math
+
+$$
 \Delta x_k = x_t - x_k, \qquad \Delta y_k = y_t - y_k
-```
+$$
+
 
   
-```math
+
+$$
 d_k = \sqrt{\Delta x_k^2 + \Delta y_k^2}
-```
+$$
+
 
   Trong đó $d_k$ là sai số khoảng cách theo đơn vị pixel.
 
@@ -94,16 +104,20 @@ d_k = \sqrt{\Delta x_k^2 + \Delta y_k^2}
   Do trục $Y$ của ảnh camera tăng theo chiều từ trên xuống dưới, thành phần $\Delta y_k$ phải đổi dấu khi tính góc:
 
   
-```math
+
+$$
 \theta_{target,k} = \operatorname{atan2}(-\Delta y_k, \Delta x_k) \cdot \frac{180^\circ}{\pi}
-```
+$$
+
 
   Sai số góc được chuẩn hóa về đoạn $[-180^\circ, 180^\circ]$ bằng hàm `wrap_to_180()`:
 
   
-```math
+
+$$
 e_{\theta,k} = \operatorname{wrap180}(\theta_{target,k} - \theta_{current,k})
-```
+$$
+
 
   - Việc chuẩn hóa giúp Leanbot luôn chọn chiều quay có cung góc ngắn nhất.
 
@@ -111,9 +125,11 @@ e_{\theta,k} = \operatorname{wrap180}(\theta_{target,k} - \theta_{current,k})
 
   Khi khoảng cách còn lại nhỏ hơn hoặc bằng dung sai $10 px$:
 
-```math
+
+$$
 d_k \le 10 px \implies v_{L,k} = 0, \quad v_{R,k} = 0
-```
+$$
+
 
   Hệ thống xét tiếp tham số `--final-angle` 
   - Nếu có tham số `--final-angle`: Leanbot tự động chuyển sang PID góc để xoay tại chỗ thân xe về đúng góc đích.
@@ -134,66 +150,86 @@ d_k \le 10 px \implies v_{L,k} = 0, \quad v_{R,k} = 0
 
   Khâu P và D của PID khoảng cách được tính như sau:
 
-```math
-P_{d,k} = K_{p,d} \cdot d_k
-```
 
-```math
+$$
+P_{d,k} = K_{p,d} \cdot d_k
+$$
+
+
+
+$$
 D_{d,k} = K_{d,d} \cdot \frac{d_k - d_{k-1}}{\Delta t_k}
-```
+$$
+
 
   Thành phần tích phân $I_{d,k}$ chỉ được kích hoạt khi $d_k \le 50 px$ 
 
-```math
+
+$$
 v_{PID,k} = P_{d,k} + I_{d,k} + D_{d,k}
-```
+$$
+
 
 * **Bước 7: Giảm vận tốc tiến theo sai số hướng**
 
   Khi Leanbot chưa hướng thẳng hoàn toàn về mục tiêu, vận tốc tiến được nhân với hệ số cosine để xe đi cong về hướng target pixel 
 
-```math
-c_k = \max\left(0.2, \cos\left(e_{\theta,k}\frac{\pi}{180}\right)\right)
-```
 
-```math
+$$
+c_k = \max\left(0.2, \cos\left(e_{\theta,k}\frac{\pi}{180}\right)\right)
+$$
+
+
+
+$$
 v_{linear,k} = v_{PID,k} \cdot c_k
-```
+$$
+
 
 * **Bước 8: Tính PID góc tạo vận tốc quay**
 
   Với sai số hướng $e_{\theta,k}$:
 
-```math
-P_{\theta,k} = K_{p,\theta} \cdot e_{\theta,k}
-```
 
-```math
+$$
+P_{\theta,k} = K_{p,\theta} \cdot e_{\theta,k}
+$$
+
+
+
+$$
 D_{\theta,k} = K_{d,\theta} \cdot \frac{\operatorname{wrap180}(e_{\theta,k} - e_{\theta,k-1})}{\Delta t_k}
-```
+$$
+
 
   Thành phần tích phân $I_{\theta,k}$ chỉ được kích hoạt khi $|e_{\theta,k}| \le 15^\circ$. Tín hiệu vận tốc quay:
 
-```math
+
+$$
 u_{angular,k} = P_{\theta,k} + I_{\theta,k} + D_{\theta,k}
-```
+$$
+
 
 * **Bước 9: Quy đổi sang vận tốc hai bánh vi sai**
 
   Tín hiệu vận tốc tiến và vận tốc quay được ánh xạ sang hai bánh:
 
-```math
+
+$$
 \begin{cases}
   v_{L,k} = v_{linear,k} - u_{angular,k} \\
   v_{R,k} = v_{linear,k} + u_{angular,k}
   \end{cases}
-```
+$$
+
 
   Sau đó vận tốc được giới hạn trong miền an toàn:
 
-```math
+
+$$
 v_{L,k}, v_{R,k} \in [-2000, 2000]
-```
+$$
+
 
   Nếu vận tốc dương nhỏ hơn `5 step/s`, bộ điều khiển nâng lên vận tốc tối thiểu để thắng ma sát tĩnh của động cơ và bánh xe.
 
@@ -207,9 +243,11 @@ v_{L,k}, v_{R,k} \in [-2000, 2000]
 
 Nếu tích phân được cộng ngay từ lúc Leanbot còn cách xa mục tiêu, sai số ban đầu có giá trị lớn sẽ nhanh chóng tạo tổng tích lũy lớn:
 
-```math
+
+$$
 \Sigma_{I,k} = \Sigma_{I,k-1} + e_k \cdot \Delta t_k
-```
+$$
+
 
 Khi xe đã tiến gần mục tiêu, phần sai số cũ vẫn còn nằm trong tổng tích phân. Thành phần $I_k$ vì vậy có thể tiếp tục đẩy vận tốc dù sai số hiện tại đã nhỏ, gây các hiện tượng:
 
@@ -222,18 +260,22 @@ Khi xe đã tiến gần mục tiêu, phần sai số cũ vẫn còn nằm trong
 
 Với ngưỡng kích hoạt tích phân $a$, vùng hoàn thành hoặc deadzone $\varepsilon$ và giới hạn chống bão hòa $I_{max}$:
 
-```math
+
+$$
 \Sigma_{I,k} =
 \begin{cases}
 0, & |e_k| > a \\
 \operatorname{clamp}(\Sigma_{I,k-1} + e_k\Delta t_k, -I_{max}, I_{max}), & \varepsilon < |e_k| \le a \\
 0, & |e_k| \le \varepsilon
 \end{cases}
-```
+$$
 
-```math
+
+
+$$
 I_k = K_i \cdot \Sigma_{I,k}
-```
+$$
+
 
 - Khi sai số còn lớn hơn $a$: khâu I bị tắt và giá trị tích phân được reset; bộ điều khiển sử dụng P và D để đưa xe nhanh về gần mục tiêu.
 - Khi sai số đi vào miền $(\varepsilon, a]$: bắt đầu cộng dồn tích phân để bù ma sát, sai số xác lập và phần điều khiển còn thiếu của khâu P.
@@ -252,18 +294,22 @@ Các ngưỡng hiện tại:
 
 Công thức triển khai:
 
-```math
+
+$$
 \Sigma_{\theta,k} =
 \begin{cases}
 0, & |e_{\theta,k}| > 15^\circ \\
 \operatorname{clamp}(\Sigma_{\theta,k-1} + e_{\theta,k}\Delta t_k, -300, 300), & 1^\circ < |e_{\theta,k}| \le 15^\circ \\
 0, & |e_{\theta,k}| \le 1^\circ
 \end{cases}
-```
+$$
 
-```math
+
+
+$$
 I_{\theta,k} = K_{i,\theta} \cdot \Sigma_{\theta,k}
-```
+$$
+
 
 | Miền sai số góc | Trạng thái khâu I | Mục đích |
 | :--- | :--- | :--- |
@@ -283,18 +329,22 @@ Các ngưỡng hiện tại:
 
 Công thức triển khai:
 
-```math
+
+$$
 \Sigma_{d,k} =
 \begin{cases}
 0, & d_k > 50 px \\
 \operatorname{clamp}(\Sigma_{d,k-1} + d_k\Delta t_k, -500, 500), & 10 px < d_k \le 50 px \\
 0, & d_k \le 10 px
 \end{cases}
-```
+$$
 
-```math
+
+
+$$
 I_{d,k} = K_{i,d} \cdot \Sigma_{d,k}
-```
+$$
+
 
 | Miền sai số khoảng cách | Trạng thái khâu I | Mục đích |
 | :--- | :--- | :--- |
@@ -343,6 +393,10 @@ I_{d,k} = K_{i,d} \cdot \Sigma_{d,k}
 - **Thời gian xác lập (Settling Time):** Đồ thị mới cho thấy thời gian xe xoay và ép sai số góc tiệm cận $0^\circ$ nhanh hơn so với đồ thị cũ (vì $K_p$ tăng từ 15 lên 25).
 - **Phản ứng phanh (Derivative Action):** Ở biểu đồ vận tốc truyền xuống bánh xe (`ble_speed_left`, `ble_speed_right`) của các đồ thị với bộ hệ số PID mới, có thể thấy rõ các xung hãm phanh đảo chiều đột ngột khi góc gần về 0. Khâu đạo hàm ($K_d = 8.5$) kéo hãm lại tín hiệu điều khiển, giảm hiện tượng vọt lố (Overshoot)
 - **Nhược điểm** : vẫn còn có hiện tượng nhiễu làm sai số xác lập lớn hơn một chút so với bộ thông số PID cũ ( chỉ có kP = 15). 
+
+
+### 4. Video thực nghiệm 
+
 
 ## B. Khó khăn 
 - Không

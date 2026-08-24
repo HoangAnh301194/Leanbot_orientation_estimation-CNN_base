@@ -106,7 +106,7 @@ $$
   
 
 $$
-\theta_{target,k} = \operatorname{atan2}(-\Delta y_k, \Delta x_k) \cdot \frac{180^\circ}{\pi}
+\theta_{target,k} = \text{atan2}(-\Delta y_k, \Delta x_k) \cdot \frac{180^\circ}{\pi}
 $$
 
 
@@ -115,7 +115,7 @@ $$
   
 
 $$
-e_{\theta,k} = \operatorname{wrap180}(\theta_{target,k} - \theta_{current,k})
+e_{\theta,k} = \text{wrap180}(\theta_{target,k} - \theta_{current,k})
 $$
 
 
@@ -198,7 +198,7 @@ $$
 
 
 $$
-D_{\theta,k} = K_{d,\theta} \cdot \frac{\operatorname{wrap180}(e_{\theta,k} - e_{\theta,k-1})}{\Delta t_k}
+D_{\theta,k} = K_{d,\theta} \cdot \frac{\text{wrap180}(e_{\theta,k} - e_{\theta,k-1})}{\Delta t_k}
 $$
 
 
@@ -265,7 +265,7 @@ $$
 \Sigma_{I,k} =
 \begin{cases}
 0, & |e_k| > a \\
-\operatorname{clamp}(\Sigma_{I,k-1} + e_k\Delta t_k, -I_{max}, I_{max}), & \varepsilon < |e_k| \le a \\
+\text{clamp}(\Sigma_{I,k-1} + e_k\Delta t_k, -I_{max}, I_{max}), & \varepsilon < |e_k| \le a \\
 0, & |e_k| \le \varepsilon
 \end{cases}
 $$
@@ -299,7 +299,7 @@ $$
 \Sigma_{\theta,k} =
 \begin{cases}
 0, & |e_{\theta,k}| > 15^\circ \\
-\operatorname{clamp}(\Sigma_{\theta,k-1} + e_{\theta,k}\Delta t_k, -300, 300), & 1^\circ < |e_{\theta,k}| \le 15^\circ \\
+\text{clamp}(\Sigma_{\theta,k-1} + e_{\theta,k}\Delta t_k, -300, 300), & 1^\circ < |e_{\theta,k}| \le 15^\circ \\
 0, & |e_{\theta,k}| \le 1^\circ
 \end{cases}
 $$
@@ -334,7 +334,7 @@ $$
 \Sigma_{d,k} =
 \begin{cases}
 0, & d_k > 50 px \\
-\operatorname{clamp}(\Sigma_{d,k-1} + d_k\Delta t_k, -500, 500), & 10 px < d_k \le 50 px \\
+\text{clamp}(\Sigma_{d,k-1} + d_k\Delta t_k, -500, 500), & 10 px < d_k \le 50 px \\
 0, & d_k \le 10 px
 \end{cases}
 $$
@@ -396,6 +396,7 @@ $$
 
 
 ### 4. Video thực nghiệm 
+
 ![Demo Point-to-Point Navigation](LeanbotTinyRC/benchmark_logs/demo_point_to_point.gif)
 
 ## B. Khó khăn 

@@ -396,7 +396,7 @@ $$
 
 
 ### 4. Video thực nghiệm 
-
+![Demo Point-to-Point Navigation](LeanbotTinyRC/benchmark_logs/demo_point_to_point.gif)
 
 ## B. Khó khăn 
 - Không

@@ -51,13 +51,13 @@ $$
 Do trục $Y$ trên ảnh tăng theo chiều từ trên xuống dưới, góc từ Leanbot tới target được tính bằng:
 
 $$
-\theta_{target} = \operatorname{atan2}(-\Delta y, \Delta x) \cdot \frac{180^\circ}{\pi}
+\theta_{target} = \text{atan2}(-\Delta y, \Delta x) \cdot \frac{180^\circ}{\pi}
 $$
 
 Sai số góc được chuẩn hóa về đoạn $[-180^\circ, 180^\circ]$:
 
 $$
-err_{angle} = \operatorname{wrap180}(\theta_{current} - \theta_{target})
+err_{angle} = \text{wrap180}(\theta_{current} - \theta_{target})
 $$
 
 Dấu của $err_{angle}$ được chọn theo quy ước chiều quay của hai động cơ Leanbot để áp dụng trực tiếp công thức vận tốc của Thầy đề xuất.

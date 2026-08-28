@@ -102,12 +102,15 @@ Trong đó:
 
 ##### Trường hợp 1 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 1](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_152_20260828_144250_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144253_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144253_pid_analysis.png)
 
 
@@ -115,12 +118,15 @@ Trong đó:
 
 ##### Trường hợp 2 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 2](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_561_20260828_144317_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144314_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144314_pid_analysis.png)
 
 
@@ -128,12 +134,15 @@ Trong đó:
 
 ##### Trường hợp 3 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 3](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_863_20260828_144337_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144338_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_144338_pid_analysis.png)
 
 
@@ -141,13 +150,17 @@ Trong đó:
 
 ##### Trường hợp 4 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 4](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_449_20260828_145438_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_145416_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_145416_pid_analysis.png)
+
 ---
 
 
@@ -160,48 +173,60 @@ Trong đó:
 
 ##### Trường hợp 1 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 1](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_215_20260828_151125_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151127_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151127_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 2 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 2](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_608_20260828_151152_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151152_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151152_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 3 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 3](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_1013_20260828_151219_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151219_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151219_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 4 
 **Ảnh Detection UI thực tế:**
+
 ![Detection UI 4](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_1561_20260828_151255_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151256_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_151256_pid_analysis.png)
 
 ---
@@ -217,57 +242,72 @@ Trong đó:
 
 ##### Trường hợp 1 
 **Ảnh xuất phát (trước khi bấm S):**
+
 ![Start UI 1](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_136_20260828_152841_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152841_2d_trajectory.png)
 
 **Ảnh khi bị vọt lố, xoay tròn quanh target (trước khi bấm C):**
+
 ![Loop Error UI 1](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_437_20260828_152901_detection_ui.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 1](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152841_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 2 
 **Ảnh xuất phát (trước khi bấm S):**
+
 ![Start UI 2](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_606_20260828_152912_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152914_2d_trajectory.png)
 
 **Ảnh khi bị vọt lố, xoay tròn quanh target (trước khi bấm C):**
+
 ![Loop Error UI 2](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_866_20260828_152930_detection_ui.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 2](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152914_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 3 
 **Ảnh xuất phát (trước khi bấm S):**
+
 ![Start UI 3](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_1125_20260828_152947_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152948_2d_trajectory.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 3](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_152948_pid_analysis.png)
 
 ---
 
 ##### Trường hợp 4 
 **Ảnh xuất phát (trước khi bấm S):**
+
 ![Start UI 4](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_1496_20260828_153012_detection_ui.png)
 
 **Đồ thị quỹ đạo 2D:**
+
 ![Trajectory 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_153012_2d_trajectory.png)
 
 **Ảnh khi bị vọt lố, xoay tròn quanh target (trước khi bấm C):**
+
 ![Loop Error UI 4](LeanbotTinyRC/benchmark_logs_0/manual_captures/manual_cap_1699_20260828_153025_detection_ui.png)
 
 **Đồ thị PID & Góc:**
+
 ![PID 4](LeanbotTinyRC/benchmark_logs_0/plots/log_roi_20260828_153012_pid_analysis.png)
 
 ---
@@ -353,74 +393,242 @@ Trong đó:
   - `max_velocity = 2000 step/s` (vận tốc tối đa của Leanbot)
 - **Test 1: `kp_angle2 = 0.01`**
 
-    - **Trường hợp 1** :
-![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_604_20260828_171324_detection_ui.png)
-![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171324_2d_trajectory.png)
-![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171324_pid_analysis.png)
-    - **Trường hợp 2** :
-![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_947_20260828_171347_detection_ui.png)
-![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171348_2d_trajectory.png)
-![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171348_pid_analysis.png)
-    - **Trường hợp 3** : Trường hợp này Leanbot ở góc nên nhiễu detect một vài frame ạ . 
-![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1299_20260828_171410_detection_ui.png)
-![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171411_2d_trajectory.png)
-![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171411_pid_analysis.png)
-    - **Trường hợp 4** :
-![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1546_20260828_171427_detection_ui.png)
-![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171428_2d_trajectory.png)
-![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171428_pid_analysis.png)
-- **Test 2 : `kp_angle2 = 0.02`**
+  - **Trường hợp 1**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_604_20260828_171324_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171324_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171324_pid_analysis.png)
 
-    - **Trường hợp 1** :
-![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_262_20260828_170514_detection_ui.png)
-![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170515_2d_trajectory.png)
-![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170515_pid_analysis.png)
-    - **Trường hợp 2** :
-![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_776_20260828_170548_detection_ui.png)
-![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170549_2d_trajectory.png)
-![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170549_pid_analysis.png)
-    - **Trường hợp 3** :
-![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1112_20260828_170611_detection_ui.png)
-![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170611_2d_trajectory.png)
-![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170611_pid_analysis.png)
-    - **Trường hợp 4** :
-![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1513_20260828_170637_detection_ui.png)
-![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170638_2d_trajectory.png)
-![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170638_pid_analysis.png)
+  - **Trường hợp 2**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_947_20260828_171347_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171348_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171348_pid_analysis.png)
+
+  - **Trường hợp 3** *(Leanbot ở góc nên nhiễu detect một vài frame)*:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1299_20260828_171410_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171411_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171411_pid_analysis.png)
+
+  - **Trường hợp 4**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1546_20260828_171427_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171428_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_171428_pid_analysis.png)
+
+---
+
+- **Test 2: `kp_angle2 = 0.02`**
+
+  - **Trường hợp 1**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_262_20260828_170514_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170515_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170515_pid_analysis.png)
+
+  - **Trường hợp 2**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_776_20260828_170548_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170549_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170549_pid_analysis.png)
+
+  - **Trường hợp 3**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1112_20260828_170611_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170611_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170611_pid_analysis.png)
+
+  - **Trường hợp 4**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1513_20260828_170637_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170638_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_170638_pid_analysis.png)
+
+---
+
 - **Test 3: `kp_angle2 = 0.03`**
-    - **Trường hợp 1** :
-![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_149_20260828_172038_detection_ui.png)
-![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172038_2d_trajectory.png)
-![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172038_pid_analysis.png)
-    - **Trường hợp 2** :
-![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_481_20260828_172100_detection_ui.png)
-![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172101_2d_trajectory.png)
-![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172101_pid_analysis.png)
-    - **Trường hợp 3** :
-![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_766_20260828_172119_detection_ui.png)
-![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172120_2d_trajectory.png)
-![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172120_pid_analysis.png)
-    - **Trường hợp 4** :
-![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1112_20260828_172142_detection_ui.png)
-![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172142_2d_trajectory.png)
-![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172142_pid_analysis.png)
+
+  - **Trường hợp 1**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_149_20260828_172038_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172038_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172038_pid_analysis.png)
+
+  - **Trường hợp 2**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_481_20260828_172100_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172101_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172101_pid_analysis.png)
+
+  - **Trường hợp 3**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_766_20260828_172119_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172120_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172120_pid_analysis.png)
+
+  - **Trường hợp 4**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1112_20260828_172142_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172142_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172142_pid_analysis.png)
+
+---
+
 - **Test 4: `kp_angle2 = 0.04`**
-    - **Trường hợp 1** :
-![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_234_20260828_172545_detection_ui.png)
-![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172546_2d_trajectory.png)
-![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172546_pid_analysis.png)
-    - **Trường hợp 2** :
-![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1034_20260828_172638_detection_ui.png)
-![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172639_2d_trajectory.png)
-![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172639_pid_analysis.png)
-    - **Trường hợp 3** :
-![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1333_20260828_172658_detection_ui.png)
-![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172659_2d_trajectory.png)
-![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172659_pid_analysis.png)
-    - **Trường hợp 4** :
-![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1627_20260828_172718_detection_ui.png)
-![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172718_2d_trajectory.png)
-![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172718_pid_analysis.png)
+
+  - **Trường hợp 1**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 1](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_234_20260828_172545_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172546_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172546_pid_analysis.png)
+
+  - **Trường hợp 2**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 2](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1034_20260828_172638_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172639_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 2](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172639_pid_analysis.png)
+
+  - **Trường hợp 3**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 3](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1333_20260828_172658_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172659_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 3](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172659_pid_analysis.png)
+
+  - **Trường hợp 4**:
+    
+    **Ảnh Detection UI:**
+    
+    ![Detection UI 4](LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1627_20260828_172718_detection_ui.png)
+    
+    **Đồ thị quỹ đạo 2D:**
+    
+    ![Trajectory 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172718_2d_trajectory.png)
+    
+    **Đồ thị PID & Góc:**
+    
+    ![PID 4](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260828_172718_pid_analysis.png)
+
 
 
 

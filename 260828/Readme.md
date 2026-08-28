@@ -8,6 +8,7 @@
   - [4. Tách PID thành 2 bộ PID_angle và PID_distance và Chỉnh sửa lại hệ số PID](#4-tách-pid-thành-2-bộ-pid_angle-và-pid_distance-và-chỉnh-sửa-lại-hệ-số-pid)
   - [5. Cập nhật công thức tính vận tốc Pha 2](#5-cập-nhật-công-thức-tính-vận-tốc-pha-2)
   - [6. Chạy Inference kiểm thử và đánh giá](#6-chạy-inference-kiểm-thử-và-đánh-giá)
+  - [7. Nhận xét tổng quan](#7-nhận-xét-tổng-quan)
 - [B. Khó khăn](#b-khó-khăn)
 - [C. Công việc tiếp theo](#c-công-việc-tiếp-theo)
 
@@ -16,6 +17,9 @@
 - Báo cáo lại hệ số weight giữa Model angle và Tangent Angle và chỉnh sửa hệ số . 
 - Tăng kP và kiểm thử 
 
+- Tách và hoàn thiện cấu trúc bộ điều khiển PID : chia thành 2 bộ PID độc lập cho 2 phase ( kp_angle2 dùng riêng cho phase 2)
+- Cập nhật và hoàn thiện công thức tính vận tốc cho Phase 2
+-  Chạy Inference thực nghiệm và đánh giá tuning hệ số Kp_angle2
 
 ### 1. Đối cơ chế start/end ghi log từ phím R thành S
 - Vì trước đó tool được sử dụng để ghi log cho các lần test Leanbot trước đó nên em vẫn để phím R để start và end ghi log ạ 

@@ -1,5 +1,18 @@
 # Báo cáo công việc ngày 04/09/2026
 
+## Mục lục
+- [A. Công việc đã làm](#a-công-việc-đã-làm)
+  - [1. Bỏ bước gửi vận tốc về (0,0) khi kết thúc phase 1 chuyển sang phase 2](#1-bỏ-bước-gửi-vận-tốc-về-00-khi-kết-thúc-phase-1-chuyển-sang-phase-2)
+  - [2. Tăng Angle Kp lên 30 và chạy thử nghiệm khi tăng Angle2 kd tăng lên](#2-tăng-angle-kp-lên-30-và-chạy-thử-nghiệm-khi-tăng-angle2-kd-tăng-lên)
+    - [2.1 Chạy Inference cấu hình Angle2 kd = 0.0](#21-chạy-inference-cấu-hình-angle2-kd--00)
+    - [2.2 Chạy Inference cấu hình Angle2 kd = 0.005](#22-chạy-inference-cấu-hình-angle2-kd--0005)
+    - [2.3 Chạy Inference cấu hình Angle2 kd = 0.01](#23-chạy-inference-cấu-hình-angle2-kd--001)
+    - [2.4 Chạy Inference cấu hình Angle2 kd = 0.02](#24-chạy-inference-cấu-hình-angle2-kd--002)
+    - [2.5 Chạy Inference cấu hình Angle2 kd = 0.04](#25-chạy-inference-cấu-hình-angle2-kd--004)
+    - [2.6 Chạy Inference cấu hình Angle2 kd = 0.08](#26-chạy-inference-cấu-hình-angle2-kd--008)
+  - [3. Chỉnh sửa cấu hình mới và chạy thử nghiệm](#3-chỉnh-sửa-cấu-hình-mới-và-chạy-thử-nghiệm)
+- [B. Khó khăn](#b-khó-khăn)
+- [C. Công việc tiếp theo](#c-công-việc-tiếp-theo)
 
 ## A. Công việc đã làm 
 - Bỏ lệnh gửi vận tốc về (0,0) khi kết thúc phase 1 chuyển sang phase 2 
@@ -321,6 +334,19 @@ python .\leanbotCameraController.py --show --source 1 --ble 983949 --heading-tol
   **Đồ thị Vi phân & Tỉ số bẻ lái (Error Angle, de/dt, v_diff):**
 
   ![Diff 1](LeanbotTinyRC/benchmark_logs/plots/log_roi_20260904_162256_pid_diff_analysis.png)
+
+  > **Chú thích các đường đồ thị:**
+  > - **Đồ thị 1 (Error Angle):**
+  >   - `Đường màu đỏ (Error Angle e(t))`: Sai số góc giữa hướng của Leanbot và vector hướng tới tâm đích ($e(t) = \text{target\_angle} - \text{fused\_angle}$). Biểu thị xe đang lệch trái (âm) hay lệch phải (dương).
+  >   - `Dải màu xanh (Tolerance Band ±15°)`: Ngưỡng dung sai góc $\pm 15^\circ$ chuyển pha.
+
+  > - **Đồ thị 2 (Differential of Error Angle):**
+  >   - `Đường màu cam (de/dt)`: Vi phân (đạo hàm) sai số góc theo thời gian $\frac{de}{dt} \approx \frac{\Delta e}{\Delta t}$ (đơn vị: deg/s), thể hiện tốc độ quay góc tức thời của xe. Đây là tín hiệu đầu vào trực tiếp của khâu vi phân $K_d$ trong PID nhằm sinh ra lực cản hãm đà quán tính gây overshoot
+
+  > - **Đồ thị 3 (Wheel Speeds, Differential Speed & Steering Ratio):**
+  >   - `Đường màu xanh dương (v_L) & màu hồng (v_R)`: Vận tốc thực tế cấp cho bánh trái và bánh phải qua lệnh BLE (thang đo runLR từ -2000 đến +2000).
+  >   - `Đường màu tím (Differential Speed v_diff)`: Vận tốc bẻ lái vi sai $v_{diff} = \frac{v_L - v_R}{2}$ do PID góc tính ra ($v_{diff} > 0$: bẻ lái phải, $v_{diff} < 0$: bẻ lái trái, $v_{diff} = 0$: đi thẳng).
+  >   - `Đường màu xanh lá - Trục tung phụ bên phải (Ratio v_diff / v_LR)`: Tỉ số bẻ lái tương đối so với vận tốc tiến thẳng $v_{LR}$. 
 
 ---
 

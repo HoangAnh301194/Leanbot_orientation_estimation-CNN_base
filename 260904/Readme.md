@@ -5,7 +5,7 @@
 - Bỏ lệnh gửi vận tốc về (0,0) khi kết thúc phase 1 chuyển sang phase 2 
 - Tăng hệ số Angle kp lên 30 
 - Tăng dần hệ số Angle2 kd lên và tìm ngưỡng ổn định
-
+- Cấu hình lại: heading_tolerance = 15 , Kp_angle = 30 , Kp_angle2 = 0.02 và thử nghiệm với kd_angle2 = 0.005 và 0.01
 
 
 ### 1. Bỏ bước gửi vận tốc về (0,0) khi kết thúc phase 1 chuyển sang phase 2 

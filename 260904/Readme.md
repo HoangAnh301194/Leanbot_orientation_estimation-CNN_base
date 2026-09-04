@@ -478,7 +478,6 @@ python .\leanbotCameraController.py --show --source 1 --ble 983949 --heading-tol
 
 
 ## B. Khó khăn 
-- Em nghĩ một số nguyên nhân khiến xe bị lắc khi tăng kp và dùng thêm kd để hãm vận tốc nhưng không cải thiện, Có thể do độ trễ điều khiển thông qua BLE ạ
+- Không
 ## C. Công việc tiếp theo 
- - Em xin phép nhận thêm đề xuất của Thầy về một số cách debug lỗi do đâu ạ 
- - Hiện tại em chỉ mới nghĩ được là có thể đo thời gian truyền, nhận lệnh điều khiển stepper qua BLE để kiểm tra độ trễ thôi ạ.
+ - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ .

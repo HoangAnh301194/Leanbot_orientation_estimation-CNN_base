@@ -1,0 +1,65 @@
+LeanbotCompiler:
+  Server: "cs.leanbot.space"
+  # Compiler server hostname.
+  # Available options:
+  #   - cs.leanbot.space        (production)
+  #   - cs1.leanbot.space       (alternative production)
+
+LeanbotController:
+  LeanbotCodeDir: "./leanbotControllerCode"
+  LeanbotHexCompiledDir: "./leanbotControllerHex"
+
+  LeanbotTinyRC:
+    Version: "Leanbot Tiny RC 260819:080731"
+
+    ManualControl:
+      Velocity: 2000
+
+      KeyMap:
+        "8":
+          name: "Forward"
+          speed_l: 4
+          speed_r: 4
+
+        "2":
+          name: "Backward"
+          speed_l: -4
+          speed_r: -4
+
+        "4":
+          name: "Turn Left"
+          speed_l: -4
+          speed_r: 4
+
+        "6":
+          name: "Turn Right"
+          speed_l: 4
+          speed_r: -4
+
+        "7":
+          name: "Forward Left"
+          speed_l: 2
+          speed_r: 4
+
+        "9":
+          name: "Forward Right"
+          speed_l: 4
+          speed_r: 2
+
+        "1":
+          name: "Back Left"
+          speed_l: -2
+          speed_r: -4
+
+        "3":
+          name: "Back Right"
+          speed_l: -4
+          speed_r: -2
+
+        "5":
+          name: "Stop"
+          speed_l: 0
+          speed_r: 0
+
+      ControlKey:
+        End: "e"

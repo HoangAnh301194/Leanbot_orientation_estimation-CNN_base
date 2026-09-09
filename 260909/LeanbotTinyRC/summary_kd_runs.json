@@ -1,0 +1,495 @@
+[
+  {
+    "section_id": "2.1",
+    "kd_str": "0.0",
+    "folder_name": "benchmark_logs_00",
+    "kd_val": 0.0,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082414.csv",
+          "total_time": 14.5,
+          "total_frames": 219,
+          "p1_time": 2.1,
+          "p1_frames": 34,
+          "p2_time": 12.2,
+          "p2_frames": 185,
+          "final_dist": 10.7,
+          "mae_angle": 17.93,
+          "rms_angle": 22.92,
+          "max_angle": 72.4,
+          "zero_crossings": 8,
+          "steer_flips": 8,
+          "rate_rms": 53.2
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_00/manual_captures/manual_cap_123_20260909_082414_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082414_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082414_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082414_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082436.csv",
+          "total_time": 16.1,
+          "total_frames": 243,
+          "p1_time": 2.3,
+          "p1_frames": 37,
+          "p2_time": 13.6,
+          "p2_frames": 206,
+          "final_dist": 10.0,
+          "mae_angle": 19.33,
+          "rms_angle": 22.58,
+          "max_angle": 51.2,
+          "zero_crossings": 8,
+          "steer_flips": 8,
+          "rate_rms": 47.3
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_00/manual_captures/manual_cap_464_20260909_082436_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082436_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082436_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_00/plots/log_roi_20260909_082436_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.2",
+    "kd_str": "0.005",
+    "folder_name": "benchmark_logs_0005",
+    "kd_val": 0.005,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082719.csv",
+          "total_time": 15.8,
+          "total_frames": 238,
+          "p1_time": 2.3,
+          "p1_frames": 35,
+          "p2_time": 13.5,
+          "p2_frames": 203,
+          "final_dist": 10.4,
+          "mae_angle": 18.05,
+          "rms_angle": 20.93,
+          "max_angle": 46.4,
+          "zero_crossings": 8,
+          "steer_flips": 8,
+          "rate_rms": 46.7
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_0005/manual_captures/manual_cap_127_20260909_082719_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082719_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082719_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082719_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082742.csv",
+          "total_time": 14.7,
+          "total_frames": 222,
+          "p1_time": 2.1,
+          "p1_frames": 33,
+          "p2_time": 12.5,
+          "p2_frames": 189,
+          "final_dist": 10.3,
+          "mae_angle": 15.47,
+          "rms_angle": 19.04,
+          "max_angle": 42.1,
+          "zero_crossings": 7,
+          "steer_flips": 7,
+          "rate_rms": 41.2
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_0005/manual_captures/manual_cap_480_20260909_082742_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082742_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082742_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_0005/plots/log_roi_20260909_082742_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.3",
+    "kd_str": "0.01",
+    "folder_name": "benchmark_logs_001",
+    "kd_val": 0.01,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082909.csv",
+          "total_time": 16.3,
+          "total_frames": 246,
+          "p1_time": 2.3,
+          "p1_frames": 36,
+          "p2_time": 13.9,
+          "p2_frames": 210,
+          "final_dist": 10.6,
+          "mae_angle": 18.99,
+          "rms_angle": 21.56,
+          "max_angle": 45.8,
+          "zero_crossings": 8,
+          "steer_flips": 8,
+          "rate_rms": 47.7
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_001/manual_captures/manual_cap_203_20260909_082909_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082909_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082909_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082909_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_082933.csv",
+          "total_time": 14.3,
+          "total_frames": 216,
+          "p1_time": 2.3,
+          "p1_frames": 37,
+          "p2_time": 11.9,
+          "p2_frames": 179,
+          "final_dist": 10.2,
+          "mae_angle": 16.35,
+          "rms_angle": 21.81,
+          "max_angle": 62.1,
+          "zero_crossings": 7,
+          "steer_flips": 7,
+          "rate_rms": 44.4
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_001/manual_captures/manual_cap_552_20260909_082933_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082933_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082933_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082933_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.4",
+    "kd_str": "0.02",
+    "folder_name": "benchmark_logs_002",
+    "kd_val": 0.02,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083024.csv",
+          "total_time": 15.2,
+          "total_frames": 229,
+          "p1_time": 2.4,
+          "p1_frames": 38,
+          "p2_time": 12.7,
+          "p2_frames": 191,
+          "final_dist": 11.1,
+          "mae_angle": 14.0,
+          "rms_angle": 18.68,
+          "max_angle": 61.7,
+          "zero_crossings": 8,
+          "steer_flips": 12,
+          "rate_rms": 43.9
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_62_20260909_083024_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083048.csv",
+          "total_time": 14.6,
+          "total_frames": 221,
+          "p1_time": 2.2,
+          "p1_frames": 35,
+          "p2_time": 12.3,
+          "p2_frames": 186,
+          "final_dist": 10.7,
+          "mae_angle": 14.13,
+          "rms_angle": 17.46,
+          "max_angle": 45.3,
+          "zero_crossings": 7,
+          "steer_flips": 7,
+          "rate_rms": 38.2
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_422_20260909_083048_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 3,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083109.csv",
+          "total_time": 9.6,
+          "total_frames": 146,
+          "p1_time": 1.5,
+          "p1_frames": 24,
+          "p2_time": 8.1,
+          "p2_frames": 122,
+          "final_dist": 11.0,
+          "mae_angle": 17.54,
+          "rms_angle": 21.73,
+          "max_angle": 50.3,
+          "zero_crossings": 4,
+          "steer_flips": 6,
+          "rate_rms": 58.4
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_742_20260909_083109_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.5",
+    "kd_str": "0.04",
+    "folder_name": "benchmark_logs_004",
+    "kd_val": 0.04,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083207.csv",
+          "total_time": 13.8,
+          "total_frames": 210,
+          "p1_time": 2.1,
+          "p1_frames": 34,
+          "p2_time": 11.6,
+          "p2_frames": 176,
+          "final_dist": 10.1,
+          "mae_angle": 8.16,
+          "rms_angle": 12.93,
+          "max_angle": 35.9,
+          "zero_crossings": 9,
+          "steer_flips": 9,
+          "rate_rms": 29.6
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_004/manual_captures/manual_cap_187_20260909_083207_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083207_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083207_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083207_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083228.csv",
+          "total_time": 13.3,
+          "total_frames": 202,
+          "p1_time": 2.2,
+          "p1_frames": 34,
+          "p2_time": 11.1,
+          "p2_frames": 168,
+          "final_dist": 10.6,
+          "mae_angle": 5.39,
+          "rms_angle": 7.48,
+          "max_angle": 25.2,
+          "zero_crossings": 9,
+          "steer_flips": 19,
+          "rate_rms": 28.4
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_004/manual_captures/manual_cap_494_20260909_083228_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083228_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083228_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083228_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 3,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083247.csv",
+          "total_time": 9.7,
+          "total_frames": 147,
+          "p1_time": 2.1,
+          "p1_frames": 33,
+          "p2_time": 7.6,
+          "p2_frames": 114,
+          "final_dist": 11.2,
+          "mae_angle": 7.5,
+          "rms_angle": 11.32,
+          "max_angle": 36.7,
+          "zero_crossings": 6,
+          "steer_flips": 16,
+          "rate_rms": 53.8
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_004/manual_captures/manual_cap_773_20260909_083247_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083247_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083247_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083247_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 4,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083303.csv",
+          "total_time": 10.5,
+          "total_frames": 160,
+          "p1_time": 2.1,
+          "p1_frames": 34,
+          "p2_time": 8.3,
+          "p2_frames": 126,
+          "final_dist": 10.4,
+          "mae_angle": 8.26,
+          "rms_angle": 11.27,
+          "max_angle": 35.4,
+          "zero_crossings": 6,
+          "steer_flips": 12,
+          "rate_rms": 45.6
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_004/manual_captures/manual_cap_1008_20260909_083303_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083303_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083303_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083303_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.6",
+    "kd_str": "0.06",
+    "folder_name": "benchmark_logs_006",
+    "kd_val": 0.06,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083618.csv",
+          "total_time": 14.9,
+          "total_frames": 226,
+          "p1_time": 2.3,
+          "p1_frames": 37,
+          "p2_time": 12.5,
+          "p2_frames": 189,
+          "final_dist": 10.3,
+          "mae_angle": 10.68,
+          "rms_angle": 14.65,
+          "max_angle": 46.8,
+          "zero_crossings": 9,
+          "steer_flips": 13,
+          "rate_rms": 36.0
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_006/manual_captures/manual_cap_374_20260909_083618_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083639.csv",
+          "total_time": 14.4,
+          "total_frames": 219,
+          "p1_time": 2.2,
+          "p1_frames": 35,
+          "p2_time": 12.2,
+          "p2_frames": 184,
+          "final_dist": 10.5,
+          "mae_angle": 13.85,
+          "rms_angle": 18.62,
+          "max_angle": 52.5,
+          "zero_crossings": 7,
+          "steer_flips": 9,
+          "rate_rms": 46.6
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_006/manual_captures/manual_cap_690_20260909_083639_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_pid_diff_analysis.png"
+      }
+    ]
+  },
+  {
+    "section_id": "2.7",
+    "kd_str": "0.08",
+    "folder_name": "benchmark_logs_008",
+    "kd_val": 0.08,
+    "runs": [
+      {
+        "run_idx": 1,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083346.csv",
+          "total_time": 14.8,
+          "total_frames": 222,
+          "p1_time": 2.0,
+          "p1_frames": 31,
+          "p2_time": 12.7,
+          "p2_frames": 191,
+          "final_dist": 11.2,
+          "mae_angle": 9.65,
+          "rms_angle": 13.03,
+          "max_angle": 39.5,
+          "zero_crossings": 8,
+          "steer_flips": 13,
+          "rate_rms": 31.4
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_60_20260909_083346_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 2,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083406.csv",
+          "total_time": 13.8,
+          "total_frames": 209,
+          "p1_time": 2.0,
+          "p1_frames": 32,
+          "p2_time": 11.8,
+          "p2_frames": 177,
+          "final_dist": 10.3,
+          "mae_angle": 9.25,
+          "rms_angle": 11.14,
+          "max_angle": 28.1,
+          "zero_crossings": 8,
+          "steer_flips": 20,
+          "rate_rms": 32.6
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_366_20260909_083406_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 3,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083425.csv",
+          "total_time": 10.4,
+          "total_frames": 157,
+          "p1_time": 2.0,
+          "p1_frames": 31,
+          "p2_time": 8.3,
+          "p2_frames": 126,
+          "final_dist": 10.4,
+          "mae_angle": 8.64,
+          "rms_angle": 14.15,
+          "max_angle": 40.9,
+          "zero_crossings": 4,
+          "steer_flips": 30,
+          "rate_rms": 39.8
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_654_20260909_083425_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_pid_diff_analysis.png"
+      },
+      {
+        "run_idx": 4,
+        "metrics": {
+          "csv_name": "log_roi_20260909_083440.csv",
+          "total_time": 10.4,
+          "total_frames": 158,
+          "p1_time": 2.3,
+          "p1_frames": 36,
+          "p2_time": 8.0,
+          "p2_frames": 122,
+          "final_dist": 11.6,
+          "mae_angle": 9.47,
+          "rms_angle": 12.34,
+          "max_angle": 32.5,
+          "zero_crossings": 8,
+          "steer_flips": 26,
+          "rate_rms": 46.4
+        },
+        "ui_img": "LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_871_20260909_083440_detection_ui.png",
+        "traj_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_2d_trajectory.png",
+        "pid_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_pid_analysis.png",
+        "diff_img": "LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_pid_diff_analysis.png"
+      }
+    ]
+  }
+]

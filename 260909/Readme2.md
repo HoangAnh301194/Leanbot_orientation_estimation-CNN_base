@@ -28,8 +28,10 @@
 
 > Thu thập ảnh toàn bộ 24 class, khối gỗ đặt trước leanbot, bên trong tay gắp. 
 
+
+
 ## B. Khó khăn 
-- Không
+- Em xin phép nhận thêm đề xuất từ thầy về số lượng ảnh cho mỗi cấu hình setup ạ 
 
 ## C. Công việc tiếp theo 
 - Tìm hiểu về thêm về kĩ thuật làm mịn  *filter noisy differential data in a PID controller*

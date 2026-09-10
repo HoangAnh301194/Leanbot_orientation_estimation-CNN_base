@@ -13,16 +13,25 @@ Hiện tại công thức tính toán khâu D như sau:
 **Công thức**:
 
 ```math
-D[k] = K_d \cdot \Delta e[k] = K_d \cdot (e[k] - e[k-1])
+\begin{aligned}
+\Delta e_\theta[k]
+&= \mathrm{wrap}_{[-180^\circ,\,180^\circ)}\left(e_\theta[k]-e_\theta[k-1]\right),\\
+D_{\mathrm{angle2}}[k]
+&= K_{d,\mathrm{angle2}}\Delta e_\theta[k].
+\end{aligned}
 ```
 
-*(Chu kỳ lấy mẫu $`\Delta t`$ được coi là hằng số và đã gộp ngầm vào hệ số $`K_d = \frac{K_{d,\text{chuẩn}}}{\Delta t}`$)*
+Sai phân sai số góc được wrap về khoảng $`[-180^\circ,180^\circ)`$ trước khi nhân với `Kd_angle2`. Ví dụ, khi sai số chuyển từ $`179^\circ`$ sang $`-179^\circ`$, sai phân sau wrap là $`2^\circ`$ thay vì $`-358^\circ`$. Nếu chưa có mẫu trước, `d_angle2 = 0.0`.
+
+*(Chu kỳ lấy mẫu $`\Delta t`$ được coi là hằng số và đã gộp ngầm vào hệ số $`K_{d,\mathrm{angle2}} = \frac{K_{d,\mathrm{angle2}}^{\mathrm{chuẩn}}}{\Delta t}`$)*
+
+Thay đổi hiện tại chỉ bổ sung wrap cho sai phân góc pha 2, chưa thêm bộ lọc thông thấp hoặc chia sai phân cho thời gian lấy mẫu.
 
 **Code thực tế đang sử dụng (`PID_controller.py` & `plot_pid_navigation_log.py`)**:
 
 ```python
 # 1. Trong bộ điều khiển thực tế (PID_controller.py - Pha 2 Driving):
-d_angle2 = (angle_error - self._prev_angle2_error) if self._prev_angle2_error is not None else 0.0
+d_angle2 = wrap_to_180(angle_error - self._prev_angle2_error) if self._prev_angle2_error is not None else 0.0
 self._prev_angle2_error = angle_error
 
 # Thành phần D tham gia hiệu chỉnh vận tốc bẻ lái delta_v:
@@ -105,7 +114,7 @@ C(s)=K_p+\frac{K_i}{s}+\frac{K_d s}{1+T_f s},
 ```math
 e_\theta[k]
 =
-\operatorname{wrap}_{[-180^\circ,\,180^\circ)}
+\mathrm{wrap}_{[-180^\circ,\,180^\circ)}
 \left(\theta[k]-\theta_{\mathrm{target}}[k]\right),
 ```
 
@@ -118,7 +127,9 @@ trong đó:
 **Code tính sai phân:**
 
 ```math
-\Delta e_\theta[k]=e_\theta[k]-e_\theta[k-1],
+\Delta e_\theta[k]
+=
+\mathrm{wrap}_{[-180^\circ,\,180^\circ)}\left(e_\theta[k]-e_\theta[k-1]\right),
 ```
 
 và thành phần D trong nhánh hiệu chỉnh góc:

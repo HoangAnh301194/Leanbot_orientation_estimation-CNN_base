@@ -160,7 +160,7 @@ class PositionPIDController:
         
         # PID for angle in Phase 2
         self._integral_angle2 += angle_error
-        d_angle2 = (angle_error - self._prev_angle2_error) if self._prev_angle2_error is not None else 0.0
+        d_angle2 = wrap_to_180(angle_error - self._prev_angle2_error) if self._prev_angle2_error is not None else 0.0
         self._prev_angle2_error = angle_error
 
         # delta_V = (Kp_angle2 * err + Ki_angle2 * integral + Kd_angle2 * derivative) * v_LR

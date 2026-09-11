@@ -3,7 +3,7 @@
 ## A. Công việc đã làm 
 - Tăng heading_tolerance = 20 
 - Cập nhật lại đồ thị phân tích: vẽ ``Kp*error`` và ``Kd*diff(error)`` trên cùng 1 hệ trục tọa độ để so sánh
-- Chạy thử nghiệm khảo sát hệ số `Kd_angle2` từ `0.0` đến `0.08` với dung sai góc `heading_tolerance = 20.0°`
+- Chạy thử nghiệm khảo sát hệ số `Kd_angle2` từ `0.0` đến `0.04` với dung sai góc `heading_tolerance = 20.0°`
 
 
 ### 1. Tăng heading_tolerance = 20 và cập nhật lại đồ thị phân tích
@@ -15,7 +15,7 @@
 | `Kp_angle` (Pha 1) | **`30.0`** |
 | `Ki_angle` / `Kd_angle` | **`0.0` / `0.0`** |
 | `Kp_angle2` (Pha 2) | **`0.02`** |
-| `Kd_angle2` (Pha 2) | **`0.005` -> `0.08`** |
+| `Kd_angle2` (Pha 2) | **`0.005` -> `0.04`** |
 | `Kp_dist` (Pha 2) | **`25.0`** |
 | `dist_tolerance` | **`10.0`** |
 | `max_velocity` | **`2000`** |
@@ -51,12 +51,12 @@ python .\plot_pid_navigation_log.py --log benchmark_logs/<ten_file_log>.csv
 ```
 
 
-### 2. Chạy thử nghiệm khi tăng kd Angle2 từ 0.0 -> 0.08 
+### 2. Chạy thử nghiệm khi tăng kd Angle2 từ 0.0 -> 0.005 -> 0.01 -> 0.04
 
 - Cấu hình hiện tại của bộ điều khiển PID : 
   - `Kp_dist = 25.0`, `Ki_dist = 0.0`, `Kd_dist = 0.0`
   - `Kp_angle = 30.0`, `Ki_angle = 0.0`, `Kd_angle = 0.0`
-  - `Kp_angle2 = 0.02`, `Ki_angle2 = 0.0`, `Kd_angle2 = 0.0 -> 0.08`
+  - `Kp_angle2 = 0.02`, `Ki_angle2 = 0.0`, `Kd_angle2 = 0.0 -> 0.04`
   - `dist_tolerance = 10.0 px`
   - `heading_tolerance = 20.0°`
 
@@ -221,84 +221,7 @@ python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30
   ![Diff 2](LeanbotTinyRC/benchmark_logs_001/plots/log_roi_20260909_082933_pid_diff_analysis.png)
 
 
-#### 2.4 Chạy Inference cấu hình Angle2 kd = 0.02
-- Lệnh chạy:
-```bash
-python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30 --kd-angle2 0.02 --heading-tol 20 --kp-angle2 0.02
-```
-
-- **Trường hợp 1:**
-  - **Thời gian di chuyển:** ~15.2 giây (229 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.4 giây (38 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~12.7 giây (191 frames)
-  - **Sai số cự ly cuối:** 11.1 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 1](LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_62_20260909_083024_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 1](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 1](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 1](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083024_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 2:**
-  - **Thời gian di chuyển:** ~14.6 giây (221 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.2 giây (35 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~12.3 giây (186 frames)
-  - **Sai số cự ly cuối:** 10.7 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 2](LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_422_20260909_083048_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 2](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 2](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 2](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083048_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 3:**
-  - **Thời gian di chuyển:** ~9.6 giây (146 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~1.5 giây (24 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~8.1 giây (122 frames)
-  - **Sai số cự ly cuối:** 11.0 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 3](LeanbotTinyRC/benchmark_logs_002/manual_captures/manual_cap_742_20260909_083109_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 3](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 3](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 3](LeanbotTinyRC/benchmark_logs_002/plots/log_roi_20260909_083109_pid_diff_analysis.png)
-
-
-#### 2.5 Chạy Inference cấu hình Angle2 kd = 0.04
+#### 2.4 Chạy Inference cấu hình Angle2 kd = 0.04
 - Lệnh chạy:
 ```bash
 python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30 --kd-angle2 0.04 --heading-tol 20 --kp-angle2 0.02
@@ -399,162 +322,7 @@ python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30
   ![Diff 4](LeanbotTinyRC/benchmark_logs_004/plots/log_roi_20260909_083303_pid_diff_analysis.png)
 
 
-#### 2.6 Chạy Inference cấu hình Angle2 kd = 0.06
-- Lệnh chạy:
-```bash
-python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30 --kd-angle2 0.06 --heading-tol 20 --kp-angle2 0.02
-```
-
-- **Trường hợp 1:**
-  - **Thời gian di chuyển:** ~14.9 giây (226 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.3 giây (37 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~12.5 giây (189 frames)
-  - **Sai số cự ly cuối:** 10.3 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 1](LeanbotTinyRC/benchmark_logs_006/manual_captures/manual_cap_374_20260909_083618_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 1](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 1](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 1](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083618_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 2:**
-  - **Thời gian di chuyển:** ~14.4 giây (219 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.2 giây (35 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~12.2 giây (184 frames)
-  - **Sai số cự ly cuối:** 10.5 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 2](LeanbotTinyRC/benchmark_logs_006/manual_captures/manual_cap_690_20260909_083639_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 2](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 2](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 2](LeanbotTinyRC/benchmark_logs_006/plots/log_roi_20260909_083639_pid_diff_analysis.png)
-
-
-#### 2.7 Chạy Inference cấu hình Angle2 kd = 0.08
-- Lệnh chạy:
-```bash
-python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30 --kd-angle2 0.08 --heading-tol 20 --kp-angle2 0.02
-```
-
-- **Trường hợp 1:**
-  - **Thời gian di chuyển:** ~14.8 giây (222 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.0 giây (31 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~12.7 giây (191 frames)
-  - **Sai số cự ly cuối:** 11.2 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 1](LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_60_20260909_083346_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 1](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 1](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 1](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083346_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 2:**
-  - **Thời gian di chuyển:** ~13.8 giây (209 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.0 giây (32 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~11.8 giây (177 frames)
-  - **Sai số cự ly cuối:** 10.3 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 2](LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_366_20260909_083406_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 2](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 2](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 2](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083406_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 3:**
-  - **Thời gian di chuyển:** ~10.4 giây (157 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.0 giây (31 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~8.3 giây (126 frames)
-  - **Sai số cự ly cuối:** 10.4 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 3](LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_654_20260909_083425_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 3](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 3](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 3](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083425_pid_diff_analysis.png)
-
----
-
-- **Trường hợp 4:**
-  - **Thời gian di chuyển:** ~10.4 giây (158 frames)
-  - **Thời gian Pha 1 (ALIGNING):** ~2.3 giây (36 frames)
-  - **Thời gian Pha 2 (DRIVING):** ~8.0 giây (122 frames)
-  - **Sai số cự ly cuối:** 11.6 px
-
-  **Ảnh Detection UI thực tế:**
-
-  ![Detection UI 4](LeanbotTinyRC/benchmark_logs_008/manual_captures/manual_cap_871_20260909_083440_detection_ui.png)
-
-  **Đồ thị quỹ đạo 2D:**
-
-  ![Trajectory 4](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_2d_trajectory.png)
-
-  **Đồ thị PID & Góc:**
-
-  ![PID 4](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_pid_analysis.png)
-
-  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
-
-  ![Diff 4](LeanbotTinyRC/benchmark_logs_008/plots/log_roi_20260909_083440_pid_diff_analysis.png)
-
----
-
-### 2.8 Kết luận về ngưỡng ổn định của Kd Angle2
+### 2.5 Kết luận về ngưỡng ổn định của Kd Angle2
 
 #### Bảng tổng hợp số liệu thực nghiệm định lượng giữa các cấu hình Kd:
 
@@ -563,13 +331,9 @@ python .\leanbotCameraController.py --show --source 1 --ble 896692 --kp-angle 30
 | **`0.0`** | 12.90s | 18.63° | 22.75° | 8.0 | 0.62 | Dao động hình sin lớn |
 | **`0.005`** | 13.00s | 16.76° | 19.99° | 7.5 | 0.58 | Giảm nhẹ dao động |
 | **`0.01`** | 12.90s | 17.67° | 21.69° | 7.5 | 0.58 | Góc lượn vẫn còn khá rộng |
-| **`0.02`** | 11.03s | 15.22° | 19.29° | 8.3 | 0.75 | Bắt đầu giảm biên độ đường hình sin|
-| **`0.04`** | 9.65s | **7.33°** | **10.75°** | 14.0 | 1.45 | **Tối ưu nhất:** Sai số góc nhỏ nhất, quỹ đạo bám thẳng hầu như không có dao động |
-| **`0.06`** | 12.35s | 12.27° | 16.64° | 11.0 | 0.89 | Bắt đầu xuất hiện giao động |
-| **`0.08`** | 10.20s | 9.25° | 12.67° | 22.3 | 2.19 | giao động rõ rệt hơn  |
+| **`0.04`** | 9.65s | **7.33°** | **10.75°** | 14.0 | 1.45 | **ổn định:** Sai số góc nhỏ nhất, quỹ đạo bám thẳng hầu như không có dao động |
 
-> - **Cấu hình ổn định và hiệu quả nhất:** **`Kd_angle2 = 0.04`** 
->- **Ngưỡng bắt đầu mất ổn định:** Bắt đầu có dấu hiệu mất ổn định **`Kd_angle2 = 0.06`** và **mất ổn rõ hơn khi `Kd_angle2 >= 0.08`**.
+> - **Cấu hình ổn định và hiệu quả nhất:** **`Kd_angle2 = 0.04`**
 
 
 ## B. Khó khăn 

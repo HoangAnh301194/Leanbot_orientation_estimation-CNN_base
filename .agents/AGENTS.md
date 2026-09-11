@@ -7,3 +7,4 @@
 ## 2. Implementation Workflow & Command Execution
 - **Propose Plan First**: Always present an Implementation Plan and wait for user confirmation/approval before making code modifications or running commands.
 - **Auto-execute Commands Once Approved**: Once the plan is approved by the user, **DO NOT ask for command execution permissions again**. Automatically propose and execute terminal commands to complete and verify the work.
+- When expain or answer the question on the chat window , use text for presenting the principle.

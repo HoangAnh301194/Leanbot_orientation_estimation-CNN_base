@@ -25,7 +25,6 @@ Sai phân sai số góc được wrap về khoảng $`[-180^\circ,180^\circ)`$ t
 
 *(Chu kỳ lấy mẫu $`\Delta t`$ được coi là hằng số và đã gộp ngầm vào hệ số $`K_{d,\mathrm{angle2}} = \frac{K_{d,\mathrm{angle2}}^{\mathrm{chuẩn}}}{\Delta t}`$)*
 
-Thay đổi hiện tại chỉ bổ sung wrap cho sai phân góc pha 2, chưa thêm bộ lọc thông thấp hoặc chia sai phân cho thời gian lấy mẫu.
 
 **Code thực tế đang sử dụng (`PID_controller.py` & `plot_pid_navigation_log.py`)**:
 
@@ -70,13 +69,13 @@ self._prev_time = current_time
 
 if dt > 0:
     # Tốc độ biến thiên sai số góc theo thời gian (de/dt, deg/s)
-    err_diff = (angle_error - self._prev_angle_error + 180.0) % 360.0 - 180.0
+    err_diff = wrap_to_180(angle_error - self._prev_angle2_error)
     de_dt = err_diff / dt
-    d_term = self.Kd_angle * de_dt
+    d_term = self.Kd_angle2 * de_dt
 else:
     d_term = 0.0
 
-self._prev_angle_error = angle_error
+self._prev_angle2_error = angle_error
 ```
 
 Tuy nhiên vì trước đó khi triển khai em coi thời gian lấy mẫu là không thay đổi, và delta T = const nên có thể gộp chung với hệ số Kd để tuning chung. Và như báo cáo hôm qua thì với Kd (đã bao gồm cả Delta T) bằng `0.04` là tối ưu nhất trong khoảng từ `0.0` đến `0.08`.
@@ -89,13 +88,16 @@ Tuy nhiên vì trước đó khi triển khai em coi thời gian lấy mẫu là
 
 - Em thấy Leanbot là dạng Robot vi sai, động học tương đối đơn giản nên em nghĩ phương pháp đơn giản, dễ triển khai thì phù hợp ạ. Em xin phép đề xuất dùng bộ lọc `First-order low-pass filtered Derivative` để triển khai thử trước ạ.
 
-#### 2.1 First-order low-pass filtered Derivative
+- Hai hướng triển khai cùng bộ lọc `First-order low-pass filtered Derivative` cho khâu D của bộ điều khiển góc pha 2 như sau:
 
-Trong bộ điều khiển PID có thành phần D (Derivative) đạo hàm, phản ánh tốc độ thay đổi của sai số error, tuy nhiên phép đạo hàm có thể khuyếch đại nhiễu tần số cao trong tín hiệu đo. Người ta đưa ra hướng xử lí là sử dụng bộ lọc thông thấp vào riêng nhánh đạo hàm (D) này để hạn chế ảnh hưởng của nhiễu lên tín hiệu điều khiển.
+    - **Hướng 1:** coi thời gian lấy mẫu là hằng số, tiếp tục gộp vào `Kd_angle2` như code hiện tại đang triển khai.
+    - **Hướng 2:** đo thời gian giữa các lần cập nhật sai số góc giữa các frame ảnh, không gộp vào `Kd_angle2` như hướng 1.
 
-**Công thức ở dạng rời rạc nhưu sau:**
+**Công thức bộ lọc chung**
 
-Với sai số $`e(t)=r(t)-y(t)`$, bộ lọc thông thấp bậc nhất được kết hợp với khâu đạo hàm như sau:
+Trong bộ điều khiển PID, khâu D phản ánh tốc độ thay đổi của sai số nhưng có thể khuếch đại nhiễu tần số cao trong tín hiệu đo. Bộ lọc thông thấp được sử dụng riêng trong nhánh D để hạn chế ảnh hưởng này.
+
+Mô hình liên tục của bộ lọc và nhánh đạo hàm được viết trong miền Laplace, với điều kiện đầu bằng 0:
 
 ```math
 G_f(s)=\frac{1}{1+T_f s},
@@ -103,105 +105,244 @@ G_f(s)=\frac{1}{1+T_f s},
 G_D(s)=K_d sG_f(s)=\frac{K_d s}{1+T_f s}.
 ```
 
-Bộ điều khiển PID dạng song song khi đó có biểu thức [2]:
+**Hàm truyền PID có lọc đạo hàm trong miền Laplace**
+
+Bộ điều khiển PID dạng song song gồm ba nhánh P, I, D cùng tác động lên sai số; bộ lọc thông thấp được đặt trong nhánh D. Hàm truyền của bộ điều khiển là:
 
 ```math
-C(s)=K_p+\frac{K_i}{s}+\frac{K_d s}{1+T_f s},
+C(s)=\frac{U(s)}{E(s)}
+=K_p+\frac{K_i}{s}+\frac{K_d s}{1+T_f s}.
+```
+Trong đó:
+
+- $`E(s)`$: biến đổi Laplace của tín hiệu sai số $`e(t)`$.
+- $`U(s)`$: biến đổi Laplace của tín hiệu điều khiển $`u(t)`$.
+- $`s`$: biến Laplace, không phải thời gian lấy mẫu $`T_s`$ hoặc $`\Delta t_k`$.
+
+- Nhân lại với $`E(s)`$, ta có đầy đủ ba thành phần để quan sát công thức PID đầy đủ ở miền rời rạc :
+
+```math
+\begin{aligned}
+U(s)&=U_P(s)+U_I(s)+U_D(s),\\
+&=K_pE(s)+\frac{K_i}{s}E(s)+\frac{K_d s}{1+T_f s}E(s).
+\end{aligned}
 ```
 
-**Hiện tại theo trong code thì sai số được tính như sau:**
+- **Thành phần tỉ lệ P:** $`U_P(s)=K_pE(s)`$, tương ứng $`u_P(t)=K_pe(t)`$ trong miền thời gian; phản ánh sai số tỉ lệ.
+- **Thành phần tích phân I:** $`U_I(s)=\frac{K_i}{s}E(s)`$, tương ứng $`u_I(t)=K_i\int_0^t e(\tau)\,d\tau`$; tích lũy sai số theo thời gian. Phép chia cho $`s`$ trong miền Laplace tương ứng phép tích phân với điều kiện đầu bằng 0.
+- **Thành phần đạo hàm có lọc D:** $`U_D(s)=\frac{K_d s}{1+T_f s}E(s)`$; nhân với $`s`$ tương ứng phép đạo hàm với điều kiện đầu bằng 0, còn $`\frac{1}{1+T_f s}`$ là bộ lọc thông thấp bậc nhất.
+
+**Sai số góc và sai phân dùng chung**
+
+Theo quy ước trong code:
 
 ```math
 e_\theta[k]
 =
 \mathrm{wrap}_{[-180^\circ,\,180^\circ)}
-\left(\theta[k]-\theta_{\mathrm{target}}[k]\right),
+\left(\theta[k]-\theta_{\mathrm{target}}[k]\right).
 ```
 
-trong đó:
+Trong đó:
 
 - $`\theta[k]`$: góc hướng robot từ kết quả hợp nhất `fused angle`.
 - $`\theta_{\mathrm{target}}[k]`$: góc hướng từ vị trí hiện tại đến điểm đích.
 - $`e_\theta[k]`$: sai số góc, tương ứng biến `angle_error`.
 
-**Code tính sai phân:**
+Sai phân sai số góc được wrap trước khi tính khâu D:
 
 ```math
 \Delta e_\theta[k]
 =
-\mathrm{wrap}_{[-180^\circ,\,180^\circ)}\left(e_\theta[k]-e_\theta[k-1]\right),
+\mathrm{wrap}_{[-180^\circ,\,180^\circ)}
+\left(e_\theta[k]-e_\theta[k-1]\right).
 ```
 
-và thành phần D trong nhánh hiệu chỉnh góc:
+#### 2.1 Hướng 1: Coi thời gian lấy mẫu là hằng số, gộp vào Kd_angle2
+
+
+Giả sử khoảng thời gian giữa hai lần cập nhật liên tiếp là:
 
 ```math
-D_{\mathrm{angle2}}[k]=K_{d,\mathrm{angle2}}\Delta e_\theta[k].
+\Delta t_k=T_s=\mathrm{const}>0.
 ```
 
-Với chu kì lấy mẫu $`\Delta T = const`$ nên gộp chugn vào với `Kd_angle2`.
+Tức là trong code hiện tại Kd_angle2 bản chất là : 
 
 ```math
-K_{d,\mathrm{angle2}}
+K_{d,\mathrm{angle2}}^{(1)}
 =
-\frac{K_{d,\mathrm{angle2}}^{\mathrm{chuẩn}}}{\Delta T}.
+\frac{K_{d,\mathrm{angle2}}^{\mathrm{chuẩn}}}{T_s}.
 ```
 
-**Bộ lọc thông thấp bậc nhất (low pass first order filtered derivative) theo như phương pháp đề xuất nhưu sau:**
-
-Gọi $`q_\theta[k]`$ là sai phân sai số góc đã lọc. Với phương pháp rời rạc hóa Backward Euler:
+Khi chưa lọc:
 
 ```math
-\boxed{
+D_{\mathrm{angle2}}^{(1)}[k]
+=
+K_{d,\mathrm{angle2}}^{(1)}\Delta e_\theta[k].
+```
+
+Vì $`1/T_s`$ đã nằm trong hệ số $`K_{d,\mathrm{angle2}}^{(1)}`$, không chia thêm sai phân cho $`T_s`$ trong mỗi lần tính khâu D.
+
+**Lọc sai phân sai số góc**
+
+Gọi $`q_\theta[k]`$ là sai phân đã lọc, có đơn vị độ. Với phương pháp Backward Euler:
+
+```math
 q_\theta[k]
 =
 \frac{T_f}{T_f+T_s}q_\theta[k-1]
 +
-\frac{T_s}{T_f+T_s}\Delta e_\theta[k]
-}
+\frac{T_s}{T_f+T_s}\Delta e_\theta[k].
 ```
 
-Trong đó $`T_f>0`$ là hằng số thời gian lọc, cùng đơn vị giây với $`T_s`$ ( thời gian lấy mẫu).
-
-Đặt:
+Đặt hệ số lọc cố định:
 
 ```math
 \alpha=\frac{T_s}{T_f+T_s},
 ```
 
-ta được:
+ta có:
 
 ```math
-\boxed{
 q_\theta[k]
 =
-(1-\alpha)q_\theta[k-1]
-+
-\alpha\Delta e_\theta[k]
-}
+(1-\alpha)q_\theta[k-1]+\alpha\Delta e_\theta[k].
 ```
 
-Thành phần D sau lọc là:
+Thành phần D sau lọc:
 
 ```math
 \boxed{
-D_{\mathrm{angle2}}^{\mathrm{filtered}}[k]
+D_{\mathrm{angle2}}^{(1)}[k]
 =
-K_{d,\mathrm{angle2}}q_\theta[k]
+K_{d,\mathrm{angle2}}^{(1)}q_\theta[k]
 }
 ```
 
-**Tích hợp vào côgn thức điều khiển hiện tại nhưu sau:**
+Hướng này giữ cách chỉnh định Kd hiện tại và dùng hệ số lọc $`\alpha`$ cố định. Tuy nhiên, nếu thời gian xử lý từng frame thay đổi đáng kể, giả thiết $`T_s=\mathrm{const}`$ không còn phản ánh đúng khoảng thời gian giữa các lần cập nhật nữa, khiến cho khâu D có thể hoạt động không chính xác .
 
-Giữ nguyên cách tích lũy sai số trong code:
+#### 2.2 Hướng 2: Đo thời gian lấy mẫu, không gộp vào Kd_angle2
+
+**Đo thời gian giữa hai lần cập nhật**
+
+Gọi $`t_k`$ là thời điểm cập nhật sai số góc thứ $`k`$:
 
 ```math
-S_{\mathrm{angle2}}[k]=S_{\mathrm{angle2}}[k-1]+e_\theta[k].
+\Delta t_k=t_k-t_{k-1}>0.
 ```
 
-Thay `d_angle2` bằng giá trị đã lọc $`q_\theta[k]`$, ta có:
+Đo delta T bằng `time.perf_counter()` của module `time`. Lấy mốc thời gian ở cùng một vị trí trong mỗi lần cập nhật PID để tính khoảng cách thời gian giữa hai mẫu sai số, không phải thời gian chạy riêng đoạn code khâu D.
+
+Ở hướng này, hệ số Kd được giữ độc lập với thời gian lấy mẫu:
+
+```math
+K_{d,\mathrm{angle2}}^{(2)}
+=
+K_{d,\mathrm{angle2}}^{\mathrm{chuẩn}}.
+```
+
+Đạo hàm sai số chưa lọc, đơn vị độ/giây:
+
+```math
+d_{\mathrm{raw}}[k]
+=
+\frac{\Delta e_\theta[k]}{\Delta t_k}.
+```
+
+Khi chưa lọc:
+
+```math
+D_{\mathrm{angle2}}^{(2)}[k]
+=
+K_{d,\mathrm{angle2}}^{(2)}
+\frac{\Delta e_\theta[k]}{\Delta t_k}.
+```
+
+**Lọc đạo hàm với thời gian lấy mẫu đo được**
+
+Gọi $`d_f[k]`$ là đạo hàm đã lọc, đơn vị độ/giây. Với $`T_f`$ cố định, hệ số lọc được cập nhật theo từng khoảng thời gian đo được:
+
+```math
+\alpha_k=\frac{\Delta t_k}{T_f+\Delta t_k}.
+```
+
+Công thức lọc:
+
+```math
+d_f[k]
+=
+(1-\alpha_k)d_f[k-1]+\alpha_k d_{\mathrm{raw}}[k].
+```
+
+Dạng tương đương theo Backward Euler:
 
 ```math
 \boxed{
+d_f[k]
+=
+\frac{T_f}{T_f+\Delta t_k}d_f[k-1]
++
+\frac{\Delta e_\theta[k]}{T_f+\Delta t_k}
+}
+```
+
+Thành phần D sau lọc:
+
+```math
+\boxed{
+D_{\mathrm{angle2}}^{(2)}[k]
+=
+K_{d,\mathrm{angle2}}^{(2)}d_f[k]
+}
+```
+
+Từ đó  $`\Delta t_k`$ được sử dụng riêng trong phép tính đạo hàm và hệ số lọc; không gộp vào Kd như hướng 1 . Nếu chỉ giữ $`\alpha`$ cố định khi $`\Delta t_k`$ thay đổi, bộ lọc sẽ không còn giữ cùng hằng số thời gian $`T_f`$. Hướng 2 sẽ phù hợp hơn với hệ thống có thời gian lấy mẫu không cố định, hoặc ổn định tại 1 giá trị. 
+
+**Code ví dụ cho hướng 2**
+
+Khi bắt đầu pha 2 hoặc reset, đặt `self._prev_time_angle2 = None`, `self._prev_angle2_error = None`, `self._filtered_derivative_angle2 = 0.0`. Thuộc tính `self.derivative_filter_time` tương ứng $`T_f>0`$, còn `self.Kd_angle2` sẽ là hệ số của hướng 2. 
+
+```python
+import time
+
+current_time = time.perf_counter()
+
+if self._prev_time_angle2 is None or self._prev_angle2_error is None:
+    self._filtered_derivative_angle2 = 0.0
+    d_term = 0.0
+else:
+    dt = current_time - self._prev_time_angle2
+    if dt > 0.0:
+        err_diff = wrap_to_180(angle_error - self._prev_angle2_error)
+        derivative_raw = err_diff / dt
+        alpha = dt / (self.derivative_filter_time + dt)
+        self._filtered_derivative_angle2 = (
+            (1.0 - alpha) * self._filtered_derivative_angle2
+            + alpha * derivative_raw
+        )
+        d_term = self.Kd_angle2 * self._filtered_derivative_angle2
+    else:
+        self._filtered_derivative_angle2 = 0.0
+        d_term = 0.0
+
+self._prev_time_angle2 = current_time
+self._prev_angle2_error = angle_error
+```
+**Tích hợp vào bộ điều khiển pha 2, áp dụng cho cả hai hướng**
+
+Để chỉ khảo sát ảnh hưởng của khâu D, giữ nguyên nhánh P, nhánh I và nhánh điều khiển khoảng cách trong code hiện tại. Trong đó, tổng sai số của nhánh I vẫn được cập nhật theo cách đang dùng:
+
+```math
+S_{\mathrm{angle2}}[k]
+=
+S_{\mathrm{angle2}}[k-1]+e_\theta[k].
+```
+
+Gọi $`D_{\mathrm{angle2}}[k]`$ là thành phần D sau lọc được chọn theo hướng 1 hoặc hướng 2:
+
+```math
 \Delta v[k]
 =
 \left(
@@ -209,13 +350,18 @@ K_{p,\mathrm{angle2}}e_\theta[k]
 +
 K_{i,\mathrm{angle2}}S_{\mathrm{angle2}}[k]
 +
-K_{d,\mathrm{angle2}}q_\theta[k]
+D_{\mathrm{angle2}}[k]
 \right)
-v_{\mathrm{LR,cropped}}[k]
-}
+v_{\mathrm{LR,cropped}}[k].
 ```
 
-Trong đó $`v_{\mathrm{LR,cropped}}[k]`$ là lệnh tiến chung do nhánh điều khiển khoảng cách tính toán, sau khi giới hạn; tương ứng `v_lr_cropped`.
+Trong đó $`v_{\mathrm{LR,cropped}}[k]`$ là lệnh tiến chung do nhánh điều khiển khoảng cách tính toán, sau khi giới hạn; tương ứng `v_lr_cropped`. Đóng góp riêng của khâu D vào chênh lệch lệnh hai bánh là:
+
+```math
+\Delta v_D[k]
+=
+v_{\mathrm{LR,cropped}}[k]D_{\mathrm{angle2}}[k].
+```
 
 Lệnh hai bánh trước bước giới hạn chung:
 
@@ -228,14 +374,108 @@ v_R[k]&=v_{\mathrm{LR,cropped}}[k]-\Delta v[k].
 
 Sau đó, chương trình dùng `_scale_speeds` để giảm đồng thời hai lệnh theo cùng tỷ lệ nếu vượt `max_velocity`.
 
-Phường pháp đề xuất chỉ thay thành phần sai phân của nhánh D; giữ nguyên nhánh P, nhánh I và hệ số nhân `v_lr_cropped`. Ảnh hưởng riêng của D vào chênh lệch lệnh hai bánh là:
+#### 2.3 Chi tiết công thức tính bộ lọc và mã nguồn áp dụng vào code hiện tại
 
-```math
-\Delta v_D[k]
-=
-v_{\mathrm{LR,cropped}}[k]\,
-K_{d,\mathrm{angle2}}q_\theta[k].
-```
+##### 1. Trường hợp 1: Thời gian lấy mẫu cố định ($`T_s = \mathrm{const}`$ - Hướng 1)
+
+* **Công thức tính bộ lọc**:
+  - Sai phân sai số góc có wrap $`[-180^\circ, 180^\circ)`$:
+    ```math
+    \Delta e_\theta[k] = \mathrm{wrap}_{[-180^\circ,\,180^\circ)}\left(e_\theta[k] - e_\theta[k-1]\right)
+    ```
+  - Lọc sai phân góc qua bộ lọc thông thấp bậc nhất với hệ số cố định $`\alpha = \frac{T_s}{T_f + T_s}`$:
+    ```math
+    q_\theta[k] = (1 - \alpha) q_\theta[k-1] + \alpha \Delta e_\theta[k]
+    ```
+  - Thành phần vi phân $`D_{\mathrm{angle2}}^{(1)}[k]`$:
+    ```math
+    D_{\mathrm{angle2}}^{(1)}[k] = K_{d,\mathrm{angle2}}^{(1)} q_\theta[k]
+    ```
+
+* **Mã nguồn áp dụng trong `compute()` (Pha 2 - Driving)**:
+  ```python
+  # --- TRƯỜNG HỢP 1: T cố định (Hướng 1) ---
+  if self._prev_angle2_error is None:
+      delta_e = 0.0
+      self._filtered_q_angle2 = 0.0
+  else:
+      # 1. Sai phân góc có wrap [-180, 180)
+      delta_e = wrap_to_180(angle_error - self._prev_angle2_error)
+      # 2. Lọc thông thấp bậc nhất với alpha cố định
+      self._filtered_q_angle2 = (
+          (1.0 - self.alpha_filter) * self._filtered_q_angle2
+          + self.alpha_filter * delta_e
+      )
+
+  self._prev_angle2_error = angle_error
+
+  # 3. Tính thành phần D sau lọc
+  D_angle2 = self.Kd_angle2 * self._filtered_q_angle2
+
+  # 4. Tính chênh lệch vận tốc delta_v và lệnh 2 bánh
+  delta_v = (self.Kp_angle2 * angle_error
+             + self.Ki_angle2 * self._integral_angle2
+             + D_angle2) * v_lr_cropped
+
+  speed_left, speed_right = self._scale_speeds(v_lr_cropped + delta_v, v_lr_cropped - delta_v)
+  ```
+
+##### 2. Trường hợp 2: Thời gian lấy mẫu có tính toán thực tế ($`\Delta t_k = t_k - t_{k-1}`$ - Hướng 2)
+
+* **Công thức tính bộ lọc**:
+  - Khoảng thời gian lấy mẫu thực tế giữa 2 frame liên tiếp (đo bằng `time.perf_counter()`):
+    ```math
+    \Delta t_k = t_k - t_{k-1} > 0
+    ```
+  - Đạo hàm sai số thô (chưa lọc, đơn vị: độ/giây):
+    ```math
+    d_{\mathrm{raw}}[k] = \frac{\Delta e_\theta[k]}{\Delta t_k} = \frac{\mathrm{wrap}_{[-180^\circ,\,180^\circ)}\left(e_\theta[k] - e_\theta[k-1]\right)}{\Delta t_k}
+    ```
+  - Cập nhật hệ số lọc động $`\alpha_k = \frac{\Delta t_k}{T_f + \Delta t_k}`$ và lọc đạo hàm:
+    ```math
+    d_f[k] = (1 - \alpha_k) d_f[k-1] + \alpha_k d_{\mathrm{raw}}[k] = \frac{T_f}{T_f + \Delta t_k} d_f[k-1] + \frac{\Delta e_\theta[k]}{T_f + \Delta t_k}
+    ```
+  - Thành phần vi phân $`D_{\mathrm{angle2}}^{(2)}[k]`$:
+    ```math
+    D_{\mathrm{angle2}}^{(2)}[k] = K_{d,\mathrm{angle2}}^{(2)} d_f[k]
+    ```
+
+* **Mã nguồn áp dụng trong `compute()` (Pha 2 - Driving)**:
+  ```python
+  # --- TRƯỜNG HỢP 2: T có tính toán (Hướng 2) ---
+  current_time = time.perf_counter()
+
+  if self._prev_time_angle2 is None or self._prev_angle2_error is None:
+      self._filtered_derivative_angle2 = 0.0
+      D_angle2 = 0.0
+  else:
+      dt = current_time - self._prev_time_angle2
+      if dt > 0.0:
+          # 1. Sai phân góc có wrap [-180, 180)
+          delta_e = wrap_to_180(angle_error - self._prev_angle2_error)
+          # 2. Đạo hàm thô (độ/giây)
+          derivative_raw = delta_e / dt
+          # 3. Cập nhật alpha_k động theo dt thực tế
+          alpha_k = dt / (self.derivative_filter_time + dt)
+          # 4. Lọc thông thấp bậc nhất cho đạo hàm
+          self._filtered_derivative_angle2 = (
+              (1.0 - alpha_k) * self._filtered_derivative_angle2
+              + alpha_k * derivative_raw
+          )
+          D_angle2 = self.Kd_angle2 * self._filtered_derivative_angle2
+      else:
+          D_angle2 = 0.0
+
+  self._prev_time_angle2 = current_time
+  self._prev_angle2_error = angle_error
+
+  # 5. Tính chênh lệch vận tốc delta_v và lệnh 2 bánh
+  delta_v = (self.Kp_angle2 * angle_error
+             + self.Ki_angle2 * self._integral_angle2
+             + D_angle2) * v_lr_cropped
+
+  speed_left, speed_right = self._scale_speeds(v_lr_cropped + delta_v, v_lr_cropped - delta_v)
+  ```
 
 ## B. Khó khăn
 

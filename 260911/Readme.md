@@ -1,5 +1,15 @@
 # Báo cáo công việc ngày 11/09/2026
 
+## Mục lục
+- [A. Công việc đã làm](#a-công-việc-đã-làm)
+  - [1. Thu thập thêm ảnh](#1-thu-thập-thêm-ảnh)
+  - [2. Thử chạy inference với Kd_angle2 = 0.04 với các mức heading_tol = 25, 35, 45 độ](#2-thử-chạy-inference-với-kd_angle2--004-với-các-mức-heading_tol--25-35-45-độ)
+    - [2.1 Trường hợp 1 : kd_angle2 = 0.04 ; heading_tol = 25.0](#21-trường-hợp-1--kd_angle2--004--heading_tol--250)
+    - [2.2 Trường hợp 2 : kd_angle2 = 0.04 ; heading_tol = 35.0](#22-trường-hợp-2--kd_angle2--004--heading_tol--350)
+    - [2.3 Trường hợp 3 : kd_angle2 = 0.04 ; heading_tol = 45.0](#23-trường-hợp-3--kd_angle2--004--heading_tol--450)
+- [B. Khó khăn](#b-khó-khăn)
+- [C. Công việc tiếp theo](#c-công-việc-tiếp-theo)
+
 ## A. Công việc đã làm 
 - Thu thập thêm dataset 
 - Chạy inference với Model cũ , và cấu hình `kd_angle2` = 0.04 & `heading_tol` = 25 , 35,45 .

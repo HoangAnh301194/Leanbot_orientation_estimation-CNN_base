@@ -136,6 +136,29 @@ def plot_pid_log(
     else:
         v_L = v_R = v_diff = v_LR = ratio_v = pd.Series([0.0] * len(df))
 
+    # Detect Phase 1 vs Phase 2 transition frame
+    split_frame = None
+    if "pid_mode" in df.columns:
+        p2_matches = df[df["pid_mode"] == "PHASE_2_DRIVING"]
+        if len(p2_matches) > 0:
+            split_frame = p2_matches["frame_id"].iloc[0]
+
+    def apply_phase_shading(ax, show_labels=False):
+        if split_frame is not None and len(frames) > 0:
+            f_start = frames.iloc[0]
+            f_end = frames.iloc[-1]
+            # Dim/gray background for Phase 1 (ALIGNING)
+            ax.axvspan(f_start, split_frame, color="#444444", alpha=0.10, zorder=0)
+            # Subtle vertical dividing dashed line
+            ax.axvline(split_frame, color="#222222", linestyle="--", linewidth=1.2, alpha=0.65, zorder=1)
+            if show_labels:
+                y_min, y_max = ax.get_ylim()
+                y_pos = y_max - (y_max - y_min) * 0.07
+                ax.text(f_start + (split_frame - f_start) * 0.03, y_pos, "PHASE 1 (ALIGNING)",
+                        fontsize=8.5, fontweight="bold", color="#555555", alpha=0.9, zorder=3)
+                ax.text(split_frame + (f_end - split_frame) * 0.02, y_pos, f"PHASE 2 (DRIVING, F={int(split_frame)})",
+                        fontsize=8.5, fontweight="bold", color="#1565c0", alpha=0.9, zorder=3)
+
     # =========================================================================
     # FIGURE 1: OVERVIEW PID & ANGLE ANALYSIS
     # =========================================================================
@@ -194,6 +217,9 @@ def plot_pid_log(
         ax3.set_title("3. Speed Commands (v_L, v_R, v_diff)", fontsize=12, fontweight="bold")
         ax3.grid(True, linestyle="-", alpha=0.25)
         ax3.legend(loc="upper right", framealpha=0.9)
+
+    for idx, ax in enumerate(axes1):
+        apply_phase_shading(ax, show_labels=(idx == 0))
 
     plt.tight_layout()
     out_fig1 = os.path.join(save_dir, f"{filename_stem}_pid_analysis.png")
@@ -267,6 +293,9 @@ def plot_pid_log(
     ax_d3.set_title("3. Wheel Speeds (v_L, v_R), Differential Speed (v_diff) & Steering Ratio (v_diff / v_LR)", fontsize=12, fontweight="bold")
     ax_d3.grid(True, linestyle="-", alpha=0.25)
 
+    for idx, ax in enumerate(axes2):
+        apply_phase_shading(ax, show_labels=(idx == 0))
+
     plt.tight_layout()
     out_fig2 = os.path.join(save_dir, f"{filename_stem}_pid_diff_analysis.png")
     plt.savefig(out_fig2, dpi=300)
@@ -285,6 +314,12 @@ def plot_pid_log(
 
             plt.plot(xs, ys, color="#1f77b4", linewidth=2.0, linestyle="-", label="Leanbot Trajectory")
             plt.scatter(xs[0], ys[0], color="green", s=120, zorder=5, label=f"Start ({xs[0]:.0f}, {ys[0]:.0f})")
+            if split_frame is not None:
+                p2_pts = valid_coords[valid_coords["frame_id"] == split_frame]
+                if len(p2_pts) > 0:
+                    px = p2_pts["x_center"].iloc[0]
+                    py = p2_pts["y_center"].iloc[0]
+                    plt.scatter(px, py, color="#ff9800", marker="D", s=110, zorder=6, label=f"Phase 2 Start ({px:.0f}, {py:.0f})")
             plt.scatter(xs[-1], ys[-1], color="blue", s=120, zorder=5, label=f"End ({xs[-1]:.0f}, {ys[-1]:.0f})")
 
             # Plot target waypoint if available

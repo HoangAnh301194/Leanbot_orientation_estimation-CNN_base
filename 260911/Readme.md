@@ -18,7 +18,7 @@
   - 9 Leanbot cho mỗi class góc (24 classs góc)
   - 3 Leanbot hiện Led RGB
   - 3 Leanbot quay gripper ngẫu nhiên
-  - 3 Leanbot có khối gỗ 3mm đặt giữa gripper
+  - 3 Leanbot có khối gỗ 3cm đặt giữa gripper
   - Phân bố ngẫu nhiên, rải đều trên sa bàn 
   - Kết hợp với dataset cũ
 
@@ -44,7 +44,7 @@
 | `original_120` | 120 | 120 | 1.080 (45 box/class) | Tập robot cơ bản ban đầu (5 ảnh/class, 9 robot/ảnh) |
 | `new_red_obstacle_48` | 48 | 48 | 432 (18 box/class) | Bổ sung vật cản khối hộp màu đỏ (2 ảnh/class, 9 robot/ảnh) |
 | `background_negative_12` | 12 | 12 | 0 | Sa bàn trống không có robot (negative background samples) |
-| `new_setup_24class_260911` | 24 | 24 | 216 (9 box/class) | Bổ sung mới hôm nay: Led RGB, gripper xoay, khối gỗ 3mm (1 ảnh/class, 9 robot/ảnh) |
+| `new_setup_24class_260911` | 24 | 24 | 216 (9 box/class) | Bổ sung mới hôm nay: Led RGB, gripper xoay, khối gỗ 3cm (1 ảnh/class, 9 robot/ảnh) |
 | **Tổng cộng** | **204 ảnh** | **204 file labels ** | **1.728 bounding box** | **72 bounding box / class cho cả 24 class** |
 
 - **Thông số ảnh trong Dataset**:

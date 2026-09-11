@@ -392,7 +392,7 @@ Sau đó, chương trình dùng `_scale_speeds` để giảm đồng thời hai 
     D_{\mathrm{angle2}}^{(1)}[k] = K_{d,\mathrm{angle2}}^{(1)} q_\theta[k]
     ```
 
-* **Mã nguồn áp dụng trong `compute()` (Pha 2 - Driving)**:
+* **Code minh hoaj áp dụng cho Pha 2 - Driving**:
   ```python
   # --- TRƯỜNG HỢP 1: T cố định (Hướng 1) ---
   if self._prev_angle2_error is None:
@@ -440,7 +440,7 @@ Sau đó, chương trình dùng `_scale_speeds` để giảm đồng thời hai 
     D_{\mathrm{angle2}}^{(2)}[k] = K_{d,\mathrm{angle2}}^{(2)} d_f[k]
     ```
 
-* **Mã nguồn áp dụng trong `compute()` (Pha 2 - Driving)**:
+* **Code minh họa ap dụng cho Pha 2 - Driving**:
   ```python
   # --- TRƯỜNG HỢP 2: T có tính toán (Hướng 2) ---
   current_time = time.perf_counter()

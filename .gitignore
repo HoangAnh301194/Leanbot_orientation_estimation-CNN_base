@@ -178,3 +178,10 @@ gmail_mcp/
 # Global ignores for heavy models
 *.bin
 */weights/
+
+
+260911/crop_images
+260911/datasets
+260911/datasets_0
+260911/raw_image
+260911/tool1_output

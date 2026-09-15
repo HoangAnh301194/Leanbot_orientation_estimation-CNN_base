@@ -41,6 +41,7 @@ python leanbotCameraController.py `
 --tracking-model ../leanbot_colab/weights/best_fp16_no_nms_imgsz160_openvino_model
 ```
 - Cấu hình thử nghiệm : 
+
 | Tham số cấu hình | Giá trị |
 | :--- | :--- |
 | `heading_tolerance` | **`25.0` -> `35.0` -> `45.0`** |

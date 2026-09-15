@@ -367,7 +367,14 @@ python leanbotCameraController.py `
 
 
 ## B. Khó khăn 
-- Không
+- Hiện tại em vẫn chưa hiểu về phần tính ra heading chính xác , và so sánh với target heading lắm ạ . 
+- Hiện tại heading trong quá trình điều khiển leanbot là tính liên tục, từ vị trí leanbot realtime tới target pixel ạ. 
+```python 
+dx = target_x - current_x
+dy = target_y - current_y
+target_heading = math.degrees(math.atan2(-dy, dx))
+```
+- Vậy tức là em cần tính thêm 1 target_heading là góc tính từ vị trí start tới vị trí target rồi dùng nó để điều khiển Leanbot bằng PID ở phase 3 ( đi tiến lùi -> tính heading thật ,...) và dùng để so sánh heading thật đúng không ạ Thầy ? 
 ## C. Công việc tiếp theo 
 - Em xin phép nhận hướng đi tiếp theo từ Thầy về phần bộ điều khiển PID ạ 
 - Thực hiện triển khai thêm phase 3 , đi tiến lùi để tính toán ra heading và so sánh với target_heading .

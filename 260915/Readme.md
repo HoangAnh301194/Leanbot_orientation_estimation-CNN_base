@@ -14,6 +14,8 @@ yolo predict model=leanbot_colab/weights/best.pt source=1 show=True conf=0.25
 - Thực tế infrence các tường hợp Thầy đề xuất như sau : 
 
 ![alt text](image-1.png)
+> Model vẫn nhận diện tốt các trường hợp có khối gỗ, tay gắp gripper ngẫu nhiên và các tường hợp bật Led RGB
+
 
 ## 2. Export model sang dạng OpenVINO 640, 160 và chạy inference đánh giá dữ liệu .
 ### 2.1 Export model sang dạng OpenVINO FP16 No NMS 

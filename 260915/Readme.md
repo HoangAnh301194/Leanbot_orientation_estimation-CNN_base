@@ -245,9 +245,129 @@ python leanbotCameraController.py `
 
 ---
 
-## B. Khó khăn 
-- Nhưu trước đó em báo cáo là ma trận nhầm lẫn ( fussion matrix ) của lần training lại với dữ liệu thêm này phân bố đúng với lý thuyết hơn , nhưng ngoài việc Model vẫn nhận diện tốt các trường hợp bật ledRGB , có khúc gỗ, gripper ngẫu nhiên thì em đang không biết model mới có hiệu quả hơn cho việc phân tích góc hơn khôgn, có giảm nhiễu noise hơn khôgn ạ 
-- Em có cần kiểm thử , so sánh 2 model trước và sau khôgn ạ ? hay dùng luôn model mới train ạ ? 
 
+### 3. Chọn bộ cấu hình ổn định nhất và chạy inference pipeLine đánh giá góc target_heading
+
+- Cấu hình ổn định nhất qua các lần khảo sát:
+
+| Tham số | Giá trị đề xuất |
+| :--- | :---: |
+| `heading_tolerance` | **`25.0°`** | 
+| `Kp_angle` (Pha 1) | **`30.0`** |
+| `Kp_angle2` (Pha 2) | **`0.02`** |
+| `Kd_angle2` (Pha 2) | **`0.04`** |
+| `Kp_dist` (Pha 2) | **`25.0`** |
+| `dist_tolerance` | **`10.0 px`** |
+| `max_velocity` | **`2000`** | 
+
+
+- Lệnh chạy : 
+
+```bash
+python leanbotCameraController.py `
+  --source 1 `
+  --show `
+  --ble 343944 `
+  --heading-tol 20 `
+  --kp-angle 30 `
+  --kp-angle2 0.02 `
+  --kd-angle2 0.04 `
+  --full-model ../leanbot_colab/weights/best_fp16_no_nms_imgsz640_openvino_model `
+  --tracking-model ../leanbot_colab/weights/best_fp16_no_nms_imgsz160_openvino_model
+```
+
+- Kết quả inference : 
+
+- **Lần chạy 1:**
+  **Ảnh Detection UI thực tế:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_81_20260915_173443_detection_ui.png" alt="Detection UI 1" width="800">
+
+  **Đồ thị quỹ đạo 2D:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173443_2d_trajectory.png" alt="Trajectory 1" width="800">
+
+  **Đồ thị PID & Góc:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173443_pid_analysis.png" alt="PID 1" width="800">
+
+  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173443_pid_diff_analysis.png" alt="Diff 1" width="800">
+
+---
+
+- **Lần chạy 2:**
+
+  **Ảnh Detection UI thực tế:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_372_20260915_173502_detection_ui.png" alt="Detection UI 2" width="800">
+
+  **Đồ thị quỹ đạo 2D:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173502_2d_trajectory.png" alt="Trajectory 2" width="800">
+
+  **Đồ thị PID & Góc:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173502_pid_analysis.png" alt="PID 2" width="800">
+
+  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173502_pid_diff_analysis.png" alt="Diff 2" width="800">
+
+---
+
+- **Lần chạy 3:**
+
+  **Ảnh Detection UI thực tế:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_670_20260915_173522_detection_ui.png" alt="Detection UI 3" width="800">
+
+  **Đồ thị quỹ đạo 2D:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173522_2d_trajectory.png" alt="Trajectory 3" width="800">
+
+  **Đồ thị PID & Góc:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173522_pid_analysis.png" alt="PID 3" width="800">
+
+  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173522_pid_diff_analysis.png" alt="Diff 3" width="800">
+
+---
+
+- **Lần chạy 4:**
+
+  **Ảnh Detection UI thực tế:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_912_20260915_173538_detection_ui.png" alt="Detection UI 4" width="800">
+
+  **Đồ thị quỹ đạo 2D:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173538_2d_trajectory.png" alt="Trajectory 4" width="800">
+
+  **Đồ thị PID & Góc:**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173538_pid_analysis.png" alt="PID 4" width="800">
+
+  **Đồ thị Vi phân & Tỉ số bẻ lái (Kp*error, Kd*diff(error), v_diff):**
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260915_173538_pid_diff_analysis.png" alt="Diff 4" width="800">
+
+---
+
+> **Nhận xét kết quả thực nghiệm:**
+
+> - Kết quả khảo sát với mô hình mới và cấu hình ổn định nhất từ các buổi chạy khảo sát inference, em thấy Leanbot di chuyển kém ổn định hơn. Mặc dù em đã thửu thay đổi thêm các thông số kd_angle2 trong dải từ 0.0001 tới 0.01 nhưng chưa thấy có xu hướng cải thiện ở cấu hình nào ạ.
+
+> - Độ ổn định phụ thuộc nhiều vào mức độ lệch góc ở cuối phase 1. Nếu góc ở phase 1 lệch càng nhiều thì khi chuyển sang phase 2 xe càng dễ mất ổn định do lực bẻ lái bù ban đầu lớn.
+ 
+> Em cũng chưa biết được là do model mới , hay do các yếu tố khác nữa , vì thông thường em nghĩ phải xét tới cả sự đồng bộ giữa tần số tính toán PID (tốc độ xử lý frame/FPS của Camera & Model) và tần số truyền nhận lệnh điều khiển (chu kỳ gửi BLE và tần số đáp ứng động cơ của Leanbot). 
+
+
+## B. Khó khăn 
+- Không
 ## C. Công việc tiếp theo 
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 
+- Em xin phép nhận hướng đi tiếp theo từ Thầy về phần bộ điều khiển PID ạ 
+- Thực hiện triển khai thêm phase 3 , đi tiến lùi để tính toán ra heading và so sánh với target_heading .

@@ -1,10 +1,26 @@
 # Báo cáo công việc ngày 15/09/2026 
+
+## Mục lục
+- [A. Công việc đã làm](#a-công-việc-đã-làm)
+  - [1. Test model với các trường hợp thử nghiệm](#1-test-model-với-các-trường-hợp-thử-nghiệm)
+  - [2. Export model sang dạng OpenVINO 640, 160 và chạy inference đánh giá dữ liệu](#2-export-model-sang-dạng-openvino-640-160-và-chạy-inference-đánh-giá-dữ-liệu-)
+    - [2.1 Export model sang dạng OpenVINO FP16 No NMS](#21-export-model-sang-dạng-openvino-fp16-no-nms)
+    - [2.2 Tiến hành chạy inference](#22-tiến-hành-chạy-inference-)
+      - [Đối với heading_tol = 25](#đối-với-heading_tol--25-)
+      - [Đối với heading_tol = 35](#đối-với-heading_tol--35-)
+      - [Đối với heading_tol = 45](#đối-với-heading_tol--45-)
+  - [3. Chọn bộ cấu hình ổn định nhất và chạy inference pipeLine đánh giá góc target_heading](#3-chọn-bộ-cấu-hình-ổn-định-nhất-và-chạy-inference-pipeline-đánh-giá-góc-target_heading)
+- [B. Khó khăn](#b-khó-khăn)
+- [C. Công việc tiếp theo](#c-công-việc-tiếp-theo)
+
 ## A. Công việc đã làm 
 - Test model mới với các trường hợp Thầy đề xuất : 
   - Leanbot bật Led RGB
   - Quay gripper
   - Có khối gỗ màu trong vùng gripper ( khối 3cm, 2cm)
 - Chạy inference điều khiển Leanbot.
+- Chọn cấu hình tốt nhất từ trước tới giờ và chạy inference với model mới. 
+
 ### 1. Test model với các trường hợp thử nghiệm 
 - Vì hiện tại code infrence đang dùng cho model export OpenVINO , các cỡ ảnh là 640 hoặc 160, để test luôn trực tiếp khả năng nhận diện của model thì em dùng lệnh test infrence của Ultralytics .
 - Lệnh chạy : 
@@ -17,7 +33,7 @@ yolo predict model=leanbot_colab/weights/best.pt source=1 show=True conf=0.25
 > Model vẫn nhận diện tốt các trường hợp có khối gỗ, tay gắp gripper ngẫu nhiên và các tường hợp bật Led RGB
 
 
-## 2. Export model sang dạng OpenVINO 640, 160 và chạy inference đánh giá dữ liệu .
+### 2. Export model sang dạng OpenVINO 640, 160 và chạy inference đánh giá dữ liệu .
 ### 2.1 Export model sang dạng OpenVINO FP16 No NMS 
 - image size = 640 : 
 ```bash

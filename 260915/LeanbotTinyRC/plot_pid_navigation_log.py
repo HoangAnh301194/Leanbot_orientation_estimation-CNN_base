@@ -45,6 +45,11 @@ def wrap_to_180_series(s: pd.Series) -> pd.Series:
     return (s + 180.0) % 360.0 - 180.0
 
 
+def wrap_to_180(angle_deg: float) -> float:
+    """Normalize a scalar angle into [-180, 180] degrees range."""
+    return (angle_deg + 180.0) % 360.0 - 180.0
+
+
 def plot_pid_log(
     csv_path: str,
     save_dir: str = "",
@@ -136,28 +141,72 @@ def plot_pid_log(
     else:
         v_L = v_R = v_diff = v_LR = ratio_v = pd.Series([0.0] * len(df))
 
-    # Detect Phase 1 vs Phase 2 transition frame
+    # Detect Phase transitions
     split_frame = None
+    split_frame_p3 = None
+    split_frame_p4_fwd = None
+    split_frame_p4_bwd = None
     if "pid_mode" in df.columns:
         p2_matches = df[df["pid_mode"] == "PHASE_2_DRIVING"]
         if len(p2_matches) > 0:
             split_frame = p2_matches["frame_id"].iloc[0]
+        p3_matches = df[df["pid_mode"] == "PHASE_3_FINAL_ALIGNING"]
+        if len(p3_matches) > 0:
+            split_frame_p3 = p3_matches["frame_id"].iloc[0]
+        p4_fwd_matches = df[df["pid_mode"] == "PHASE_4_FORWARD"]
+        if len(p4_fwd_matches) > 0:
+            split_frame_p4_fwd = p4_fwd_matches["frame_id"].iloc[0]
+        p4_bwd_matches = df[df["pid_mode"] == "PHASE_4_BACKWARD"]
+        if len(p4_bwd_matches) > 0:
+            split_frame_p4_bwd = p4_bwd_matches["frame_id"].iloc[0]
 
     def apply_phase_shading(ax, show_labels=False):
-        if split_frame is not None and len(frames) > 0:
-            f_start = frames.iloc[0]
-            f_end = frames.iloc[-1]
-            # Dim/gray background for Phase 1 (ALIGNING)
-            ax.axvspan(f_start, split_frame, color="#444444", alpha=0.10, zorder=0)
-            # Subtle vertical dividing dashed line
-            ax.axvline(split_frame, color="#222222", linestyle="--", linewidth=1.2, alpha=0.65, zorder=1)
-            if show_labels:
-                y_min, y_max = ax.get_ylim()
-                y_pos = y_max - (y_max - y_min) * 0.07
-                ax.text(f_start + (split_frame - f_start) * 0.03, y_pos, "PHASE 1 (ALIGNING)",
-                        fontsize=8.5, fontweight="bold", color="#555555", alpha=0.9, zorder=3)
-                ax.text(split_frame + (f_end - split_frame) * 0.02, y_pos, f"PHASE 2 (DRIVING, F={int(split_frame)})",
-                        fontsize=8.5, fontweight="bold", color="#1565c0", alpha=0.9, zorder=3)
+        if len(frames) == 0:
+            return
+        f_start = frames.iloc[0]
+        f_end = frames.iloc[-1]
+
+        p2_end = split_frame_p3 if split_frame_p3 is not None else (split_frame_p4_fwd if split_frame_p4_fwd is not None else f_end)
+        p3_end = split_frame_p4_fwd if split_frame_p4_fwd is not None else f_end
+        p4_fwd_end = split_frame_p4_bwd if split_frame_p4_bwd is not None else f_end
+        
+        # Phase 1
+        if split_frame is not None:
+            ax.axvspan(f_start, split_frame, color="#666666", alpha=0.05, zorder=0)
+            ax.axvline(split_frame, color="#444444", linestyle="--", linewidth=1.0, alpha=0.4, zorder=1)
+
+        # Phase 3
+        if split_frame_p3 is not None:
+            ax.axvspan(split_frame_p3, p3_end, color="#ba68c8", alpha=0.06, zorder=0)
+            ax.axvline(split_frame_p3, color="#ab47bc", linestyle="--", linewidth=1.0, alpha=0.4, zorder=1)
+
+        # Phase 4 Forward
+        if split_frame_p4_fwd is not None:
+            ax.axvspan(split_frame_p4_fwd, p4_fwd_end, color="#4dd0e1", alpha=0.06, zorder=0)
+            ax.axvline(split_frame_p4_fwd, color="#00acc1", linestyle="--", linewidth=1.0, alpha=0.4, zorder=1)
+
+        # Phase 4 Backward
+        if split_frame_p4_bwd is not None:
+            ax.axvspan(split_frame_p4_bwd, f_end, color="#ff8a65", alpha=0.06, zorder=0)
+            ax.axvline(split_frame_p4_bwd, color="#f4511e", linestyle="--", linewidth=1.0, alpha=0.4, zorder=1)
+
+        if show_labels:
+            y_min, y_max = ax.get_ylim()
+            y_pos = y_max - (y_max - y_min) * 0.07
+            if split_frame is not None:
+                ax.text(f_start + (split_frame - f_start) * 0.03, y_pos, "PHASE 1 (ALIGN)",
+                        fontsize=8.0, fontweight="bold", color="#555555", alpha=0.9, zorder=3)
+                ax.text(split_frame + (p2_end - split_frame) * 0.02, y_pos, f"PHASE 2 (DRIVE, F={int(split_frame)})",
+                        fontsize=8.0, fontweight="bold", color="#1565c0", alpha=0.9, zorder=3)
+            if split_frame_p3 is not None:
+                ax.text(split_frame_p3 + (p3_end - split_frame_p3) * 0.02, y_pos, f"PH3 (FINAL, F={int(split_frame_p3)})",
+                        fontsize=8.0, fontweight="bold", color="#7b1fa2", alpha=0.9, zorder=3)
+            if split_frame_p4_fwd is not None:
+                ax.text(split_frame_p4_fwd + (p4_fwd_end - split_frame_p4_fwd) * 0.02, y_pos, f"PH4-FWD (F={int(split_frame_p4_fwd)})",
+                        fontsize=8.0, fontweight="bold", color="#00838f", alpha=0.9, zorder=3)
+            if split_frame_p4_bwd is not None:
+                ax.text(split_frame_p4_bwd + (f_end - split_frame_p4_bwd) * 0.02, y_pos, f"PH4-BWD (F={int(split_frame_p4_bwd)})",
+                        fontsize=8.0, fontweight="bold", color="#d84315", alpha=0.9, zorder=3)
 
     # =========================================================================
     # FIGURE 1: OVERVIEW PID & ANGLE ANALYSIS
@@ -342,10 +391,93 @@ def plot_pid_log(
             plt.close(fig3)
             print(f"[SAVED] 2D trajectory chart: {out_fig3}")
 
+    # =========================================================================
+    # FIGURE 4: PHASE 4 FORWARD/BACKWARD TRAJECTORY & 1ST-ORDER FIT HEADING
+    # =========================================================================
+    if "pid_mode" in df.columns and "x_center" in df.columns and "y_center" in df.columns:
+        fwd_df = df[df["pid_mode"] == "PHASE_4_FORWARD"].dropna(subset=["x_center", "y_center"])
+        bwd_df = df[df["pid_mode"] == "PHASE_4_BACKWARD"].dropna(subset=["x_center", "y_center"])
+
+        if len(fwd_df) >= 3 or len(bwd_df) >= 3:
+            fig4, ax4 = plt.subplots(figsize=(10, 8))
+
+            fit_df = fwd_df if len(fwd_df) >= 3 else bwd_df
+            x_pts = fit_df["x_center"].values
+            y_pts = fit_df["y_center"].values
+            t_norm = np.linspace(0.0, 1.0, len(fit_df))
+
+            # Fit polynomial degree 1: x(t) = ax*t + bx, y(t) = ay*t + by
+            px = np.polyfit(t_norm, x_pts, deg=1)
+            py = np.polyfit(t_norm, y_pts, deg=1)
+
+            dx_fit = float(px[0])
+            dy_fit = float(py[0])
+            # In image coords, -dy is upward Cartesian
+            theta_fit_deg = float(np.degrees(np.arctan2(-dy_fit, dx_fit)))
+
+            # Target heading from log
+            trg_h = None
+            if "target_angle" in fit_df.columns:
+                trg_vals = fit_df["target_angle"].values
+                if len(trg_vals) > 0 and (trg_vals != 0).any():
+                    trg_h = float(trg_vals[0])
+            if trg_h is None and "target_angle" in df.columns:
+                p3_sub = df[df["pid_mode"] == "PHASE_3_FINAL_ALIGNING"]
+                if len(p3_sub) > 0:
+                    trg_h = float(p3_sub["target_angle"].iloc[0])
+            if trg_h is None:
+                trg_h = 90.0
+
+            heading_diff_deg = wrap_to_180(theta_fit_deg - trg_h)
+
+            # Plot raw forward & backward trajectory points
+            if len(fwd_df) > 0:
+                ax4.scatter(fwd_df["x_center"], fwd_df["y_center"], color="#00897b", s=40, alpha=0.8,
+                            label=f"Phase 4 Forward ({len(fwd_df)} pts)")
+                ax4.plot(fwd_df["x_center"], fwd_df["y_center"], color="#00897b", linewidth=1.5, alpha=0.5)
+            if len(bwd_df) > 0:
+                ax4.scatter(bwd_df["x_center"], bwd_df["y_center"], color="#e64a19", s=40, alpha=0.8,
+                            label=f"Phase 4 Backward ({len(bwd_df)} pts)")
+                ax4.plot(bwd_df["x_center"], bwd_df["y_center"], color="#e64a19", linewidth=1.5, alpha=0.5)
+
+            # Plot fitted line
+            t_eval = np.linspace(-0.2, 1.2, 50)
+            x_line = np.polyval(px, t_eval)
+            y_line = np.polyval(py, t_eval)
+            ax4.plot(x_line, y_line, color="#d81b60", linestyle="--", linewidth=2.5,
+                     label=f"Degree-1 Fit Line (Heading={theta_fit_deg:.1f}°)")
+
+            # Text box with comparison summary (placed at bottom-left)
+            textstr = "\n".join([
+                r"$\mathbf{PHASE\ 4\ HEADING\ VERIFICATION}$",
+                rf"Target Heading ($\mathbf{{\theta_{{target}}}}$): {trg_h:.2f}°",
+                rf"Fitted Traj Heading ($\mathbf{{\theta_{{traj}}}}$): {theta_fit_deg:.2f}°",
+                rf"Absolute Angle Error ($|\Delta \theta|$): {abs(heading_diff_deg):.2f}°",
+                f"Fit Displacement: {np.hypot(dx_fit, dy_fit):.1f} px",
+            ])
+            props = dict(boxstyle='round,pad=0.6', facecolor='#fff9c4', edgecolor='#fbc02d', alpha=0.95)
+            ax4.text(0.03, 0.05, textstr, transform=ax4.transAxes, fontsize=10.5,
+                     verticalalignment='bottom', bbox=props, zorder=10)
+
+            # Invert Y axis for image coordinates
+            ax4.invert_yaxis()
+            ax4.set_title(f"PHASE 4 FORWARD/BACKWARD TRAJECTORY & 1ST-ORDER FIT HEADING\nFile: {os.path.basename(csv_path)}",
+                          fontsize=13, fontweight="bold")
+            ax4.set_xlabel("X Coordinate (Pixel)", fontsize=11)
+            ax4.set_ylabel("Y Coordinate (Pixel - Inverted)", fontsize=11)
+            ax4.grid(True, linestyle="-", alpha=0.3)
+            ax4.legend(loc="upper right", framealpha=0.9)
+
+            out_fig4 = os.path.join(save_dir, f"{filename_stem}_phase4_fwd_bwd_heading.png")
+            plt.savefig(out_fig4, dpi=300)
+            plt.close(fig4)
+            print(f"[SAVED] Phase 4 trajectory & heading estimation chart: {out_fig4}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Tool for plotting PID & Navigation log data from Leanbot")
     parser.add_argument("--log", default="", help="Path to the CSV log file (if omitted, auto-selects the latest file in benchmark_logs/)")
+    parser.add_argument("--all", action="store_true", help="Plot all CSV log files found in benchmark_logs/")
     parser.add_argument("--kd", type=float, default=None, help="Kd value for angle PID in phase 2 (auto-detected if omitted)")
     parser.add_argument("--out", default="", help="Output directory for chart images (default: <log_dir>/plots/)")
     args = parser.parse_args()
@@ -354,7 +486,16 @@ def main():
     parent_benchmark_dir = Path(__file__).resolve().parent.parent / "benchmark"
 
     if args.log:
-        target_csv = args.log
+        target_csvs = [args.log]
+    elif args.all:
+        csv_files = glob.glob(str(local_benchmark_dir / "*.csv"))
+        if not csv_files:
+            csv_files = glob.glob(str(parent_benchmark_dir / "*.csv"))
+        if not csv_files:
+            print(f"[WARN] No CSV files found in {local_benchmark_dir} or {parent_benchmark_dir}")
+            return
+        target_csvs = sorted(csv_files)
+        print(f"[INFO] Found {len(target_csvs)} log files to plot.")
     else:
         csv_files = glob.glob(str(local_benchmark_dir / "*.csv"))
         if not csv_files:
@@ -362,10 +503,15 @@ def main():
         if not csv_files:
             print(f"[WARN] No CSV files found in {local_benchmark_dir} or {parent_benchmark_dir}")
             return
-        target_csv = max(csv_files, key=os.path.getmtime)
-        print(f"[INFO] Auto-selected latest log file: {target_csv}")
+        target_csvs = [max(csv_files, key=os.path.getmtime)]
+        print(f"[INFO] Auto-selected latest log file: {target_csvs[0]}")
 
-    plot_pid_log(target_csv, save_dir=args.out, kd_angle2=args.kd)
+    for target_csv in target_csvs:
+        print(f"\n=== Processing: {os.path.basename(target_csv)} ===")
+        try:
+            plot_pid_log(target_csv, save_dir=args.out, kd_angle2=args.kd)
+        except Exception as e:
+            print(f"[ERROR] Failed to plot {target_csv}: {e}")
 
 
 if __name__ == "__main__":

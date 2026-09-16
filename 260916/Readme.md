@@ -192,7 +192,7 @@ Cấu hình chạy thực nghiệm chung:
 
 ## B. Khó khăn
 
-- **Sai lệch phối cảnh ảnh camera:** Việc dùng fit quỹ đạo trên ảnh để suy ra heading chưa hoàn toàn chính xác để đánh giá, vì camera đặt góc chéo gây ra biến dạng phối cảnh. Leanbot đi thẳng trên thực tế nhưng quỹ đạo trên ảnh sẽ bị xiên nhẹ — đặc biệt khi di chuyển theo chiều dọc ($y(t) \neq 0$), do vùng xa camera hẹp hơn vùng gần camera.
+- Em nghĩ việc dùng fit quỹ đạo trên ảnh để suy ra heading chưa hoàn toàn chính xác để đánh giá, vì camera đặt góc chéo gây ra biến dạng phối cảnh. Leanbot đi thẳng trên thực tế nhưng quỹ đạo trên ảnh sẽ bị xiên nhẹ — đặc biệt khi di chuyển theo chiều dọc ($y(t) \neq 0$), do vùng xa camera hẹp hơn vùng gần camera. Em xin phép xin thêm ý kiến từ Thầy ạ.
 
 <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1291_20260916_153523_orig.png" alt="Phối cảnh camera" width="600">
 

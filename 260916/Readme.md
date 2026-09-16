@@ -35,8 +35,8 @@ Sau khi Leanbot đã đến đích (Phase 2 hoàn thành), Phase 3 thực hiện
 
  | Argument | Kiểu | Mặc định | Mô tả |
  |---|---|---|---|
- | `--target-heading` | `float` | `None` | **Góc hướng mong muốn cuối cùng (°)**. Nếu không truyền, Phase 3 bị bỏ qua. |
- | `--heading-tol3` | `float` | `10.0` | Dải sai số chấp nhận ở Phase 3 (°), hẹp hơn Phase 1 |
+ | `--target-heading` | `float` | `None` | **Target heading** |
+ | `--heading-tol3` | `float` | `5.0` | Dải sai số góc |
  | `--settle-time-ms` | `float` | `200.0` | Thời gian giữ ổn định tối thiểu (ms) trước khi complete |
  | `--kp-angle` | `float` | `30.0` | Kp Phase 1 |
  | `--kd-angle` | `float` | `0.0` | Kd Phase 1 |
@@ -47,7 +47,7 @@ Sau khi Leanbot đã đến đích (Phase 2 hoàn thành), Phase 3 thực hiện
 
 
 #### 1.2 Phase 4 – Tiến/Lùi thẳng (`PHASE_4_FORWARD` / `PHASE_4_BACKWARD`)
-Ngay sau khi Phase 3 ổn định xong, Leanbot thực hiện đi **tiến thẳng** trong `fwd_bwd_time_s` giây, sau đó **lùi thẳng** trong `fwd_bwd_time_s` giây cùng vận tốc cố định `fwd_bwd_speed`. Dữ liệu quỹ đạo tiến/lùi này được ghi log và dùng để **fit bậc 1** tính ra heading thực tế, sau đó so sánh với `target_heading` đã truyền vào ở Phase 3.
+Ngay sau khi Phase 3 ổn định xong, Leanbot thực hiện đi **tiến thẳng** trong `fwd_bwd_time_s` giây, sau đó **lùi thẳng** trong `fwd_bwd_time_s` giây cùng vận tốc cố định `fwd_bwd_speed`. Dữ liệu quỹ đạo tiến/lùi này được ghi log và dùng để **fit đa thức bậc 1** tính ra heading thực tế, sau đó so sánh với `target_heading` đã truyền vào ở Phase 3.
 
 - **Code bổ sung:** [`PID_controller.py`](LeanbotTinyRC/PID_controller.py)
 
@@ -76,11 +76,11 @@ Ngay sau khi Phase 3 ổn định xong, Leanbot thực hiện đi **tiến thẳ
 
  | Argument | Kiểu | Mặc định | Mô tả |
  |---|---|---|---|
- | `--fwd-bwd-time` | `float` | `10.0` | Thời gian tiến (và lùi) tính bằng giây. Đặt `0` để tắt Phase 4. |
+ | `--fwd-bwd-time` | `float` | `10.0` | Thời gian tiến (và lùi) tính bằng giây |
  | `--fwd-bwd-speed` | `int` | `1000` | Vận tốc bánh xe trong Phase 4 (đơn vị `runLR`) |
 
 - **Lệnh chạy thực tế (PowerShell):**
-- **Lệnh chạy thực tế (PowerShell):**
+
 
   ```powershell
   python leanbotCameraController.py `
@@ -124,7 +124,7 @@ Cấu hình chạy thực nghiệm chung:
 
 > **Nhận xét:**
 > - Tất cả 6 lần chạy hoàn chỉnh đều có sai số heading fit **dưới 2.4°**
-> - Lần 3 (`152824`, target 135°): Phase 3 mất **305 frame (~20s)** không rõ nguyên nhân .
+> - Lần 3 (`152824`, target 135°): Phase 3 lost tracking nhiều nhất ( em đã thử chạy đi chạy lại nhiều lần ở các vị trí khác nhau trên sa bàn nhưng khi tới căn chỉnh góc 135 độ ở phase 3 thì lost tracking rất nhiều ạ)
 ---
 
 
@@ -197,18 +197,18 @@ Cấu hình chạy thực nghiệm chung:
 <img src="LeanbotTinyRC/benchmark_logs/manual_captures/manual_cap_1291_20260916_153523_orig.png" alt="Phối cảnh camera" width="600">
 
 - **Thông số PID Phase 1 không phù hợp cho Phase 3:** Khi tái sử dụng bộ PID góc của Phase 1 cho Phase 3, em thấy Leanbot thường bị lắc qua lại và không ổn định trong nhiều trường hợp test thực tế. 
-- **Hiện tượng mất dấu (Lost Tracking) diễn ra thường xuyên:** Trong quá trình inference thời gian thực, hệ thống gặp hiện tượng lost tracking tương đối dày và thường xuyên (thể hiện rõ qua các khoảng ngắt quãng / mất mẫu trên các đồ thị vận tốc và góc). Nguyên nhân có thể do khi xe quay hoặc chuyển hướng nhanh, Leanbot bị lệch ra khỏi biên vùng ROI crop hoặc hiện tượng mờ chuyển động (motion blur) làm giảm điểm tin cậy (confidence) của mô hình.
-- Một số trường hợp bị lost tracking được hệ thống tự động ghi lại như sau:
+- **Hiện tượng mất dấu (Lost Tracking) diễn ra thường xuyên:** Trong quá trình inference thời gian thực, hiện tượng lost tracking xảy ra tương đối dày và thường xuyên (thể hiện rõ qua các khoảng ngắt quãng / mất mẫu trên các đồ thị vận tốc và góc)
+- Một số trường hợp bị lost tracking được hệ thống tự động ghi lại như sau: 
 
 | Trường hợp mất dấu (Lost Tracking) | Trường hợp mất dấu (Lost Tracking) |
 | :---: | :---: |
-| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1472_15-29-53-442_ROI_roi.png" alt="Lost Frame 1472" width="360"><br>Frame 1472 (15:29:53) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1598_15-30-01-840_ROI_roi.png" alt="Lost Frame 1598" width="360"><br>Frame 1598 (15:30:01) |
-| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1719_15-26-30-878_ROI_roi.png" alt="Lost Frame 1719" width="360"><br>Frame 1719 (15:26:30) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_639_15-28-56-946_ROI_roi.png" alt="Lost Frame 639" width="360"><br>Frame 639 (15:28:56) |
-| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_617_15-28-55-366_ROI_roi.png" alt="Lost Frame 617" width="360"><br>Frame 617 (15:28:55) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1653_15-26-26-527_ROI_roi.png" alt="Lost Frame 1653" width="360"><br>Frame 1653 (15:26:26) |
-| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_2415_15-27-17-256_ROI_roi.png" alt="Lost Frame 2415" width="360"><br>Frame 2415 (15:27:17) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1583_15-30-00-849_ROI_roi.png" alt="Lost Frame 1583" width="360"><br>Frame 1583 (15:30:00) |
-| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1498_15-29-55-140_ROI_roi.png" alt="Lost Frame 1498" width="360"><br>Frame 1498 (15:29:55) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1672_15-30-07-022_ROI_roi.png" alt="Lost Frame 1672" width="360"><br>Frame 1672 (15:30:07) |
+| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1598_15-26-22-825_ROI_roi.png" alt="Lost Frame 1598" width="360"><br>Frame 1598 (15:26:22) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_2056_15-26-53-369_ROI_roi.png" alt="Lost Frame 2056" width="360"><br>Frame 2056 (15:26:53) |
+| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_2191_15-27-02-345_ROI_roi.png" alt="Lost Frame 2191" width="360"><br>Frame 2191 (15:27:02) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_2411_15-27-17-031_ROI_roi.png" alt="Lost Frame 2411" width="360"><br>Frame 2411 (15:27:17) |
+| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_386_15-28-38-675_ROI_roi.png" alt="Lost Frame 386" width="360"><br>Frame 386 (15:28:38) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_653_15-28-57-964_ROI_roi.png" alt="Lost Frame 653" width="360"><br>Frame 653 (15:28:57) |
+| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1358_15-29-45-793_ROI_roi.png" alt="Lost Frame 1358" width="360"><br>Frame 1358 (15:29:45) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_1737_15-30-11-281_ROI_roi.png" alt="Lost Frame 1737" width="360"><br>Frame 1737 (15:30:11) |
+| <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_991_15-35-03-612_ROI_roi.png" alt="Lost Frame 991" width="360"><br>Frame 991 (15:35:03) | <img src="LeanbotTinyRC/benchmark_logs/lost_tracking_captures/lost_frame_473_15-37-32-651_ROI_roi.png" alt="Lost Frame 473" width="360"><br>Frame 473 (15:37:32) |
 
-> Tất cả các trường hợp lost tracking đề bình thường, không có vật thể nhiễu , chưa rõ nguyên nhân mất tracking Leanbot. 
+> Hầu hết các trường hợp lost tracking đề bình thường, không có vật thể nhiễu , chưa rõ nguyên nhân mất tracking Leanbot. 
 
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.

@@ -210,5 +210,13 @@ Cấu hình chạy thực nghiệm chung:
 
 > Hầu hết các trường hợp lost tracking đề bình thường, không có vật thể nhiễu , chưa rõ nguyên nhân mất tracking Leanbot. 
 
+- Khi em chạy test lại với cùng cấu hình (góc 135 độ) với **model cũ (`models/YOLO11n_versions/FP16_NO_NMS`)**  thì không có hiện tượng lost tracking ạ .
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260916_162344_pid_analysis.png" alt="PID Model Cũ 135deg" width="800">
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260916_162344_2d_trajectory.png" alt="Traj Model Cũ 135deg" width="600">
+
+  <img src="LeanbotTinyRC/benchmark_logs/plots/log_roi_20260916_162344_phase4_fwd_bwd_heading.png" alt="Ph4 Heading Model Cũ 135deg" width="600">
+
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.

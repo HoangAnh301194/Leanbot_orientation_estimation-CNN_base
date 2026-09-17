@@ -1,0 +1,122 @@
+[
+  {
+    "target_id": 1,
+    "calibrated_at": "2026-09-17 11:34:00",
+    "target_x": 602.3,
+    "target_y": 252.3,
+    "target_heading": -4.6,
+    "trajectory_points": 90,
+    "fit_dx": 58.5,
+    "fit_dy": -4.7
+  },
+  {
+    "target_id": 2,
+    "calibrated_at": "2026-09-17 12:00:11",
+    "target_x": 679.2,
+    "target_y": 290.2,
+    "target_heading": 178.1,
+    "trajectory_points": 150,
+    "fit_dx": -123.17,
+    "fit_dy": -4.02
+  },
+  {
+    "target_id": 3,
+    "calibrated_at": "2026-09-17 12:02:00",
+    "target_x": 676.2,
+    "target_y": 286.7,
+    "target_heading": 176.8,
+    "trajectory_points": 150,
+    "fit_dx": -121.86,
+    "fit_dy": -6.91
+  },
+  {
+    "target_id": 4,
+    "calibrated_at": "2026-09-17 12:03:20",
+    "target_x": 679.9,
+    "target_y": 288.7,
+    "target_heading": -1.1,
+    "trajectory_points": 152,
+    "fit_dx": 123.55,
+    "fit_dy": 2.4
+  },
+  {
+    "target_id": 5,
+    "calibrated_at": "2026-09-17 12:04:06",
+    "target_x": 681.2,
+    "target_y": 291.6,
+    "target_heading": -37.8,
+    "trajectory_points": 154,
+    "fit_dx": 102.87,
+    "fit_dy": 79.9
+  },
+  {
+    "target_id": 6,
+    "calibrated_at": "2026-09-17 12:04:57",
+    "target_x": 688.2,
+    "target_y": 281.0,
+    "target_heading": 35.3,
+    "trajectory_points": 152,
+    "fit_dx": 76.08,
+    "fit_dy": -53.96
+  },
+  {
+    "target_id": 7,
+    "calibrated_at": "2026-09-17 12:06:18",
+    "target_x": 683.1,
+    "target_y": 335.5,
+    "target_heading": 92.9,
+    "trajectory_points": 134,
+    "fit_dx": -4.7,
+    "fit_dy": -92.54
+  },
+  {
+    "target_id": 8,
+    "calibrated_at": "2026-09-17 12:10:02",
+    "target_x": 685.5,
+    "target_y": 478.5,
+    "target_heading": 93.3,
+    "trajectory_points": 152,
+    "fit_dx": -6.3,
+    "fit_dy": -110.19
+  },
+  {
+    "target_id": 9,
+    "calibrated_at": "2026-09-17 12:10:57",
+    "target_x": 662.7,
+    "target_y": 250.0,
+    "target_heading": -89.8,
+    "trajectory_points": 152,
+    "fit_dx": 0.31,
+    "fit_dy": 98.58
+  },
+  {
+    "target_id": 10,
+    "calibrated_at": "2026-09-17 12:13:34",
+    "target_x": 739.5,
+    "target_y": 248.5,
+    "target_heading": -145.8,
+    "trajectory_points": 146,
+    "fit_dx": -73.84,
+    "fit_dy": 50.1
+  },
+  {
+    "target_id": 11,
+    "calibrated_at": "2026-09-17 12:14:20",
+    "target_x": 680.7,
+    "target_y": 291.0,
+    "target_heading": 144.8,
+    "trajectory_points": 147,
+    "fit_dx": -85.68,
+    "fit_dy": -60.34
+  },
+  {
+    "target_id": 12,
+    "calibrated_at": "2026-09-17 12:16:03",
+    "target_x": 534.7,
+    "target_y": 89.1,
+    "target_heading": -99.1,
+    "trajectory_points": 150,
+    "fit_dx": -10.07,
+    "fit_dy": 62.93
+  }
+]

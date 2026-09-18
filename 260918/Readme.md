@@ -4,7 +4,7 @@
 
 - Chia bộ PID cho phase 3 riêng và tinh chỉnh lại PID cho phase 1 và 3 : phase 1 ưu tiên tốc độ , phase 3 ưu tiên độ chính xác 
 
-- Vẽ thêm đồ thị Kp*error và Kd*d(error) để đánh giá thêm, điều chỉnh lại Kp, Kd ở phase 2 để giảm đánh võng 
+- Báo cáo bổ sung đồ thị Kp*error và Kd*d(error) để đánh giá thêm, điều chỉnh lại Kp, Kd ở phase 2 để giảm đánh võng 
 
 - Khảo sát thêm các trường hợp góc ngẫu nhiên ( hiển thị targer heading segment và ko hiển thị các điểm trajectory bị lost tracking )  
 
@@ -104,7 +104,7 @@ python leanbotCameraController.py `
 
 #### Bảng tổng hợp kết quả toàn bộ 8 lần chạy thử nghiệm:
 
-| # | Trường hợp | File Log | Target $\theta_{target}$ | Target Pixel $(x, y)$ | Heading Fit $\theta_{traj}$ | Sai số $|\Delta \theta|$ | Quãng đường Phase 4 | Số frames (Ph1/Ph2/Ph3/Ph4) | Lost Tracking |
+| # | Trường hợp | File Log | Target $\theta_{target}$ | Target Pixel $(x, y)$ | Heading Fit $\theta_{traj}$ | Sai số \|Δθ\| | Quãng đường Phase 4 (px) | Số frames (Ph1/Ph2/Ph3/Ph4) | Lost Tracking |
 |---|:---:|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | 1 | **TH 1 (Lần 1)** | `log_roi_20260918_173410.csv` | **-18.9°** | `(593.9, 265.1)` | **-10.9°** | **8.00°** | 230.4 px | 31f / 116f / 66f / 91f | 0f |
 | 2 | **TH 1 (Lần 2)** | `log_roi_20260918_173437.csv` | **-18.9°** | `(593.9, 265.1)` | **-14.1°** | **4.77°** | 230.7 px | 28f / 143f / 32f / 91f | 0f |

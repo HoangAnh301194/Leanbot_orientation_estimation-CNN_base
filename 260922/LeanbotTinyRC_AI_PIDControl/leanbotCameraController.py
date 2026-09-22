@@ -384,7 +384,7 @@ class BLEMotorWorker:
                 
                 if cmd is not None:
                     try:
-                        
+
                         await leanbotTinyRC.sendTinyRCCommand(self.leanbot, cmd)
                     except Exception as e:
                         print(f"[WARN] BLE send error: {e}")
@@ -395,7 +395,8 @@ class BLEMotorWorker:
         finally:
             if self.leanbot is not None:
                 try:
-                    await self.leanbot.send("r/0/0\n", response=False)
+                    #await self.leanbot.send("r/0/0\n", response=False)
+                    await leanbotTinyRC.sendTinyRCCommand(self.leanbot, "r/0/0")
                     self.leanbot.clearSerialState()
                     self.leanbot.closeSerial()
                     await self.leanbot.killSerialBLEHandlerTask()
@@ -407,7 +408,7 @@ class BLEMotorWorker:
     def send_speed(self, speed_l: int, speed_r: int):
         if not self.connected:
             return
-        cmd = f"r/{speed_l}/{speed_r}\n"
+        cmd = f"r/{speed_l}/{speed_r}"
         try:
             if self.cmd_queue.full():
                 _ = self.cmd_queue.get_nowait()
@@ -418,7 +419,7 @@ class BLEMotorWorker:
     def send_run_fw_bw(self, speed: int, duration_ms: int):
         if not self.connected:
             return
-        cmd = f"rfb/{speed}/{duration_ms}\n"
+        cmd = f"rfb/{speed}/{duration_ms}"
         try:
             if self.cmd_queue.full():
                 _ = self.cmd_queue.get_nowait()

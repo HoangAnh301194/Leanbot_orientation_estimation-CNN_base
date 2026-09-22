@@ -16,9 +16,9 @@ void spinSteps(String args) {
   int speed  = args.substring(0, pos).toInt();
   int rotationSteps = args.substring(pos + 1).toInt();
 
-  LbMotion.stopAndWait()
-  LbMotion.runLR(+speed, -speed)
-  LbMotion.waitRotation(rotationSteps)
+  LbMotion.stopAndWait();
+  LbMotion.runLR(+speed, -speed);
+  LbMotion.waitRotation(rotationSteps);
   LbMotion.stopAndWait();
 }
 ```
@@ -159,19 +159,28 @@ async def _async_loop(self):
 
 - Kết quả log khi chạy triển khai như sau :
 ```
-15:12:44.709 (   +0) [BLE] Serial line: r/2000/-2000/START
-15:12:44.709 (   +0) [BLE RX] r/2000/-2000/END
 
-15:12:44.709 (   +0) [BLE] Serial line: r/2000/-2000/END
+15:46:18.545 (   +0) [BLE] Serial line: r/500/106/START
+15:46:18.545 (   +0) [BLE] Serial line: r/500/106/END
+15:46:18.546 (   +0) [tinyRC] Receive command START
+15:46:18.546 (   +0) [tinyRC] Receive command END
+15:46:18.575 (  +29) [tinyRC] Send command r/433/78 try 1
+15:46:18.634 (  +58) [BLE RX] r/433/78/START
+r/43
+15:46:18.634 (   +0) [BLE] Serial line: r/433/78/START
+15:46:18.635 (   +0) [BLE RX] 3/78/END
 
-15:12:45.005 ( +295) [tinyRC] Send command r/2000/-2000
- try 1
-15:12:45.045 (  +40) [BLE RX] r/2000/-2000/START
+15:46:18.635 (   +0) [BLE] Serial line: r/433/78/END
+15:46:18.635 (   +0) [tinyRC] Receive command START
+15:46:18.636 (   +0) [tinyRC] Receive command END
+[INFO] Stopping Leanbot and disconnecting BLE Worker...
+15:46:18.668 (  +32) [tinyRC] Send command r/0/0 try 1
+15:46:18.701 (  +32) [BLE RX] r/0/0/START
+r/0/0/E
+15:46:18.702 (   +0) [BLE] Serial line: r/0/0/START
+15:46:18.702 (   +0) [BLE RX] ND
+15:46:18.702 (   +0) [BLE] Serial line: r/0/0/END
 
-15:12:45.046 (   +0) [BLE] Serial line: r/2000/-2000/START
-15:12:45.046 (   +0) [BLE RX] r/2000/-2000/END
-
-15:12:45.046 (   +0) [BLE] Serial line: r/2000/-2000/END
 ```
 
 
@@ -179,4 +188,5 @@ async def _async_loop(self):
 - Không
 
 ## C. Công việc tiếp theo 
-- Em xin phép nhận đề xuất hướng đi tiếp theo từ Thầy ạ . 
+- Chỉnh góc sau khi đã đo được sai số so với target heading
+- Chỉnh lại Kp ở Phase 2 để sai số tại phase3 là nhỏ nhất . 

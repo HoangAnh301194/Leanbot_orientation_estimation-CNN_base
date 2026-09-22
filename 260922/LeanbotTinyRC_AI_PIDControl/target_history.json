@@ -1,0 +1,52 @@
+[
+  {
+    "target_id": 1,
+    "calibrated_at": "2026-09-18 17:33:59",
+    "target_x": 593.9,
+    "target_y": 265.1,
+    "target_heading": -18.9,
+    "trajectory_points": 90,
+    "fit_dx": 108.4,
+    "fit_dy": 37.17
+  },
+  {
+    "target_id": 2,
+    "calibrated_at": "2026-09-18 17:35:16",
+    "target_x": 446.8,
+    "target_y": 327.2,
+    "target_heading": 14.0,
+    "trajectory_points": 91,
+    "fit_dx": 125.12,
+    "fit_dy": -31.21
+  },
+  {
+    "target_id": 3,
+    "calibrated_at": "2026-09-18 17:36:55",
+    "target_x": 530.8,
+    "target_y": 529.4,
+    "target_heading": -136.2,
+    "trajectory_points": 91,
+    "fit_dx": -112.79,
+    "fit_dy": 108.03
+  },
+  {
+    "target_id": 4,
+    "calibrated_at": "2026-09-18 17:39:51",
+    "target_x": 757.3,
+    "target_y": 200.6,
+    "target_heading": -165.9,
+    "trajectory_points": 91,
+    "fit_dx": -103.2,
+    "fit_dy": 25.91
+  },
+  {
+    "target_id": 5,
+    "calibrated_at": "2026-09-18 17:41:57",
+    "target_x": 640.1,
+    "target_y": 480.0,
+    "target_heading": 108.9,
+    "trajectory_points": 91,
+    "fit_dx": -38.71,
+    "fit_dy": -113.19
+  }
+]

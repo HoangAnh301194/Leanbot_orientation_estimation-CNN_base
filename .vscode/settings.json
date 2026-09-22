@@ -1,3 +1,7 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/260918/LeanbotTinyRC_AI_PIDControl/LeanbotTinyRC",
+        "${workspaceFolder}/260918/tools"
+    ]
 }

@@ -1,52 +1,52 @@
 [
   {
     "target_id": 1,
-    "calibrated_at": "2026-09-18 17:33:59",
-    "target_x": 593.9,
-    "target_y": 265.1,
-    "target_heading": -18.9,
-    "trajectory_points": 90,
-    "fit_dx": 108.4,
-    "fit_dy": 37.17
+    "calibrated_at": "2026-09-22 17:43:15",
+    "target_x": 638.9,
+    "target_y": 314.2,
+    "target_heading": -67.9,
+    "trajectory_points": 113,
+    "fit_dx": 7.01,
+    "fit_dy": 17.27
   },
   {
     "target_id": 2,
-    "calibrated_at": "2026-09-18 17:35:16",
-    "target_x": 446.8,
-    "target_y": 327.2,
-    "target_heading": 14.0,
-    "trajectory_points": 91,
-    "fit_dx": 125.12,
-    "fit_dy": -31.21
+    "calibrated_at": "2026-09-22 17:44:16",
+    "target_x": 396.9,
+    "target_y": 188.7,
+    "target_heading": 16.9,
+    "trajectory_points": 114,
+    "fit_dx": 18.79,
+    "fit_dy": -5.71
   },
   {
     "target_id": 3,
-    "calibrated_at": "2026-09-18 17:36:55",
-    "target_x": 530.8,
-    "target_y": 529.4,
-    "target_heading": -136.2,
-    "trajectory_points": 91,
-    "fit_dx": -112.79,
-    "fit_dy": 108.03
+    "calibrated_at": "2026-09-22 17:45:27",
+    "target_x": 688.2,
+    "target_y": 383.6,
+    "target_heading": -125.7,
+    "trajectory_points": 113,
+    "fit_dx": -11.93,
+    "fit_dy": 16.58
   },
   {
     "target_id": 4,
-    "calibrated_at": "2026-09-18 17:39:51",
-    "target_x": 757.3,
-    "target_y": 200.6,
-    "target_heading": -165.9,
-    "trajectory_points": 91,
-    "fit_dx": -103.2,
-    "fit_dy": 25.91
+    "calibrated_at": "2026-09-22 17:46:48",
+    "target_x": 484.1,
+    "target_y": 247.0,
+    "target_heading": 177.7,
+    "trajectory_points": 114,
+    "fit_dx": -20.8,
+    "fit_dy": -0.85
   },
   {
     "target_id": 5,
-    "calibrated_at": "2026-09-18 17:41:57",
-    "target_x": 640.1,
-    "target_y": 480.0,
-    "target_heading": 108.9,
-    "trajectory_points": 91,
-    "fit_dx": -38.71,
-    "fit_dy": -113.19
+    "calibrated_at": "2026-09-22 17:47:46",
+    "target_x": 760.5,
+    "target_y": 406.2,
+    "target_heading": -1.1,
+    "trajectory_points": 114,
+    "fit_dx": 17.58,
+    "fit_dy": 0.34
   }
 ]

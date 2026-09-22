@@ -413,8 +413,35 @@ def plot_pid_log(
 
         valid_coords = traj_df.dropna(subset=["x_center", "y_center"])
         if len(valid_coords) > 0:
-            # Vẽ đường quỹ đạo xe (tự động ngắt quãng ở các frame NaN do lost tracking)
-            plt.plot(traj_df["x_center"], traj_df["y_center"], color="#1f77b4", linewidth=2.0, linestyle="-", label="Leanbot Trajectory")
+            # Kiểm tra xem log có chu trình Post-Phase 4 (re-rfb lần 2) không
+            has_post_ph4 = "pid_mode" in traj_df.columns and (traj_df["pid_mode"] == "POST_PH4_RE_RFB").any()
+
+            if has_post_ph4:
+                # 1. Đường di chuyển điều hướng tiếp cận (Phase 1 -> Phase 3)
+                nav_mask = ~traj_df["pid_mode"].astype(str).str.contains("PHASE_4|POST_PH4|COMPLETED")
+                nav_indices = traj_df[nav_mask].index
+                if len(nav_indices) > 0:
+                    last_nav = min(nav_indices[-1] + 1, len(traj_df) - 1)
+                    plt.plot(traj_df.loc[:last_nav, "x_center"], traj_df.loc[:last_nav, "y_center"],
+                             color="#1f77b4", linewidth=2.0, linestyle="-", label="Navigation Path (Ph 1-3)")
+
+                # 2. Quỹ đạo Run FW-BW lần 1 (Trước khi Spin) - Màu đỏ nhạt
+                p4_1_mask = traj_df["pid_mode"].astype(str).str.contains("PHASE_4_FWD_BWD|PHASE_4_FORWARD|PHASE_4_BACKWARD")
+                p4_1_indices = traj_df[p4_1_mask].index
+                if len(p4_1_indices) > 0:
+                    plt.plot(traj_df.loc[p4_1_indices, "x_center"], traj_df.loc[p4_1_indices, "y_center"],
+                             color="#e57373", linewidth=2.6, linestyle="-", alpha=0.9, label="Run FW-BW 1 (Before Spin)")
+
+                # 3. Quỹ đạo Run FW-BW lần 2 (Sau khi Spin) - Màu đỏ đậm
+                p4_2_mask = traj_df["pid_mode"].astype(str).str.contains("POST_PH4_RE_RFB")
+                p4_2_indices = traj_df[p4_2_mask].index
+                if len(p4_2_indices) > 0:
+                    plt.plot(traj_df.loc[p4_2_indices, "x_center"], traj_df.loc[p4_2_indices, "y_center"],
+                             color="#b71c1c", linewidth=3.0, linestyle="-", alpha=1.0, label="Run FW-BW 2 (After Spin)")
+            else:
+                # Quỹ đạo tiêu chuẩn nếu không có chu trình Post-Phase 4
+                plt.plot(traj_df["x_center"], traj_df["y_center"], color="#1f77b4", linewidth=2.0, linestyle="-", label="Leanbot Trajectory")
+
 
             start_x = valid_coords["x_center"].iloc[0]
             start_y = valid_coords["y_center"].iloc[0]

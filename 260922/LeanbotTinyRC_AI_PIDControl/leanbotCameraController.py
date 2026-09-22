@@ -25,7 +25,7 @@ sys.path.append(str(parent_dir))
 from datetime import datetime
 from ultralytics import YOLO
 import openvino as ov
-from PID_controller import create_position_pid
+from PID_controller import create_position_pid, wrap_to_180
 from LeanbotController import LeanbotController
 from logs import logs_init
 import asyncio
@@ -352,13 +352,19 @@ class BLEMotorWorker:
         self.running = True
         self.connected = False
         self.leanbot = None
+        self.loop = None
+        self._action_running = False
         self.thread = threading.Thread(target=self._worker_thread, daemon=True)
         self.thread.start()
 
+    @property
+    def is_busy(self) -> bool:
+        return self._action_running or not self.cmd_queue.empty()
+
     def _worker_thread(self):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(self._async_loop())
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_until_complete(self._async_loop())
 
     async def _async_loop(self):
         await logs_init()
@@ -375,19 +381,20 @@ class BLEMotorWorker:
             print(f"[INFO] BLE connected to Leanbot {self.leanbot_id}! Navigation [READY]")
             
             while self.running:
-                cmd = None
-                try:
-                    while not self.cmd_queue.empty():
-                        cmd = self.cmd_queue.get_nowait()
-                except Exception:
-                    pass
-                
-                if cmd is not None:
+                # Chỉ lấy và gửi lệnh speed nếu KHÔNG có action nào đang chạy
+                if not self._action_running:
+                    cmd = None
                     try:
-
-                        await leanbotTinyRC.sendTinyRCCommand(self.leanbot, cmd)
-                    except Exception as e:
-                        print(f"[WARN] BLE send error: {e}")
+                        while not self.cmd_queue.empty():
+                            cmd = self.cmd_queue.get_nowait()
+                    except Exception:
+                        pass
+                    
+                    if cmd is not None:
+                        try:
+                            await leanbotTinyRC.sendTinyRCCommand(self.leanbot, cmd)
+                        except Exception as e:
+                            print(f"[WARN] BLE send error: {e}")
                 
                 await asyncio.sleep(0.02)
         except Exception as e:
@@ -395,7 +402,6 @@ class BLEMotorWorker:
         finally:
             if self.leanbot is not None:
                 try:
-                    #await self.leanbot.send("r/0/0\n", response=False)
                     await leanbotTinyRC.sendTinyRCCommand(self.leanbot, "r/0/0")
                     self.leanbot.clearSerialState()
                     self.leanbot.closeSerial()
@@ -406,7 +412,8 @@ class BLEMotorWorker:
             self.connected = False
 
     def send_speed(self, speed_l: int, speed_r: int):
-        if not self.connected:
+        # Nếu đang chạy action (spin hoặc rfb) thì cấm gửi lệnh speed đè lên
+        if not self.connected or self._action_running:
             return
         cmd = f"r/{speed_l}/{speed_r}"
         try:
@@ -417,15 +424,46 @@ class BLEMotorWorker:
             pass
 
     def send_run_fw_bw(self, speed: int, duration_ms: int):
-        if not self.connected:
+        """Gửi trực tiếp lệnh run_fw_bw qua thư viện leanbotTinyRC."""
+        if not self.connected or self.loop is None:
             return
-        cmd = f"rfb/{speed}/{duration_ms}"
+        self._action_running = True
         try:
-            if self.cmd_queue.full():
-                _ = self.cmd_queue.get_nowait()
-            self.cmd_queue.put_nowait(cmd)
+            while not self.cmd_queue.empty():
+                self.cmd_queue.get_nowait()
         except Exception:
             pass
+
+        async def _do_rfb():
+            try:
+                await leanbotTinyRC.run_fw_bw(self.leanbot, speed, duration_ms)
+            except Exception as e:
+                print(f"[WARN] BLE run_fw_bw error: {e}")
+            finally:
+                self._action_running = False
+
+        asyncio.run_coroutine_threadsafe(_do_rfb(), self.loop)
+
+    def send_spin_steps(self, speed: int, rotation_steps: int):
+        """Gửi trực tiếp lệnh spin_steps qua thư viện leanbotTinyRC."""
+        if not self.connected or self.loop is None:
+            return
+        self._action_running = True
+        try:
+            while not self.cmd_queue.empty():
+                self.cmd_queue.get_nowait()
+        except Exception:
+            pass
+
+        async def _do_spin():
+            try:
+                await leanbotTinyRC.spin_steps(self.leanbot, speed, rotation_steps)
+            except Exception as e:
+                print(f"[WARN] BLE spin_steps error: {e}")
+            finally:
+                self._action_running = False
+
+        asyncio.run_coroutine_threadsafe(_do_spin(), self.loop)
 
     def stop(self):
         self.send_speed(0, 0)
@@ -460,17 +498,19 @@ def main():
     # --- PID controller parameters ---
     parser.add_argument("--kp-angle", type=float, default=30.0, help="PID Phase 1 heading gain (default 30.0)")
     parser.add_argument("--kd-angle", type=float, default=0.0, help="PID Phase 1 derivative gain (default 0.0)")
-    parser.add_argument("--kp-angle2", type=float, default=0.02, help="PID Phase 2 heading gain (default 0.02)")
+    parser.add_argument("--kp-angle2", type=float, default=0.01, help="PID Phase 2 heading gain (default 0.01)")
     parser.add_argument("--kd-angle2", type=float, default=0.04, help="PID Phase 2 derivative gain (default 0.04)")
     parser.add_argument("--heading-tol", type=float, default=20.0, help="Heading tolerance in degrees (default 20.0)")
     parser.add_argument("--target-heading", type=float, default=None, help="Target heading in degrees for Phase 3 final alignment (default: None)")
-    parser.add_argument("--kp-angle3", type=float, default=10.0, help="PID Phase 3 final heading gain (default 10.0)")
-    parser.add_argument("--kd-angle3", type=float, default=0.04, help="PID Phase 3 derivative gain (default 0.04)")
+    parser.add_argument("--kp-angle3", type=float, default=20.0, help="PID Phase 3 final heading gain (default 20.0)")
+    parser.add_argument("--kd-angle3", type=float, default=0.01, help="PID Phase 3 derivative gain (default 0.01)")
     parser.add_argument("--ki-angle3", type=float, default=0.0, help="PID Phase 3 integral gain (default 0.0)")
     parser.add_argument("--heading-tol3", type=float, default=5.0, help="Phase 3 final heading tolerance in degrees (default 5.0)")
     parser.add_argument("--settle-time-ms", type=float, default=500.0, help="Hold time in ms to settle target heading before complete (default 500.0)")
     parser.add_argument("--fwd-bwd-time", type=float, default=3.0, help="Forward/backward test duration in seconds after Phase 3 (default 3.0, 0 to disable)")
     parser.add_argument("--fwd-bwd-speed", type=int, default=2000, help="Wheel speed during forward/backward test (default 2000)")
+    parser.add_argument("--kp-spin", type=float, default=5.0, help="Steps per degree gain for post-Phase 4 spinSteps alignment (default 5.0)")
+    parser.add_argument("--spin-speed", type=int, default=100, help="Wheel speed during post-Phase 4 spinSteps alignment (default 1500)")
     # --- Set Target parameters (phím T / file JSON) ---
     parser.add_argument("--target-config", type=str, default="target_config.json", help="Path to target config JSON file (default: target_config.json)")
     parser.add_argument("--set-target-time", type=float, default=3.0, help="Set Target: duration (s) for fwd/bwd drive each way (default 3.0)")
@@ -578,6 +618,8 @@ def main():
     writer = None
     recording = False
     current_log_file = ""
+    pos_pid = None
+    target_pos = None
 
     def start_recording():
         nonlocal log_handle, writer, recording, current_log_file
@@ -608,7 +650,7 @@ def main():
                         "kp_angle", "kd_angle", "kp_angle2", "kd_angle2", "kp_angle3", "kd_angle3",
                         "heading_tol3_deg", "settle_time_ms", "fwd_bwd_time_s", "fwd_bwd_speed"
                     ])
-                th_val = f"{pos_pid.target_heading:.1f}" if pos_pid.target_heading is not None else "None"
+                th_val = f"{pos_pid.target_heading:.1f}" if (pos_pid is not None and pos_pid.target_heading is not None) else "None"
                 tx_val = f"{target_pos[0]:.1f}" if target_pos is not None else "None"
                 ty_val = f"{target_pos[1]:.1f}" if target_pos is not None else "None"
                 idx_writer.writerow([
@@ -622,7 +664,7 @@ def main():
         except Exception as e:
             print(f"[WARN] Failed to write experiment index: {e}")
 
-        th_str = f"{pos_pid.target_heading:.1f} deg" if pos_pid.target_heading is not None else "None"
+        th_str = f"{pos_pid.target_heading:.1f} deg" if (pos_pid is not None and pos_pid.target_heading is not None) else "None"
         print(f"\n[INFO] >>> REC ON. Started recording: {os.path.basename(current_log_file)} | Target: {target_pos} @ {th_str} <<<\n")
 
     def stop_recording():
@@ -633,19 +675,10 @@ def main():
         log_handle = None
         writer = None
         recording = False
-        th_str = f"{pos_pid.target_heading:.1f} deg" if pos_pid.target_heading is not None else "None"
+        th_str = f"{pos_pid.target_heading:.1f} deg" if (pos_pid is not None and pos_pid.target_heading is not None) else "None"
         print(f"\n[INFO] >>> REC OFF. Log saved: {os.path.basename(current_log_file)} | Target: {target_pos} @ {th_str} <<<\n")
 
     print(f"[INFO] Starting Inference ({args.mode.upper()} mode).")
-    if args.no_show:
-        print(f"[INFO] No-show mode: auto-recording log to {benchmark_base}")
-        start_recording()
-    elif args.video:
-        print(f"[INFO] Video mode: auto-recording log to {benchmark_base}")
-        start_recording()
-        print("[INFO] Key controls: T = set target, S = start + record log, P = pause, C = cancel run, Q = quit.")
-    else:
-        print("[INFO] Key controls: T = set target, S = start + record log, P = pause, C = cancel run, Q = quit.")
 
     # Timeout feature has been removed
 
@@ -669,12 +702,40 @@ def main():
     is_pid_completed = False
     target_pos = None
 
-    # =====================================================================
-    # SET TARGET STATE MACHINE (Phím T)
-    # Giai đoạn 1: SET_TARGET_MEASURING_POS - Đo center x,y trung bình 3s
-    # Giai đoạn 2: SET_TARGET_DRIVING - Chạy tiến lùi, thu thập quỹ đạo
-    # Giai đoạn 3: SET_TARGET_DONE - Fit heading, lưu config, chuyển READY
-    # =====================================================================
+    # Biến quản lý quy trình tuần tự sau Phase 4 (Spin -> Re-rfb -> So sánh)
+    post_ph4_active = False
+    post_ph4_spin_sent = False
+    post_ph4_spin_sent_time = 0.0
+    post_ph4_spin_steps = 0
+    post_ph4_spin_spd = 0
+    post_ph4_ang_err1 = 0.0
+    post_ph4_re_rfb_sent = False
+    post_ph4_re_rfb_sent_time = 0.0
+    post_ph4_settling = False
+    post_ph4_settle_start_time = 0.0
+    post_ph4_done = False
+    post_ph4_ang_err2 = 0.0
+
+    def reset_post_ph4():
+        nonlocal post_ph4_active, post_ph4_spin_sent, post_ph4_spin_sent_time
+        nonlocal post_ph4_spin_steps, post_ph4_spin_spd, post_ph4_ang_err1
+        nonlocal post_ph4_re_rfb_sent, post_ph4_re_rfb_sent_time
+        nonlocal post_ph4_settling, post_ph4_settle_start_time
+        nonlocal post_ph4_done, post_ph4_ang_err2
+        post_ph4_active = False
+        post_ph4_spin_sent = False
+        post_ph4_spin_sent_time = 0.0
+        post_ph4_spin_steps = 0
+        post_ph4_spin_spd = 0
+        post_ph4_ang_err1 = 0.0
+        post_ph4_re_rfb_sent = False
+        post_ph4_re_rfb_sent_time = 0.0
+        post_ph4_settling = False
+        post_ph4_settle_start_time = 0.0
+        post_ph4_done = False
+        post_ph4_ang_err2 = 0.0
+
+    
     SET_TARGET_IDLE = "IDLE"
     SET_TARGET_MEASURING_POS = "MEASURING_POS"
     SET_TARGET_DRIVING = "DRIVING"
@@ -742,11 +803,21 @@ def main():
         print(f"  * Phase 4 Test     : Fwd/Bwd {pos_pid.fwd_bwd_time_s}s each at Speed {pos_pid.fwd_bwd_speed}")
     else:
         print("  * Phase 4 Test     : DISABLED")
+    print(f"  * Post-Ph4 Spin    : Kp={args.kp_spin} steps/deg, Speed={args.spin_speed}")
     print(f"  * Max Velocity     : {pos_pid.max_velocity} runLR units")
     print(f"  * BLE Target       : {args.ble if args.ble > 0 else 'OFF'}")
     print(f"  * Camera Mode      : {args.mode.upper()} ({args.width}x{args.height})")
     print("=" * 65)
     print("[INFO] Press T to calibrate target (position + heading), then S to start navigation.")
+    if args.no_show:
+        print(f"[INFO] No-show mode: auto-recording log to {benchmark_base}")
+        start_recording()
+    elif args.video:
+        print(f"[INFO] Video mode: auto-recording log to {benchmark_base}")
+        start_recording()
+        print("[INFO] Key controls: T = set target, S = start + record log, P = pause, C = cancel run, Q = quit.")
+    else:
+        print("[INFO] Key controls: T = set target, S = start + record log, P = pause, C = cancel run, Q = quit.")
 
     # --- Realtime angle graph ---
     GRAPH_W, GRAPH_H = 600, 300
@@ -1006,8 +1077,8 @@ def main():
 
             speed_l, speed_r = 0, 0
             dist_err = 0.0
-            ang_err = 0.0
-            target_heading = 0.0
+            target_heading = float(pos_pid.target_heading) if (pos_pid is not None and pos_pid.target_heading is not None) else None
+            ang_err = wrap_to_180(sm_fused - target_heading) if (sm_fused is not None and target_heading is not None) else 0.0
             pos_state = "READY"
 
             # =================================================================
@@ -1054,13 +1125,17 @@ def main():
                 if detected:
                     set_target_traj_samples_x.append(cx)
                     set_target_traj_samples_y.append(cy)
-                remaining = max(0, total_drive_duration - elapsed_drive)
-                pid_status_txt = f"[SET TARGET] Driving FWD/BWD (rfb)... {remaining:.1f}s left ({len(set_target_traj_samples_x)} pts)"
+                rem_sec = total_drive_duration - elapsed_drive
+                if rem_sec > 0:
+                    pid_status_txt = f"[SET TARGET] Driving FWD/BWD (rfb)... {rem_sec:.1f}s left ({len(set_target_traj_samples_x)} pts)"
+                else:
+                    pid_status_txt = f"[SET TARGET] Returning to target... ({len(set_target_traj_samples_x)} pts)"
                 nav_sub_txt = f"Autonomous rfb: Spd={set_target_fwd_bwd_speed}, Dur={int(set_target_fwd_bwd_time * 1000)}ms"
                 pid_color_type = "AUTO"
                 pos_state = "SET_TARGET_DRIVE"
 
-                if elapsed_drive >= total_drive_duration:
+                drive_motion_done = (elapsed_drive >= total_drive_duration) and (ble_worker is None or not ble_worker.is_busy)
+                if drive_motion_done:
                     # Giai đoạn 3: Linear fit heading từ quỹ đạo thu thập được
                     n_traj = len(set_target_traj_samples_x)
                     if n_traj >= 5:
@@ -1148,6 +1223,7 @@ def main():
                     set_target_state = SET_TARGET_IDLE
                     is_auto_pid_enabled = False
                     is_pid_completed = False
+                    reset_post_ph4()
                     pos_pid.reset()
                     print(f"[SET TARGET] Ready. Press S to start PID navigation to target.\n")
 
@@ -1157,8 +1233,95 @@ def main():
             elif is_pid_completed:
                 pos_state = "COMPLETED"
                 pid_status_txt = f"Target: ({target_pos[0]}, {target_pos[1]}) [COMPLETED]"
-                nav_sub_txt = "P-only: L=   0 R=   0 | No heading correction at target"
+                nav_sub_txt = f"COMPLETED | Err1={post_ph4_ang_err1:+.1f} -> Err2={post_ph4_ang_err2:+.1f} deg"
                 pid_color_type = "COMPLETED"
+            elif post_ph4_active and not post_ph4_done:
+                now_t = time.perf_counter()
+                if post_ph4_spin_sent and not post_ph4_re_rfb_sent:
+                    pos_state = "POST_PH4_SPIN"
+                    pid_status_txt = f"Target: ({target_pos[0]}, {target_pos[1]}) [SPINNING]"
+                    nav_sub_txt = f"Post-Ph4 Spin: {post_ph4_spin_steps} steps | Err1={post_ph4_ang_err1:+.1f}deg"
+                    pid_color_type = "AUTO"
+
+                    spin_finished = (ble_worker is None) or (not ble_worker.is_busy and (now_t - post_ph4_spin_sent_time > 0.4))
+                    if spin_finished:
+                        post_ph4_re_rfb_sent = True
+                        post_ph4_re_rfb_sent_time = now_t
+                        rfb_spd = pos_pid.fwd_bwd_speed
+                        rfb_dur = int(pos_pid.fwd_bwd_time_s * 1000)
+                        print(f"\n[POST-PHASE 4] Step 2/3: Spin completed! Triggering re-verification run_fw_bw: Speed={rfb_spd}, Duration={rfb_dur}ms")
+                        if ble_worker is not None:
+                            ble_worker.send_run_fw_bw(rfb_spd, rfb_dur)
+
+                elif post_ph4_re_rfb_sent and not post_ph4_done:
+                    total_dur = 2.0 * pos_pid.fwd_bwd_time_s
+                    rfb2_motion_finished = (now_t - post_ph4_re_rfb_sent_time >= total_dur) and ((ble_worker is None) or (not ble_worker.is_busy))
+
+                    if not post_ph4_settling:
+                        pos_state = "POST_PH4_RE_RFB"
+                        pid_status_txt = f"Target: ({target_pos[0]}, {target_pos[1]}) [RE-VERIFY RFB]"
+                        rem_rfb = max(0.0, total_dur - (now_t - post_ph4_re_rfb_sent_time))
+                        th_disp = f"{target_heading:.1f}deg" if target_heading is not None else "--"
+                        nav_sub_txt = f"Post-Ph4 Re-rfb: {rem_rfb:.1f}s left (Tgt={th_disp})"
+                        pid_color_type = "AUTO"
+
+                        if rfb2_motion_finished:
+                            post_ph4_settling = True
+                            post_ph4_settle_start_time = now_t
+                            print("\n[POST-PHASE 4] Step 3/3: Re-rfb motion finished! Settling Leanbot for final angle measurement...")
+
+                    else:
+                        pos_state = "POST_PH4_SETTLING"
+                        settle_elapsed = now_t - post_ph4_settle_start_time
+                        rem_settle = max(0.0, 0.8 - settle_elapsed)
+                        pid_status_txt = f"Target: ({target_pos[0]}, {target_pos[1]}) [SETTLING]"
+                        nav_sub_txt = f"Settling: {rem_settle:.1f}s left | Measuring final heading"
+                        pid_color_type = "AUTO"
+
+                        if settle_elapsed >= 0.8:
+                            post_ph4_done = True
+                            is_pid_completed = True
+                            curr_ang = sm_fused if sm_fused is not None else 0.0
+                            if target_heading is not None:
+                                tgt_h_str = f"{target_heading:.1f} deg"
+                                post_ph4_ang_err2 = wrap_to_180(curr_ang - target_heading)
+                                err1_str = f"{post_ph4_ang_err1:+.2f} deg"
+                                err2_str = f"{post_ph4_ang_err2:+.2f} deg"
+                                improvement = abs(post_ph4_ang_err1) - abs(post_ph4_ang_err2)
+                                impr_str = f"{improvement:+.2f} deg"
+                            else:
+                                tgt_h_str = "--"
+                                post_ph4_ang_err2 = 0.0
+                                err1_str = "--"
+                                err2_str = "--"
+                                impr_str = "--"
+
+                            print(f"Target Heading      : {tgt_h_str}")
+                            print(f"Heading Error 1     : {err1_str} (trước spinSteps())")
+                            print(f"Spin Applied        : {post_ph4_spin_steps} steps (Speed: {post_ph4_spin_spd})")
+                            print(f"Heading Error 2     : {err2_str} (Sau khi spinSteps() & chạy run_fw_bw())")
+                            print(f"Error Improvement   : {impr_str}")
+                            # Lưu kết quả tổng kết vào post_phase4_summary.csv
+                            post_phase4_csv = os.path.join(benchmark_base, "post_phase4_summary.csv")
+                            p4_exists = os.path.exists(post_phase4_csv)
+                            try:
+                                with open(post_phase4_csv, 'a', newline='') as pf:
+                                    pw = csv.writer(pf)
+                                    if not p4_exists:
+                                        pw.writerow(["timestamp", "log_file", "target_heading", "ang_err1_deg", "spin_steps", "spin_speed", "ang_err2_deg", "improvement_deg"])
+                                    pw.writerow([
+                                        datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                        os.path.basename(current_log_file) if current_log_file else "N/A",
+                                        tgt_h_str, err1_str, post_ph4_spin_steps, post_ph4_spin_spd, err2_str, impr_str
+                                    ])
+                            except Exception as e:
+                                print(f"[WARN] Failed to save post-phase4 summary: {e}")
+
+                            if ble_worker is not None:
+                                ble_worker.send_speed(0, 0)
+                            if recording:
+                                print("[INFO] Post-Phase 4 re-verification completed -> Auto-stopping log recording.")
+                                stop_recording()
             elif not is_auto_pid_enabled:
                 pos_state = "READY"
                 pid_status_txt = f"Target: ({target_pos[0]}, {target_pos[1]}) [READY - PRESS S]"
@@ -1177,13 +1340,29 @@ def main():
                 ang_err = dbg_pos["angle_error"]
                 target_heading = dbg_pos["target_heading"]
                 pos_state = dbg_pos["state"]
-                is_pid_completed = dbg_pos["is_completed"]
-                if is_pid_completed:
+                is_completed_flag = dbg_pos["is_completed"]
+                ph4_physically_done = is_completed_flag and (ble_worker is None or not ble_worker.is_busy)
+
+                if not ph4_physically_done and pos_state == "COMPLETED":
+                    # Xe vẫn đang chạy nốt quãng đường lùi của Phase 4 trên thực tế phần cứng
+                    pos_state = "PHASE_4_FWD_BWD"
+
+                if ph4_physically_done and not post_ph4_active:
                     is_auto_pid_enabled = False
-                    # Auto-stop logging when Leanbot reaches target
-                    if recording:
-                        print("[INFO] Leanbot reached target -> Auto-stopping log recording.")
-                        stop_recording()
+                    post_ph4_active = True
+                    post_ph4_ang_err1 = ang_err
+                    rotation_steps = int(round(args.kp_spin * abs(ang_err)))
+                    post_ph4_spin_steps = rotation_steps
+                    if rotation_steps > 0:
+                        post_ph4_spin_spd = +args.spin_speed if ang_err > 0 else -args.spin_speed
+                        print(f"\n[POST-PHASE 4] Step 1/3: Phase 4 ended (ang_err1={post_ph4_ang_err1:+.2f}deg). Triggering spinSteps: Speed={post_ph4_spin_spd}, Steps={rotation_steps}")
+                        if ble_worker is not None:
+                            ble_worker.send_spin_steps(post_ph4_spin_spd, rotation_steps)
+                    else:
+                        post_ph4_spin_spd = 0
+                        print(f"\n[POST-PHASE 4] Angle error is zero ({ang_err:.2f}deg). No spinSteps needed.")
+                    post_ph4_spin_sent = True
+                    post_ph4_spin_sent_time = time.perf_counter()
 
                 if "rfb_trigger" in dbg_pos and ble_worker is not None:
                     rfb_spd, rfb_dur = dbg_pos["rfb_trigger"]
@@ -1194,16 +1373,17 @@ def main():
                     f"Target: ({target_pos[0]}, {target_pos[1]}) | "
                     f"DistErr: {dist_err:.1f}px | State: {pos_state}"
                 )
+                th_lbl = f"{target_heading:.1f}" if target_heading is not None else "--"
                 if pos_state == "PHASE_3_FINAL_ALIGNING":
                     nav_sub_txt = (
                         f"Ph3 Spin: L={speed_l:4d} R={speed_r:4d} | "
-                        f"FinalAngErr={ang_err:5.1f}deg (Tgt={target_heading:.1f})"
+                        f"FinalAngErr={ang_err:5.1f}deg (Tgt={th_lbl})"
                     )
                 elif pos_state == "PHASE_4_FWD_BWD":
                     rem_rfb = dbg_pos.get("remaining_rfb", 0.0)
                     nav_sub_txt = (
                         f"Ph4 Autonomous rfb: Spd={pos_pid.fwd_bwd_speed}, Dur={int(pos_pid.fwd_bwd_time_s * 1000)}ms | "
-                        f"{rem_rfb:.1f}s left (Tgt={target_heading:.1f}deg)"
+                        f"{rem_rfb:.1f}s left (Tgt={th_lbl}deg)"
                     )
                 else:
                     nav_sub_txt = (
@@ -1218,14 +1398,15 @@ def main():
                 pid_color_type = "LOST"
 
             # Send control command to Leanbot via BLE Worker (thread-safe, non-blocking)
-            # Lưu ý: khi đang trong Set Target hoặc Phase 4 FWD_BWD, tốc độ đã được xử lý bằng lệnh rfb
             if ble_worker is not None:
                 if set_target_state in (SET_TARGET_MEASURING_POS, SET_TARGET_DRIVING):
                     pass  # Lệnh dừng hoặc rfb đã được xử lý trong state machine Set Target
-                elif pos_state == "PHASE_4_FWD_BWD":
-                    pass  # Phase 4 chạy tự hành bằng lệnh rfb gửi 1 lần duy nhất
+                elif pos_state in ("PHASE_4_FWD_BWD", "POST_PH4_SPIN", "POST_PH4_RE_RFB", "POST_PH4_SETTLING") or post_ph4_active:
+                    pass  # Phase 4 và các chu kỳ tự hành sau Phase 4 không gửi đè r/0/0
                 elif is_auto_pid_enabled and not is_pid_completed:
                     ble_worker.send_speed(speed_l, speed_r)
+                elif is_pid_completed:
+                    pass  # Post-Phase 4 spinSteps/stop đã gửi, không gửi đè r/0/0
                 else:
                     ble_worker.send_speed(0, 0)
 
@@ -1363,6 +1544,7 @@ def main():
                     if key in (ord('s'), ord('S')):
                         pos_pid.reset()
                         is_pid_completed = False
+                        reset_post_ph4()
                         is_auto_pid_enabled = True
                         th_info = f"{pos_pid.target_heading:.1f} deg" if pos_pid.target_heading is not None else "None"
                         print(f"[INFO] START: target={target_pos}, target_heading={th_info}. Beginning Phase 1.")
@@ -1375,6 +1557,7 @@ def main():
                         do_manual_capture(tag="manual_cap")
                     if key in (ord('c'), ord('C')):
                         is_pid_completed = False
+                        reset_post_ph4()
                         is_auto_pid_enabled = False
                         pos_pid.reset()
                         # Reset Set Target state machine nếu đang chạy
@@ -1393,6 +1576,7 @@ def main():
                             # Bắt đầu quy trình Set Target
                             is_auto_pid_enabled = False
                             is_pid_completed = False
+                            reset_post_ph4()
                             pos_pid.reset()
                             if ble_worker is not None:
                                 ble_worker.send_speed(0, 0)

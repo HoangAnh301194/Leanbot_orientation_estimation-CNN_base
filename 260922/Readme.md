@@ -64,8 +64,6 @@ void spinSteps(String args) {
       LbMotion.stopAndWait();
     }
     ```
-- Hiện tại sau khi nhận thêm code bổ sugn từ anh Thế Anh về việc thêm hàm `spinSteps()` thì em đang chưa biết có cần thay đổi cơ chế di chuyển hiện tại là gửi lệnh vận tốc liên tục bằng Leanbot_run() hay dùng spinSteps() để xuay từng khoảng bước step một ạ . 
-- Em xin phép nhận thêm đề xuất từ Thầy ạ .
 
 #### 1.2 Hàm `sendTinyRCCommand()`
 - Code sau khi update mới từ anh Thế Anh : 

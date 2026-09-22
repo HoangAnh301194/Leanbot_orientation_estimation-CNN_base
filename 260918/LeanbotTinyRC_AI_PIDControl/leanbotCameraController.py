@@ -31,7 +31,7 @@ from logs import logs_init
 import asyncio
 import threading
 import queue
-
+import leanbotTinyRC
 import check_confidence
 from angle_smoothing import AngleSmoothingEngine
 
@@ -384,7 +384,7 @@ class BLEMotorWorker:
                 
                 if cmd is not None:
                     try:
-                        await self.leanbot.send(cmd, response=False)
+                        await leanbotTinyRC.sendTinyRCCommand(self.leanbot, cmd)
                     except Exception as e:
                         print(f"[WARN] BLE send error: {e}")
                 

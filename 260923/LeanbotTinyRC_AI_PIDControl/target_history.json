@@ -1,0 +1,32 @@
+[
+  {
+    "target_id": 1,
+    "calibrated_at": "2026-09-23 16:48:54",
+    "target_x": 615.6,
+    "target_y": 168.0,
+    "target_heading": 90.7,
+    "trajectory_points": 113,
+    "fit_dx": -0.16,
+    "fit_dy": -13.23
+  },
+  {
+    "target_id": 2,
+    "calibrated_at": "2026-09-23 16:50:58",
+    "target_x": 830.0,
+    "target_y": 451.9,
+    "target_heading": 71.5,
+    "trajectory_points": 113,
+    "fit_dx": 6.0,
+    "fit_dy": -17.89
+  },
+  {
+    "target_id": 3,
+    "calibrated_at": "2026-09-23 16:52:00",
+    "target_x": 452.8,
+    "target_y": 138.1,
+    "target_heading": 131.5,
+    "trajectory_points": 110,
+    "fit_dx": -7.37,
+    "fit_dy": -8.34
+  }
+]

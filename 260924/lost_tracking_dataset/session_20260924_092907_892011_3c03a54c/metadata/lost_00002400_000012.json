@@ -1,0 +1,36 @@
+{
+  "source_frame_id": 2399,
+  "source_frame_size": [
+    1280,
+    720
+  ],
+  "source_inference_mode": "FULL",
+  "source_bbox_xyxy": [
+    418.01873779296875,
+    170.34373474121094,
+    522.8062744140625,
+    259.65625
+  ],
+  "source_angle_deg": 132.07,
+  "source_confidence": 0.5957773923873901,
+  "class_id": 9,
+  "class_name": "Leanbot_p135",
+  "class_angle_deg": 135.0,
+  "bbox_yolo": [
+    0.28801563262939456,
+    0.31874999046325686,
+    0.13098442077636718,
+    0.11164064407348633
+  ],
+  "frame_id": 2400,
+  "frames_since_detection": 1,
+  "inference_mode": "ROI",
+  "captured_at": "2026-09-24T09:31:48.548+07:00",
+  "label_source": "last_successful_detection",
+  "requires_review": true,
+  "image_size": [
+    640,
+    640
+  ],
+  "center_crop_ratio": 0.625
+}

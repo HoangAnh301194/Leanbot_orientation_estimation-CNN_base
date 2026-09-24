@@ -56,7 +56,7 @@ python .\leanbotCameraController.py --source 1 --show --spin-speed 50 --kp-spin 
    - **$Kp = 25$:** Bắt đầu có hiện tượng overshoot.
 2. **Kết luận**
    - Cấu hình tối ưu nhất là:
-     $$\text{spin\_speed} = 50, \quad Kp_{\text{spin}} = 20.0$$
+     spin-speed = 50, Kp_spin = 20.0
 
 
 ### Các ví dụ lost tracking

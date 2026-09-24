@@ -62,7 +62,8 @@ python .\leanbotCameraController.py --source 1 --show --spin-speed 50 --kp-spin 
 ### Các ví dụ lost tracking
 
 - **Tổng kết:** Trong toàn bộ quá trình khảo sát thực nghiệm (27 lần chạy infrence , tổng cộng 11,092 frames), có **37 frames** bị lost tracking (tỷ lệ **0.33%**), trong đó có **20 / 27 lần chạy (74.1%)** không bị mất tracking (0 frame lost tracking ).
-- Bảng tổng hợp hiện tại em để là 10 ảnh , vì có nhiều ảnh gần như là y hệt nhau ạ . 
+- Bảng tổng hợp hiện tại em để là 10 ảnh , vì có nhiều ảnh gần như là y hệt nhau ạ .
+ 
 | Ảnh Dataset (`images/`) | Ảnh Check Label (`check_labels/`) |
 | :---: | :---: |
 | **Trường hợp 1 (Kp = 5)** — Frame ID: 380 (09:22:54, ROI)<br><img src="lost_tracking_dataset/session_20260924_092228_359688_ad1d17f7/images/lost_00000380_000003.png" alt="Dataset 380" width="380"> | **Check Label Preview** (BBox & Class Angle)<br><img src="lost_tracking_dataset/session_20260924_092228_359688_ad1d17f7/check_labels/lost_00000380_000003.png" alt="Check Label 380" width="380"> |

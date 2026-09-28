@@ -8,17 +8,11 @@
   - linear fit
   - return measuredHeading result 
 
-- Viết code Python riêng khảo sát kết quá measureHeading()  và  spinSteps()
+- Viết code Python riêng khảo sát kết quả measureHeading()  và  spinSteps()
   - Vẽ đồ thị measuredHeading theo intervalMs
   - Tính trung bình measuredHeading từ tất cả các lần intervalMs
   - Vẽ đồ thị  trung bình measuredHeading   theo  steps
-  - Báo cáo cả thời gian từng lần measureHeading
-
-for steps = 0 : 5 : 200    // bước 5 step
-  spinSteps(+50, steps)
-  for intervalMs = 1000 : 100 : 3000
-    measuredHeading[...] = measureHeading(+2000, intervalMs)
-    thu thập measuredHeading và thời gian measureHeading
+  - Báo cáo thời gian từng lần measureHeading
 
 
 ### 1. Bổ sung cơ chế lưu dataset khi lost tracking lần đầu tiên trong mỗi lần chạy tới target 

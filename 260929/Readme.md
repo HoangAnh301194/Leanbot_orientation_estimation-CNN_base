@@ -151,4 +151,4 @@ python leanbotCameraController.py --ble 654321 --source 1 --kp-spin 18.8 --spin-
 ## B. Khó khăn 
 - Không
 ## C. Công việc tiếp theo
-- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ.
+- Bố sung thêm cơ chế Spin thuật , nghịch và khảo sát lại với step nhỏ = 10 

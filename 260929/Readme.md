@@ -6,9 +6,7 @@
 
 ### 1. Bổ sung cơ chế đi lùi 
 - **Code chỉnh sửa & Bổ sung:** 
-  - File điều khiển PID: [`PID_controller.py`](LeanbotTinyRC_AI_PIDControl/PID_controller.py)
-  - File chạy chính: [`leanbotCameraController.py`](LeanbotTinyRC_AI_PIDControl/leanbotCameraController.py)
-  - Tool vẽ đồ thị có highlight phase: [`plot_pid_navigation_log.py`](tools/plot_pid_navigation_log.py)
+  - Module điều khiển PID: [`PID_controller.py`](LeanbotTinyRC_AI_PIDControl/PID_controller.py)
 - Code bổ sung : 
 ```python
         # Phát hiện và đảo chiều ở Phase 1 nếu lệch > 90 độ

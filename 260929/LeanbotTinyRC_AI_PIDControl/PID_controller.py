@@ -328,10 +328,10 @@ class PositionPIDController:
                    + self.Kd_angle2 * d_angle2) * abs(v_lr_cropped)
 
         # Calculate and scale individual wheel speeds
-        if self.is_reversing:
-            speed_left, speed_right = self._scale_speeds(v_lr_cropped - delta_v, v_lr_cropped + delta_v)
-        else:
-            speed_left, speed_right = self._scale_speeds(v_lr_cropped + delta_v, v_lr_cropped - delta_v)
+        # Do not swap delta_v when reversing! The angle_error is computed against the 180-degree offset bearing,
+        # which correctly provides the CW/CCW torque needed. Differential drive kinematics dictate that 
+        # a given omega always requires the same (v_L - v_R) difference, regardless of the base velocity v_lr.
+        speed_left, speed_right = self._scale_speeds(v_lr_cropped + delta_v, v_lr_cropped - delta_v)
 
         debug = self._debug(
             self.PHASE_DRIVING, distance_error, bearing_heading,

@@ -51,22 +51,17 @@
     ![PID Analysis 134914](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_134914_pid_analysis.png)
     ![PID Diff 134914](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_134914_pid_diff_analysis.png)
 
-  - **Trường hợp 3 (log_roi_20260929_135010):** 
-    ![Trajectory 135010](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135010_2d_trajectory.png)
-    ![PID Analysis 135010](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135010_pid_analysis.png)
-    ![PID Diff 135010](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135010_pid_diff_analysis.png)
-
-  - **Trường hợp 4 (log_roi_20260929_135027):** 
+  - **Trường hợp 3 (log_roi_20260929_135027):** 
     ![Trajectory 135027](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135027_2d_trajectory.png)
     ![PID Analysis 135027](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135027_pid_analysis.png)
     ![PID Diff 135027](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135027_pid_diff_analysis.png)
 
-  - **Trường hợp 5 (log_roi_20260929_135143):** 
+  - **Trường hợp 4 (log_roi_20260929_135143):** 
     ![Trajectory 135143](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135143_2d_trajectory.png)
     ![PID Analysis 135143](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135143_pid_analysis.png)
     ![PID Diff 135143](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135143_pid_diff_analysis.png)
 
-  - **Trường hợp 6 (log_roi_20260929_135213):** 
+  - **Trường hợp 5 (log_roi_20260929_135213):** 
     ![Trajectory 135213](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135213_2d_trajectory.png)
     ![PID Analysis 135213](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135213_pid_analysis.png)
     ![PID Diff 135213](LeanbotTinyRC_AI_PIDControl/benchmark_logs/plots/log_roi_20260929_135213_pid_diff_analysis.png)

@@ -68,5 +68,15 @@
     "trajectory_points": 114,
     "fit_dx": 15.26,
     "fit_dy": -0.16
+  },
+  {
+    "target_id": 8,
+    "calibrated_at": "2026-09-29 15:13:45",
+    "target_x": 575.4,
+    "target_y": 250.3,
+    "target_heading": 2.3,
+    "trajectory_points": 114,
+    "fit_dx": 15.66,
+    "fit_dy": -0.63
   }
 ]

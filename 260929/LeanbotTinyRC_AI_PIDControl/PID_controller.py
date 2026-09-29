@@ -38,9 +38,13 @@ class PositionPIDController:
         Kp_angle: float = 30.0,
         Ki_angle: float = 0.0,
         Kd_angle: float = 0.0,
+        Kp_angle_rev: float = 15.0,
+        Kd_angle_rev: float = 0.0,
         Kp_angle2: float = 0.02,
         Ki_angle2: float = 0.0,
         Kd_angle2: float = 0.04,
+        Kp_angle2_rev: float = 0.015,
+        Kd_angle2_rev: float = 0.05,
         Kp_angle3: Optional[float] = None,
         Ki_angle3: float = 0.0,
         Kd_angle3: float = 0.04,
@@ -61,10 +65,14 @@ class PositionPIDController:
         self.Kp_angle = Kp_angle
         self.Ki_angle = Ki_angle
         self.Kd_angle = Kd_angle
+        self.Kp_angle_rev = Kp_angle_rev
+        self.Kd_angle_rev = Kd_angle_rev
         # PID gains - angle (Phase 2: driving)
         self.Kp_angle2 = Kp_angle2
         self.Ki_angle2 = Ki_angle2
         self.Kd_angle2 = Kd_angle2
+        self.Kp_angle2_rev = Kp_angle2_rev
+        self.Kd_angle2_rev = Kd_angle2_rev
         # PID gains - angle (Phase 3: final aligning to target heading)
         self.Kp_angle3 = Kp_angle3 if Kp_angle3 is not None else Kp_angle
         self.Ki_angle3 = Ki_angle3
@@ -292,9 +300,16 @@ class PositionPIDController:
                 self._prev_angle_error = angle_error
 
                 v_lr = 0.0
-                v_diff = (self.Kp_angle * angle_error
+                if self.is_reversing:
+                    kp = self.Kp_angle_rev
+                    kd = self.Kd_angle_rev
+                else:
+                    kp = self.Kp_angle
+                    kd = self.Kd_angle
+
+                v_diff = (kp * angle_error
                           + self.Ki_angle * self._integral_angle
-                          + self.Kd_angle * d_angle)
+                          + kd * d_angle)
                 speed_left, speed_right = self._scale_speeds(v_lr + v_diff, v_lr - v_diff)
                 debug = self._debug(
                     self.PHASE_ALIGNING, distance_error, bearing_heading,
@@ -323,9 +338,16 @@ class PositionPIDController:
         self._prev_angle2_error = angle_error
 
         # delta_V = (Kp_angle2 * err + Ki_angle2 * integral + Kd_angle2 * derivative) * abs(v_LR)
-        delta_v = (self.Kp_angle2 * angle_error
+        if self.is_reversing:
+            kp2 = self.Kp_angle2_rev
+            kd2 = self.Kd_angle2_rev
+        else:
+            kp2 = self.Kp_angle2
+            kd2 = self.Kd_angle2
+            
+        delta_v = (kp2 * angle_error
                    + self.Ki_angle2 * self._integral_angle2
-                   + self.Kd_angle2 * d_angle2) * abs(v_lr_cropped)
+                   + kd2 * d_angle2) * abs(v_lr_cropped)
 
         # Calculate and scale individual wheel speeds
         # Do not swap delta_v when reversing! The angle_error is computed against the 180-degree offset bearing,

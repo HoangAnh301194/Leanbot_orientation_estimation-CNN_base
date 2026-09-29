@@ -727,8 +727,12 @@ def main():
     # --- PID controller parameters ---
     parser.add_argument("--kp-angle", type=float, default=30.0, help="PID Phase 1 heading gain (default 30.0)")
     parser.add_argument("--kd-angle", type=float, default=0.0, help="PID Phase 1 derivative gain (default 0.0)")
+    parser.add_argument("--kp-angle-rev", type=float, default=15.0, help="PID Phase 1 reversing heading gain (default 15.0)")
+    parser.add_argument("--kd-angle-rev", type=float, default=0.0, help="PID Phase 1 reversing derivative gain (default 0.0)")
     parser.add_argument("--kp-angle2", type=float, default=0.01, help="PID Phase 2 heading gain (default 0.01)")
     parser.add_argument("--kd-angle2", type=float, default=0.04, help="PID Phase 2 derivative gain (default 0.04)")
+    parser.add_argument("--kp-angle2-rev", type=float, default=0.015, help="PID Phase 2 reversing heading gain (default 0.015)")
+    parser.add_argument("--kd-angle2-rev", type=float, default=0.05, help="PID Phase 2 reversing derivative gain (default 0.05)")
     parser.add_argument("--heading-tol", type=float, default=20.0, help="Heading tolerance in degrees (default 20.0)")
     parser.add_argument("--target-heading", type=float, default=None, help="Target heading in degrees for Phase 3 final alignment (default: None)")
     parser.add_argument("--kp-angle3", type=float, default=20.0, help="PID Phase 3 final heading gain (default 20.0)")
@@ -922,8 +926,12 @@ def main():
     pos_pid = create_position_pid(
         Kp_angle=args.kp_angle,
         Kd_angle=args.kd_angle,
+        Kp_angle_rev=args.kp_angle_rev,
+        Kd_angle_rev=args.kd_angle_rev,
         Kp_angle2=args.kp_angle2,
         Kd_angle2=args.kd_angle2,
+        Kp_angle2_rev=args.kp_angle2_rev,
+        Kd_angle2_rev=args.kd_angle2_rev,
         Kp_angle3=args.kp_angle3,
         Kd_angle3=args.kd_angle3,
         Ki_angle3=args.ki_angle3,
@@ -1027,9 +1035,9 @@ def main():
         print(f"  * Target Config    : {target_config_path} [NOT FOUND]")
         print(f"  * Target Position  : Center of frame (fallback)")
     print(f"  * Smoothing Engine : Window={args.smooth_window}, EvalIndex={args.smooth_index}, K={args.smooth_K}")
-    print(f"  * PID Angle (Ph1)  : Kp={pos_pid.Kp_angle}, Ki={pos_pid.Ki_angle}, Kd={pos_pid.Kd_angle}")
+    print(f"  * PID Angle (Ph1)  : Kp={pos_pid.Kp_angle}, Ki={pos_pid.Ki_angle}, Kd={pos_pid.Kd_angle} (Rev: Kp={pos_pid.Kp_angle_rev}, Kd={pos_pid.Kd_angle_rev})")
     print(f"  * PID Dist  (Ph2)  : Kp={pos_pid.Kp_dist}, Ki={pos_pid.Ki_dist}, Kd={pos_pid.Kd_dist}")
-    print(f"  * PID Angle2(Ph2)  : Kp={pos_pid.Kp_angle2}, Ki={pos_pid.Ki_angle2}, Kd={pos_pid.Kd_angle2}")
+    print(f"  * PID Angle2(Ph2)  : Kp={pos_pid.Kp_angle2}, Ki={pos_pid.Ki_angle2}, Kd={pos_pid.Kd_angle2} (Rev: Kp={pos_pid.Kp_angle2_rev}, Kd={pos_pid.Kd_angle2_rev})")
     print(f"  * PID Angle3(Ph3)  : Kp={pos_pid.Kp_angle3}, Ki={pos_pid.Ki_angle3}, Kd={pos_pid.Kd_angle3}")
     print(f"  * Tolerances       : HeadingTol={pos_pid.heading_tolerance} deg, DistTol={pos_pid.dist_tolerance} px")
     if pos_pid.target_heading is not None:

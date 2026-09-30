@@ -945,6 +945,20 @@ def measureHeading(
     else:
         print(f"[WARN] measureHeading: Không đủ điểm hợp lệ để fit quỹ đạo XY ({n_pts} pts).")
         measuredHeading = 0.0
+        raw_path = save_heading_raw_trajectory_csv(
+            raw_csv_dir=raw_csv_dir,
+            measurement_id=measurement_id,
+            traj_x=traj_samples_x,
+            traj_y=traj_samples_y,
+            traj_elapsed_s=traj_samples_elapsed,
+            measured_heading=None,
+            fit_vx=None,
+            fit_vy=None,
+            turn_index=None,
+            measurement_meta=measurement_meta,
+        )
+        if raw_path is not None:
+            print(f"[measureHeading XY] Raw trajectory saved (fit failed): {raw_path}")
 
     # 4. return measuredHeading
     return measuredHeading

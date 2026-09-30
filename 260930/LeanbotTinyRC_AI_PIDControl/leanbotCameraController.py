@@ -660,6 +660,113 @@ def estimate_heading_from_xy_trajectory(
     return heading_deg, vx, vy, turn_index
 
 
+def _save_heading_raw_trajectory(raw_output_dir, measurement_tag, elapsed_samples, traj_x, traj_y):
+    """Persist exactly the raw samples later used for the XY heading fit."""
+    if not raw_output_dir:
+        return None
+
+    out_dir = Path(raw_output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    tag = measurement_tag or datetime.now().strftime("measurement_%Y%m%d_%H%M%S_%f")
+    safe_tag = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(tag))
+    raw_path = out_dir / f"{safe_tag}_raw_xy.csv"
+
+    with open(raw_path, "w", newline="", encoding="utf-8") as rf:
+        rw = csv.writer(rf)
+        rw.writerow(["sample_idx", "elapsed_s", "x", "y"])
+        for idx, (t_s, x, y) in enumerate(zip(elapsed_samples, traj_x, traj_y)):
+            rw.writerow([idx, f"{float(t_s):.6f}", f"{float(x):.6f}", f"{float(y):.6f}"])
+
+    return str(raw_path)
+
+
+def _render_heading_fit_result(frame, traj_x, traj_y, heading_deg, fit_vx, fit_vy, turn_index):
+    """Render the post-action trajectory/fit result. No fitting is performed here."""
+    if frame is None:
+        return None
+    if heading_deg is None or fit_vx is None or fit_vy is None or turn_index is None:
+        return frame.copy()
+
+    vis = frame.copy()
+    pts = np.column_stack((
+        np.asarray(traj_x, dtype=np.float64),
+        np.asarray(traj_y, dtype=np.float64),
+    ))
+    if len(pts) == 0:
+        return vis
+
+    turn_index = max(0, min(int(turn_index), len(pts) - 1))
+
+    # Raw samples: forward leg and backward leg are intentionally separated.
+    for i, p in enumerate(pts):
+        px, py = int(round(p[0])), int(round(p[1]))
+        if i <= turn_index:
+            point_color = (0, 255, 0)       # forward samples
+        else:
+            point_color = (255, 0, 255)     # backward samples
+        cv2.circle(vis, (px, py), 2, point_color, -1)
+
+    for i in range(1, turn_index + 1):
+        p0 = tuple(np.round(pts[i - 1]).astype(int))
+        p1 = tuple(np.round(pts[i]).astype(int))
+        cv2.line(vis, p0, p1, (0, 255, 0), 2)
+
+    for i in range(max(turn_index + 1, 1), len(pts)):
+        p0 = tuple(np.round(pts[i - 1]).astype(int))
+        p1 = tuple(np.round(pts[i]).astype(int))
+        cv2.line(vis, p0, p1, (255, 0, 255), 2)
+
+    start_pt = tuple(np.round(pts[0]).astype(int))
+    turn_pt = tuple(np.round(pts[turn_index]).astype(int))
+    end_pt = tuple(np.round(pts[-1]).astype(int))
+    cv2.circle(vis, start_pt, 8, (0, 0, 255), -1)
+    cv2.circle(vis, turn_pt, 9, (0, 255, 255), -1)
+    cv2.circle(vis, end_pt, 8, (255, 255, 0), -1)
+    cv2.putText(vis, "START", (start_pt[0] + 10, start_pt[1] - 8),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(vis, "TURN", (turn_pt[0] + 10, turn_pt[1] - 8),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+    cv2.putText(vis, "END", (end_pt[0] + 10, end_pt[1] - 8),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+
+    # Draw the PCA/TLS line over the projection extent of the raw point cloud.
+    center = pts.mean(axis=0)
+    direction = np.array([float(fit_vx), float(fit_vy)], dtype=np.float64)
+    proj = (pts - center) @ direction
+    p_line0 = center + direction * (float(np.min(proj)) - 20.0)
+    p_line1 = center + direction * (float(np.max(proj)) + 20.0)
+    line0 = tuple(np.round(p_line0).astype(int))
+    line1 = tuple(np.round(p_line1).astype(int))
+    cv2.line(vis, line0, line1, (255, 255, 255), 2)
+
+    # Arrow points in the resolved positive mechanical-heading direction.
+    arrow_start = tuple(np.round(center).astype(int))
+    arrow_end_arr = center + direction * 80.0
+    arrow_end = tuple(np.round(arrow_end_arr).astype(int))
+    cv2.arrowedLine(vis, arrow_start, arrow_end, (255, 255, 255), 3, tipLength=0.25)
+
+    cv2.putText(
+        vis,
+        f"Heading={heading_deg:+.2f} deg | pts={len(pts)} | turn_idx={turn_index}",
+        (20, 40),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
+        (255, 255, 255),
+        2,
+    )
+    cv2.putText(
+        vis,
+        "FWD=green | BWD=magenta | START=red | TURN=yellow | END=cyan",
+        (20, 68),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        (255, 255, 255),
+        1,
+    )
+    return vis
+
+
 def measureHeading(
     speed_or_interval: int = 2000,
     intervalMs: int = None,
@@ -667,8 +774,12 @@ def measureHeading(
     tracker: LeanbotCameraTracker = None,
     get_pos_fn = None,
     wait_frame_fn = None,
-    show_ui: bool = False
-) -> float:
+    show_ui: bool = False,
+    raw_output_dir = None,
+    measurement_tag: str = None,
+    result_hold_ms: int = 250,
+    return_details: bool = False,
+):
     if intervalMs is None:
         interval_ms = int(speed_or_interval)
         speed = 2000
@@ -682,13 +793,17 @@ def measureHeading(
     drive_duration_s = float(interval_ms) / 1000.0
     total_motion_duration = 2.0 * drive_duration_s
 
-    # 1. Gửi lệnh run_fw_bw(speed, intervalMs)
+    # 1. Send one complete FWD+BWD action.
     ble_worker.send_run_fw_bw(speed, interval_ms)
     t_start = time.perf_counter()
 
     traj_samples_x = []
     traj_samples_y = []
-    # 2. Thu thập toàn bộ quỹ đạo FWD + BWD trên mặt phẳng ảnh (x, y).
+    elapsed_samples = []
+    last_frame = None
+
+    # 2. Acquisition phase: inference + raw append only.
+    #    No trajectory polyline, turning-point search, or PCA/TLS is computed here.
     while True:
         elapsed = time.perf_counter() - t_start
 
@@ -696,17 +811,21 @@ def measureHeading(
         frame = None
         if tracker is not None:
             frame, (cx, cy), detected, _ = tracker.read_and_track()
+            if frame is not None:
+                last_frame = frame.copy()
             if show_ui and frame is not None:
                 vis = frame.copy()
                 if detected:
                     cv2.circle(vis, (int(cx), int(cy)), 6, (0, 0, 255), -1)
-                for i in range(1, len(traj_samples_x)):
-                    cv2.line(vis, (int(traj_samples_x[i-1]), int(traj_samples_y[i-1])),
-                                  (int(traj_samples_x[i]), int(traj_samples_y[i])), (0, 255, 0), 2)
                 cv2.putText(
                     vis,
-                    f"[MEASURING HEADING XY] interval={interval_ms}ms ({elapsed:.1f}s / {total_motion_duration:.1f}s) | pts={len(traj_samples_x)}",
+                    f"[ACQUIRING RAW XY] interval={interval_ms}ms | elapsed={elapsed:.1f}s | pts={len(traj_samples_x)}",
                     (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2
+                )
+                cv2.putText(
+                    vis,
+                    "No trajectory fitting/drawing during acquisition",
+                    (20, 68), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1
                 )
                 cv2.imshow("Leanbot Heading Survey", vis)
                 key = cv2.waitKey(1) & 0xFF
@@ -720,38 +839,77 @@ def measureHeading(
             if pos_res is not None:
                 cx, cy, detected = pos_res
 
-        # Bỏ 50 ms đầu do giật cơ khí, sau đó thu liên tục cho tới khi action BLE kết thúc.
+        # Ignore only the first 50 ms. Thereafter save every valid detection
+        # until the BLE action has actually completed.
         if detected and elapsed >= 0.05:
+            elapsed_samples.append(elapsed)
             traj_samples_x.append(cx)
             traj_samples_y.append(cy)
 
-        # Không cắt dữ liệu theo total_motion_duration. Chỉ kết thúc khi đã qua
-        # thời gian danh định và BLE worker xác nhận run_fw_bw thực sự hoàn tất.
         if elapsed >= total_motion_duration and (not ble_worker.is_busy):
             break
 
         time.sleep(0.01)
 
-    # 3. Fit trực tiếp đường quỹ đạo 2D XY bằng PCA/TLS, không fit x(t), y(t).
+    # 3. Persist raw samples FIRST. These are the exact samples used below.
     n_pts = len(traj_samples_x)
+    raw_csv_path = _save_heading_raw_trajectory(
+        raw_output_dir,
+        measurement_tag,
+        elapsed_samples,
+        traj_samples_x,
+        traj_samples_y,
+    )
+
+    # 4. Post-action computation only: turning point + PCA/TLS + heading.
     measured_heading, fit_vx, fit_vy, turn_index = estimate_heading_from_xy_trajectory(
         traj_samples_x,
         traj_samples_y,
         min_points=5,
     )
+
     if measured_heading is not None:
         measuredHeading = round(float(measured_heading), 2)
         print(
             f"[measureHeading XY] pts={n_pts}, turn_idx={turn_index}, "
             f"dir=({fit_vx:+.4f},{fit_vy:+.4f}), heading={measuredHeading:+.2f} deg"
         )
+        if raw_csv_path:
+            print(f"[measureHeading RAW] {raw_csv_path}")
+
+        # 5. Final visualization is rendered once, after the action and fit.
+        if show_ui and last_frame is not None:
+            result_vis = _render_heading_fit_result(
+                last_frame,
+                traj_samples_x,
+                traj_samples_y,
+                measuredHeading,
+                fit_vx,
+                fit_vy,
+                turn_index,
+            )
+            if result_vis is not None:
+                cv2.imshow("Leanbot Heading Survey", result_vis)
+                key = cv2.waitKey(max(1, int(result_hold_ms))) & 0xFF
+                if key == ord('q'):
+                    return None
     else:
         print(f"[WARN] measureHeading: Không đủ điểm hợp lệ để fit quỹ đạo XY ({n_pts} pts).")
         measuredHeading = 0.0
+        fit_vx = None
+        fit_vy = None
+        turn_index = None
 
-    # 4. return measuredHeading
-    return measuredHeading
-
+    details = {
+        "heading": measuredHeading,
+        "points": int(n_pts),
+        "turn_idx": int(turn_index) if turn_index is not None else None,
+        "fit_vx": float(fit_vx) if fit_vx is not None else None,
+        "fit_vy": float(fit_vy) if fit_vy is not None else None,
+        "raw_csv": raw_csv_path,
+        "action_elapsed_s": float(time.perf_counter() - t_start),
+    }
+    return details if return_details else measuredHeading
 
 def main():
     parser = argparse.ArgumentParser()

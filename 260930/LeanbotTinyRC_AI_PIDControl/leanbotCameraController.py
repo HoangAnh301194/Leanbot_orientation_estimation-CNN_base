@@ -600,6 +600,70 @@ class LeanbotCameraTracker:
             self.cap.release()
 
 
+
+def estimate_heading_from_xy_trajectory(
+    traj_x,
+    traj_y,
+    forward_count: int = None,
+    min_points: int = 5,
+):
+    """
+    Fit one 2D line directly to the full FWD+BWD trajectory using PCA/TLS.
+
+    The fitted geometric line has a 180-degree direction ambiguity. Resolve it
+    with the displacement measured during the forward half of run_fw_bw().
+
+    Returns:
+        heading_deg: heading in [-180, 180), camera-y corrected
+        fit_vx, fit_vy: unit direction vector in image coordinates
+    """
+    if traj_x is None or traj_y is None:
+        return None, None, None
+
+    pts = np.column_stack((
+        np.asarray(traj_x, dtype=np.float64),
+        np.asarray(traj_y, dtype=np.float64),
+    ))
+    if len(pts) < min_points:
+        return None, None, None
+
+    finite_mask = np.isfinite(pts).all(axis=1)
+    pts = pts[finite_mask]
+    if len(pts) < min_points:
+        return None, None, None
+
+    center = pts.mean(axis=0)
+    centered = pts - center
+
+    # Total-least-squares / PCA line fit in the image XY plane.
+    cov = centered.T @ centered / float(len(centered))
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    direction = eigvecs[:, int(np.argmax(eigvals))]
+    vx, vy = float(direction[0]), float(direction[1])
+
+    # Resolve PCA's 180-deg ambiguity using the forward displacement.
+    if forward_count is not None:
+        n_fwd = max(0, min(int(forward_count), len(pts)))
+    else:
+        n_fwd = 0
+
+    if n_fwd >= 2:
+        d_fwd = pts[n_fwd - 1] - pts[0]
+        if float(np.linalg.norm(d_fwd)) > 1e-6:
+            if vx * float(d_fwd[0]) + vy * float(d_fwd[1]) < 0.0:
+                vx, vy = -vx, -vy
+    else:
+        # Fallback: use the first half of the samples as the nominal forward leg.
+        half = max(2, len(pts) // 2)
+        d_fwd = pts[half - 1] - pts[0]
+        if float(np.linalg.norm(d_fwd)) > 1e-6:
+            if vx * float(d_fwd[0]) + vy * float(d_fwd[1]) < 0.0:
+                vx, vy = -vx, -vy
+
+    heading_deg = wrap_to_180(float(np.degrees(np.arctan2(-vy, vx))))
+    return heading_deg, vx, vy
+
+
 def measureHeading(
     speed_or_interval: int = 2000,
     intervalMs: int = None,
@@ -628,8 +692,9 @@ def measureHeading(
 
     traj_samples_x = []
     traj_samples_y = []
+    forward_count = 0
 
-    # 2. Thu thập tọa độ tâm (cx, cy) từ camera trong thời gian xe chạy
+    # 2. Thu thập toàn bộ quỹ đạo FWD + BWD trên mặt phẳng ảnh (x, y).
     while True:
         elapsed = time.perf_counter() - t_start
 
@@ -646,7 +711,7 @@ def measureHeading(
                                   (int(traj_samples_x[i]), int(traj_samples_y[i])), (0, 255, 0), 2)
                 cv2.putText(
                     vis,
-                    f"[MEASURING HEADING] interval={interval_ms}ms ({elapsed:.1f}s / {total_motion_duration:.1f}s) | pts={len(traj_samples_x)}",
+                    f"[MEASURING HEADING XY] interval={interval_ms}ms ({elapsed:.1f}s / {total_motion_duration:.1f}s) | pts={len(traj_samples_x)}",
                     (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2
                 )
                 cv2.imshow("Leanbot Heading Survey", vis)
@@ -661,11 +726,12 @@ def measureHeading(
             if pos_res is not None:
                 cx, cy, detected = pos_res
 
-        # Chỉ thu thập tọa độ trong giai đoạn xe đang chạy tiến (từ 0.05s đến drive_duration_s)
-        # Bỏ 50ms đầu tiên để tránh quán tính giật khởi động
-        if detected and (0.05 <= elapsed <= drive_duration_s):
+        # Bỏ 50 ms đầu do giật cơ khí, sau đó lấy cả forward và backward.
+        if detected and 0.05 <= elapsed <= total_motion_duration:
             traj_samples_x.append(cx)
             traj_samples_y.append(cy)
+            if elapsed <= drive_duration_s:
+                forward_count += 1
 
         # Chờ đến khi hết cả chu kỳ tiến + lùi và BLE worker báo xong hành động
         if elapsed >= total_motion_duration and (not ble_worker.is_busy):
@@ -673,27 +739,22 @@ def measureHeading(
 
         time.sleep(0.01)
 
-    # 3. Linear fit
+    # 3. Fit trực tiếp đường quỹ đạo 2D XY bằng PCA/TLS, không fit x(t), y(t).
     n_pts = len(traj_samples_x)
-    if n_pts >= 3:
-        t_norm = np.linspace(0.0, 1.0, n_pts)
-        px_fit = np.polyfit(t_norm, traj_samples_x, deg=1)
-        py_fit = np.polyfit(t_norm, traj_samples_y, deg=1)
-        dx_fit = float(px_fit[0])
-        dy_fit = float(py_fit[0])
-        # Hệ trục camera có y hướng xuống dưới -> góc theo hệ tọa độ Descartes là arctan2(-dy, dx)
-        theta_fit = float(np.degrees(np.arctan2(-dy_fit, dx_fit)))
-        measuredHeading = round(theta_fit, 2)
-    elif n_pts > 0:
-        # Fallback nếu số điểm ít
-        dx = traj_samples_x[-1] - traj_samples_x[0]
-        dy = traj_samples_y[-1] - traj_samples_y[0]
-        if abs(dx) > 1e-3 or abs(dy) > 1e-3:
-            measuredHeading = round(float(np.degrees(np.arctan2(-dy, dx))), 2)
-        else:
-            measuredHeading = 0.0
+    measured_heading, fit_vx, fit_vy = estimate_heading_from_xy_trajectory(
+        traj_samples_x,
+        traj_samples_y,
+        forward_count=forward_count,
+        min_points=5,
+    )
+    if measured_heading is not None:
+        measuredHeading = round(float(measured_heading), 2)
+        print(
+            f"[measureHeading XY] pts={n_pts}, fwd_pts={forward_count}, "
+            f"dir=({fit_vx:+.4f},{fit_vy:+.4f}), heading={measuredHeading:+.2f} deg"
+        )
     else:
-        print(f"[WARN] measureHeading: Không phát hiện được điểm tâm nào trong {interval_ms}ms!")
+        print(f"[WARN] measureHeading: Không đủ điểm hợp lệ để fit quỹ đạo XY ({n_pts} pts).")
         measuredHeading = 0.0
 
     # 4. return measuredHeading
@@ -964,6 +1025,15 @@ def main():
     post_ph4_settle_start_time = 0.0
     post_ph4_done = False
     post_ph4_ang_err2 = 0.0
+    phase4_traj_x = []
+    phase4_traj_y = []
+    phase4_forward_count = 0
+    phase4_rfb_start_time = None
+    phase4_measured_heading = None
+    reverify_traj_x = []
+    reverify_traj_y = []
+    reverify_forward_count = 0
+    reverify_measured_heading = None
 
     def reset_post_ph4():
         nonlocal post_ph4_active, post_ph4_spin_sent, post_ph4_spin_sent_time
@@ -971,6 +1041,8 @@ def main():
         nonlocal post_ph4_re_rfb_sent, post_ph4_re_rfb_sent_time
         nonlocal post_ph4_settling, post_ph4_settle_start_time
         nonlocal post_ph4_done, post_ph4_ang_err2
+        nonlocal phase4_traj_x, phase4_traj_y, phase4_forward_count, phase4_rfb_start_time, phase4_measured_heading
+        nonlocal reverify_traj_x, reverify_traj_y, reverify_forward_count, reverify_measured_heading
         post_ph4_active = False
         post_ph4_spin_sent = False
         post_ph4_spin_sent_time = 0.0
@@ -983,6 +1055,15 @@ def main():
         post_ph4_settle_start_time = 0.0
         post_ph4_done = False
         post_ph4_ang_err2 = 0.0
+        phase4_traj_x = []
+        phase4_traj_y = []
+        phase4_forward_count = 0
+        phase4_rfb_start_time = None
+        phase4_measured_heading = None
+        reverify_traj_x = []
+        reverify_traj_y = []
+        reverify_forward_count = 0
+        reverify_measured_heading = None
 
     
     SET_TARGET_IDLE = "IDLE"
@@ -996,6 +1077,7 @@ def main():
     set_target_pos_samples_y = []
     set_target_traj_samples_x = []
     set_target_traj_samples_y = []
+    set_target_forward_count = 0
     set_target_measure_duration = 3.0  # seconds
     set_target_driving_start_time = None
     set_target_fwd_bwd_time = args.set_target_time
@@ -1377,6 +1459,7 @@ def main():
                         set_target_driving_start_time = time.perf_counter()
                         set_target_traj_samples_x = []
                         set_target_traj_samples_y = []
+                        set_target_forward_count = 0
                     else:
                         print(f"\n[SET TARGET] FAILED: Only {n_samples} samples detected in 3s (need >= 5). Aborting.")
                         set_target_state = SET_TARGET_IDLE
@@ -1390,6 +1473,8 @@ def main():
                 if detected:
                     set_target_traj_samples_x.append(cx)
                     set_target_traj_samples_y.append(cy)
+                    if elapsed_drive <= set_target_fwd_bwd_time:
+                        set_target_forward_count += 1
                 rem_sec = total_drive_duration - elapsed_drive
                 if rem_sec > 0:
                     pid_status_txt = f"[SET TARGET] Driving FWD/BWD (rfb)... {rem_sec:.1f}s left ({len(set_target_traj_samples_x)} pts)"
@@ -1401,16 +1486,22 @@ def main():
 
                 drive_motion_done = (elapsed_drive >= total_drive_duration) and (ble_worker is None or not ble_worker.is_busy)
                 if drive_motion_done:
-                    # Giai đoạn 3: Linear fit heading từ quỹ đạo thu thập được
+                    # Giai đoạn 3: Fit trực tiếp quỹ đạo 2D FWD+BWD trên mặt phẳng ảnh XY.
                     n_traj = len(set_target_traj_samples_x)
                     if n_traj >= 5:
-                        t_norm = np.linspace(0.0, 1.0, n_traj)
-                        px_fit = np.polyfit(t_norm, set_target_traj_samples_x, deg=1)
-                        py_fit = np.polyfit(t_norm, set_target_traj_samples_y, deg=1)
-                        dx_fit = float(px_fit[0])
-                        dy_fit = float(py_fit[0])
-                        theta_fit = float(np.degrees(np.arctan2(-dy_fit, dx_fit)))
-                        target_heading_value = round(theta_fit, 2)
+                        theta_fit, fit_vx, fit_vy = estimate_heading_from_xy_trajectory(
+                            set_target_traj_samples_x,
+                            set_target_traj_samples_y,
+                            forward_count=set_target_forward_count,
+                            min_points=5,
+                        )
+                        if theta_fit is None:
+                            print("[SET TARGET] Heading XY fit failed.")
+                            set_target_state = SET_TARGET_IDLE
+                            continue
+                        dx_fit = float(fit_vx)
+                        dy_fit = float(fit_vy)
+                        target_heading_value = round(float(theta_fit), 2)
 
                         # Cập nhật PID controller
                         pos_pid.target_heading = target_heading_value
@@ -1419,7 +1510,7 @@ def main():
                         print(f"   Target Position : ({target_pos[0]}, {target_pos[1]})")
                         print(f"   Target Heading  : {target_heading_value} deg")
                         print(f"   Trajectory pts  : {n_traj}")
-                        print(f"   Linear fit      : dx={dx_fit:.2f}, dy={dy_fit:.2f}")
+                        print(f"   XY PCA/TLS fit  : vx={dx_fit:+.4f}, vy={dy_fit:+.4f} | fwd_pts={set_target_forward_count}")
                         print(f"{'='*65}")
 
                         # 1. Lưu ra file target_config.json (ghi đè target mới nhất)
@@ -1515,6 +1606,10 @@ def main():
                     if spin_finished:
                         post_ph4_re_rfb_sent = True
                         post_ph4_re_rfb_sent_time = now_t
+                        reverify_traj_x = []
+                        reverify_traj_y = []
+                        reverify_forward_count = 0
+                        reverify_measured_heading = None
                         rfb_spd = pos_pid.fwd_bwd_speed
                         rfb_dur = int(pos_pid.fwd_bwd_time_s * 1000)
                         print(f"\n[POST-PHASE 4] Step 2/3: Spin completed! Triggering re-verification run_fw_bw: Speed={rfb_spd}, Duration={rfb_dur}ms")
@@ -1523,6 +1618,12 @@ def main():
 
                 elif post_ph4_re_rfb_sent and not post_ph4_done:
                     total_dur = 2.0 * pos_pid.fwd_bwd_time_s
+                    reverify_elapsed = now_t - post_ph4_re_rfb_sent_time
+                    if detected and 0.05 <= reverify_elapsed <= total_dur:
+                        reverify_traj_x.append(cx)
+                        reverify_traj_y.append(cy)
+                        if reverify_elapsed <= pos_pid.fwd_bwd_time_s:
+                            reverify_forward_count += 1
                     rfb2_motion_finished = (now_t - post_ph4_re_rfb_sent_time >= total_dur) and ((ble_worker is None) or (not ble_worker.is_busy))
 
                     if not post_ph4_settling:
@@ -1551,16 +1652,22 @@ def main():
                         if settle_elapsed >= 0.8:
                             post_ph4_done = True
                             is_pid_completed = True
-                            curr_ang = active_angle if active_angle is not None else 0.0
-                            if target_heading is not None:
+                            reverify_measured_heading, _, _ = estimate_heading_from_xy_trajectory(
+                                reverify_traj_x,
+                                reverify_traj_y,
+                                forward_count=reverify_forward_count,
+                                min_points=5,
+                            )
+                            if target_heading is not None and reverify_measured_heading is not None:
                                 tgt_h_str = f"{target_heading:.1f} deg"
-                                post_ph4_ang_err2 = wrap_to_180(curr_ang - target_heading)
+                                post_ph4_ang_err2 = wrap_to_180(reverify_measured_heading - target_heading)
+                                print(f"Measured Heading 2 : {reverify_measured_heading:+.2f} deg (XY FWD+BWD fit)")
                                 err1_str = f"{post_ph4_ang_err1:+.2f} deg"
                                 err2_str = f"{post_ph4_ang_err2:+.2f} deg"
                                 improvement = abs(post_ph4_ang_err1) - abs(post_ph4_ang_err2)
                                 impr_str = f"{improvement:+.2f} deg"
                             else:
-                                tgt_h_str = "--"
+                                tgt_h_str = f"{target_heading:.1f} deg" if target_heading is not None else "--"
                                 post_ph4_ang_err2 = 0.0
                                 err1_str = "--"
                                 err2_str = "--"
@@ -1613,6 +1720,14 @@ def main():
                 is_completed_flag = dbg_pos["is_completed"]
                 ph4_physically_done = is_completed_flag and (ble_worker is None or not ble_worker.is_busy)
 
+                if phase4_rfb_start_time is not None and not post_ph4_active:
+                    ph4_elapsed = time.perf_counter() - phase4_rfb_start_time
+                    if detected and 0.05 <= ph4_elapsed <= 2.0 * pos_pid.fwd_bwd_time_s:
+                        phase4_traj_x.append(cx)
+                        phase4_traj_y.append(cy)
+                        if ph4_elapsed <= pos_pid.fwd_bwd_time_s:
+                            phase4_forward_count += 1
+
                 if not ph4_physically_done and pos_state == "COMPLETED":
                     # Xe vẫn đang chạy nốt quãng đường lùi của Phase 4 trên thực tế phần cứng
                     pos_state = "PHASE_4_FWD_BWD"
@@ -1620,22 +1735,42 @@ def main():
                 if ph4_physically_done and not post_ph4_active:
                     is_auto_pid_enabled = False
                     post_ph4_active = True
-                    post_ph4_ang_err1 = ang_err
-                    rotation_steps = int(round(args.kp_spin * abs(ang_err)))
+                    phase4_measured_heading, _, _ = estimate_heading_from_xy_trajectory(
+                        phase4_traj_x,
+                        phase4_traj_y,
+                        forward_count=phase4_forward_count,
+                        min_points=5,
+                    )
+                    if target_heading is not None and phase4_measured_heading is not None:
+                        post_ph4_ang_err1 = wrap_to_180(phase4_measured_heading - target_heading)
+                        print(
+                            f"\n[PHASE 4 XY] measured_heading={phase4_measured_heading:+.2f} deg, "
+                            f"target={target_heading:+.2f} deg, err={post_ph4_ang_err1:+.2f} deg, "
+                            f"pts={len(phase4_traj_x)}, fwd_pts={phase4_forward_count}"
+                        )
+                    else:
+                        post_ph4_ang_err1 = 0.0
+                        print("\n[PHASE 4 XY] WARNING: insufficient trajectory points; heading correction disabled.")
+                    rotation_steps = int(round(args.kp_spin * abs(post_ph4_ang_err1)))
                     post_ph4_spin_steps = rotation_steps
                     if rotation_steps > 0:
-                        post_ph4_spin_spd = +args.spin_speed if ang_err > 0 else -args.spin_speed
+                        post_ph4_spin_spd = +args.spin_speed if post_ph4_ang_err1 > 0 else -args.spin_speed
                         print(f"\n[POST-PHASE 4] Step 1/3: Phase 4 ended (ang_err1={post_ph4_ang_err1:+.2f}deg). Triggering spinSteps: Speed={post_ph4_spin_spd}, Steps={rotation_steps}")
                         if ble_worker is not None:
                             ble_worker.send_spin_steps(post_ph4_spin_spd, rotation_steps)
                     else:
                         post_ph4_spin_spd = 0
-                        print(f"\n[POST-PHASE 4] Angle error is zero ({ang_err:.2f}deg). No spinSteps needed.")
+                        print(f"\n[POST-PHASE 4] XY heading error is zero/invalid ({post_ph4_ang_err1:.2f}deg). No spinSteps needed.")
                     post_ph4_spin_sent = True
                     post_ph4_spin_sent_time = time.perf_counter()
 
                 if "rfb_trigger" in dbg_pos and ble_worker is not None:
                     rfb_spd, rfb_dur = dbg_pos["rfb_trigger"]
+                    phase4_traj_x = []
+                    phase4_traj_y = []
+                    phase4_forward_count = 0
+                    phase4_measured_heading = None
+                    phase4_rfb_start_time = time.perf_counter()
                     print(f"\n[PHASE 4] Triggering autonomous run_fw_bw: Speed={rfb_spd}, Duration={rfb_dur}ms")
                     ble_worker.send_run_fw_bw(rfb_spd, rfb_dur)
 
@@ -1887,6 +2022,7 @@ def main():
                             set_target_pos_samples_y = []
                             set_target_traj_samples_x = []
                             set_target_traj_samples_y = []
+                            set_target_forward_count = 0
                             set_target_start_time = time.perf_counter()
                             set_target_state = SET_TARGET_MEASURING_POS
                             if not recording:

@@ -1,0 +1,12 @@
+[
+  {
+    "target_id": 1,
+    "calibrated_at": "2026-09-30 15:48:25",
+    "target_x": 631.9,
+    "target_y": 88.4,
+    "target_heading": 15.3,
+    "trajectory_points": 114,
+    "fit_dx": 0.96,
+    "fit_dy": -0.26
+  }
+]

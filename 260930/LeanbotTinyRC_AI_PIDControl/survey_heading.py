@@ -223,6 +223,7 @@ except KeyboardInterrupt:
 finally:
     csv_file.close()
     tracker.release()
+    ble.stop()
     if show_ui:
         cv2.destroyAllWindows()
 

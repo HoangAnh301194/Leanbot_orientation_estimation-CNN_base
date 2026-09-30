@@ -851,6 +851,8 @@ def measureHeading(
 
         time.sleep(0.01)
 
+    action_elapsed_s = float(time.perf_counter() - t_start)
+
     # 3. Persist raw samples FIRST. These are the exact samples used below.
     n_pts = len(traj_samples_x)
     raw_csv_path = _save_heading_raw_trajectory(
@@ -907,7 +909,7 @@ def measureHeading(
         "fit_vx": float(fit_vx) if fit_vx is not None else None,
         "fit_vy": float(fit_vy) if fit_vy is not None else None,
         "raw_csv": raw_csv_path,
-        "action_elapsed_s": float(time.perf_counter() - t_start),
+        "action_elapsed_s": action_elapsed_s,
     }
     return details if return_details else measuredHeading
 

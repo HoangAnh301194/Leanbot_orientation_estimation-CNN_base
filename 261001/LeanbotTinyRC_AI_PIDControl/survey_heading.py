@@ -7,9 +7,11 @@ import cv2
 from pathlib import Path
 import numpy as np
 from datetime import datetime
+
 current_dir = Path(__file__).resolve().parent
 sys.path.insert(0, str(current_dir))
 from leanbotCameraController import BLEMotorWorker, LeanbotCameraTracker, measureHeading as _measureHeading
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--ble", type=int, default=654321, help="Leanbot BLE ID")
@@ -21,7 +23,7 @@ show_ui = not args.no_show
 
 ble = BLEMotorWorker(args.ble)
 tracker = LeanbotCameraTracker(source=args.source)
-time.sleep(2.0) 
+time.sleep(2.0)
 
 
 def spinSteps(speed: int, steps: int):
@@ -36,10 +38,18 @@ def spinSteps(speed: int, steps: int):
                     vis = frame.copy()
                     if detected:
                         cv2.circle(vis, (int(cx), int(cy)), 6, (0, 0, 255), -1)
-                    cv2.putText(vis, f"[SPINNING] steps={steps} (+{speed})", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                    cv2.putText(
+                        vis,
+                        f"[SPINNING] steps={steps} (+{speed})",
+                        (20, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 255, 255),
+                        2,
+                    )
                     cv2.imshow("Leanbot Heading Survey", vis)
                     key = cv2.waitKey(1) & 0xFF
-                    if key == ord('q'):
+                    if key == ord("q"):
                         print("User interrupted survey.")
                         sys.exit(0)
             time.sleep(0.02)
@@ -63,7 +73,13 @@ def make_measurement_id(direction: int, steps: int, intervalMs: int) -> str:
     return f"m{measurement_counter:04d}_dir{direction:+d}_steps{steps:03d}_int{intervalMs}_{ts}"
 
 
-def measureHeading(intervalMs: int, direction: int, steps: int, signed_steps: int, measurement_id: str) -> float:
+def measureHeading(
+    intervalMs: int,
+    direction: int,
+    steps: int,
+    signed_steps: int,
+    measurement_id: str,
+) -> float:
     return _measureHeading(
         speed_or_interval=2000,
         intervalMs=intervalMs,
@@ -81,89 +97,158 @@ def measureHeading(intervalMs: int, direction: int, steps: int, signed_steps: in
         result_hold_ms=args.result_hold_ms,
     )
 
+
+fieldnames = [
+    "measurement_id",
+    "direction",
+    "steps",
+    "signed_steps",
+    "intervalMs",
+    "heading",
+    "duration",
+    "status",
+    "error",
+    "raw_trajectory_file",
+]
 csv_file = open(csv_path, "w", newline="", encoding="utf-8")
-csv_writer = csv.DictWriter(csv_file, fieldnames=["measurement_id", "direction", "steps", "signed_steps", "intervalMs", "heading", "duration", "raw_trajectory_file"])
+csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 csv_writer.writeheader()
 
 records = []
 print(f"Start survey..... Data will be saved continuously to {csv_path}")
 
-# Measure at center (0) first
-for intervalMs in range(1500, 3001, 250):
-    measurement_id = make_measurement_id(0, 0, intervalMs)
+
+def run_measurement(direction: int, steps: int, signed_steps: int, intervalMs: int):
+    """
+    Execute one measureHeading() call and write exactly one summary CSV row.
+
+    Returns:
+        heading on success;
+        None for a recoverable BLE verification failure.
+
+    Fatal BLE failures stop the survey after their FAILED row has been flushed.
+    """
+    measurement_id = make_measurement_id(direction, steps, intervalMs)
     t0 = time.time()
-    heading = measureHeading(intervalMs, direction=0, steps=0, signed_steps=0, measurement_id=measurement_id)
-    if heading is None:
-        print("Quitting survey...")
-        sys.exit(0)
+    heading = measureHeading(
+        intervalMs,
+        direction=direction,
+        steps=steps,
+        signed_steps=signed_steps,
+        measurement_id=measurement_id,
+    )
     duration = time.time() - t0
+
+    raw_rel = str(Path("trajectories") / f"{measurement_id}.csv")
+
+    if heading is None:
+        # measureHeading() also returns None when the user presses Q.  A BLE
+        # verification failure is distinguishable by last_action_ok == False.
+        if ble.last_action_ok is not False:
+            print("Quitting survey by user request...")
+            csv_file.flush()
+            csv_file.close()
+            if show_ui:
+                cv2.destroyAllWindows()
+            sys.exit(0)
+
+        error = ble.last_action_error or "BLE_ACTION_FAILED"
+        row_data = {
+            "measurement_id": measurement_id,
+            "direction": direction,
+            "steps": steps,
+            "signed_steps": signed_steps,
+            "intervalMs": intervalMs,
+            "heading": "",
+            "duration": duration,
+            "status": "FAILED",
+            "error": error,
+            "raw_trajectory_file": raw_rel,
+        }
+        records.append(row_data)
+        csv_writer.writerow(row_data)
+        csv_file.flush()
+
+        print(
+            f"[FAILED] dir={direction:+d} | steps={steps:4d} | "
+            f"intervalMs={intervalMs:4d} | error={error} | time={duration:.2f}s"
+        )
+
+        # If END was still received, the physical action completed and the
+        # serial stream was drained. The measurement is invalid, but the next
+        # measurement can safely continue.
+        if error == "START_TIMEOUT_END_RECEIVED":
+            return None
+
+        # Missing END or a BLE exception leaves the robot/action state
+        # uncertain. Do not send another motion command.
+        print(
+            "[FATAL] BLE action state is uncertain. "
+            "Stopping survey to avoid mixing trajectories."
+        )
+        csv_file.close()
+        if show_ui:
+            cv2.destroyAllWindows()
+        sys.exit(2)
+
     row_data = {
         "measurement_id": measurement_id,
-        "direction": 0,
-        "steps": 0,
-        "signed_steps": 0,
+        "direction": direction,
+        "steps": steps,
+        "signed_steps": signed_steps,
         "intervalMs": intervalMs,
         "heading": heading,
         "duration": duration,
-        "raw_trajectory_file": str(Path("trajectories") / f"{measurement_id}.csv"),
+        "status": "OK",
+        "error": "",
+        "raw_trajectory_file": raw_rel,
     }
     records.append(row_data)
     csv_writer.writerow(row_data)
     csv_file.flush()
-    print(f"Dir= 0 | steps=   0 | intervalMs={intervalMs:4d} | heading={heading:6.2f} deg | time={duration:.2f}s")
+
+    if direction == 0:
+        prefix = "Dir= 0 | steps=   0"
+    elif direction > 0:
+        prefix = f"Dir=+1 | steps={steps:4d}"
+    else:
+        prefix = f"Dir=-1 | Return= 0 (cycle steps={steps})"
+
+    print(
+        f"{prefix} | intervalMs={intervalMs:4d} | "
+        f"heading={heading:6.2f} deg | time={duration:.2f}s | status=OK"
+    )
+    return heading
+
+
+# Measure at center (0) first.
+for intervalMs in range(1500, 3001, 250):
+    run_measurement(direction=0, steps=0, signed_steps=0, intervalMs=intervalMs)
+
 
 for steps in range(10, 201, 10):
-    # Từ center, xoay thuận
+    # Từ center, xoay thuận.
     spinSteps(+50, steps)
-    
+
     for intervalMs in range(1500, 3001, 250):
-        measurement_id = make_measurement_id(1, steps, intervalMs)
-        t0 = time.time()
-        heading = measureHeading(intervalMs, direction=1, steps=steps, signed_steps=steps, measurement_id=measurement_id)
-        if heading is None:
-            print("Quitting survey...")
-            sys.exit(0)
-        duration = time.time() - t0
-        row_data = {
-            "measurement_id": measurement_id,
-            "direction": 1,
-            "steps": steps,
-            "signed_steps": steps,
-            "intervalMs": intervalMs,
-            "heading": heading,
-            "duration": duration,
-            "raw_trajectory_file": str(Path("trajectories") / f"{measurement_id}.csv"),
-        }
-        records.append(row_data)
-        csv_writer.writerow(row_data)
-        csv_file.flush()
-        print(f"Dir=+1 | steps={steps:4d} | intervalMs={intervalMs:4d} | heading={heading:6.2f} deg | time={duration:.2f}s")
-    
-    # Từ vị trí hiện tại, quay nghịch đúng 'steps' bước để trả về lại center
+        run_measurement(
+            direction=1,
+            steps=steps,
+            signed_steps=steps,
+            intervalMs=intervalMs,
+        )
+
+    # Từ vị trí hiện tại, quay nghịch đúng 'steps' bước để trả về center.
     spinSteps(-50, steps)
-    
+
     for intervalMs in range(1500, 3001, 250):
-        measurement_id = make_measurement_id(-1, steps, intervalMs)
-        t0 = time.time()
-        heading = measureHeading(intervalMs, direction=-1, steps=steps, signed_steps=0, measurement_id=measurement_id)
-        if heading is None:
-            print("Quitting survey...")
-            sys.exit(0)
-        duration = time.time() - t0
-        row_data = {
-            "measurement_id": measurement_id,
-            "direction": -1,
-            "steps": steps,
-            "signed_steps": 0,  # Thực chất nó đang ở 0
-            "intervalMs": intervalMs,
-            "heading": heading,
-            "duration": duration,
-            "raw_trajectory_file": str(Path("trajectories") / f"{measurement_id}.csv"),
-        }
-        records.append(row_data)
-        csv_writer.writerow(row_data)
-        csv_file.flush()
-        print(f"Dir=-1 | Return= 0 | intervalMs={intervalMs:4d} | heading={heading:6.2f} deg | time={duration:.2f}s")
+        run_measurement(
+            direction=-1,
+            steps=steps,
+            signed_steps=0,
+            intervalMs=intervalMs,
+        )
+
 
 csv_file.close()
 print(f"Survey completed. Data saved to {csv_path}")

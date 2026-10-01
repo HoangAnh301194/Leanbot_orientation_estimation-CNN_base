@@ -11,34 +11,11 @@ from pathlib import Path
 from uuid import uuid4
 
 import cv2
-import numpy as np
 
 
 IMAGE_SIZE = 640
-CENTER_CROP_RATIO = 0.625
 ANGLE_PATTERN = re.compile(r"^Leanbot_(?:(?P<sign>[pm])(?P<value>\d+)|(?P<plain>\d+))$")
 LOGGER = logging.getLogger(__name__)
-
-
-def _training_geometry(frame_shape):
-    frame_height, frame_width = frame_shape[:2]
-    crop_width = max(1, int(frame_width * CENTER_CROP_RATIO))
-    start_x = (frame_width - crop_width) // 2
-    square_size = max(crop_width, frame_height)
-    pad_left = (square_size - crop_width) // 2
-    pad_top = (square_size - frame_height) // 2
-    return crop_width, start_x, square_size, pad_left, pad_top
-
-
-def prepare_training_image(frame):
-    """Match the controller's FULL center-crop, black-padding and 640 resize."""
-    frame_height = frame.shape[0]
-    crop_width, start_x, square_size, pad_left, pad_top = _training_geometry(frame.shape)
-    padded = np.zeros((square_size, square_size, 3), dtype=frame.dtype)
-    padded[pad_top:pad_top + frame_height, pad_left:pad_left + crop_width] = (
-        frame[:, start_x:start_x + crop_width]
-    )
-    return cv2.resize(padded, (IMAGE_SIZE, IMAGE_SIZE))
 
 
 def render_label_check(image, label, metadata):
@@ -80,7 +57,7 @@ class LostTrackingCollector:
     especially when the robot moves, rotates or leaves the camera view.
     """
 
-    def __init__(self, output_dir=None, class_names=None, max_queue_size=32, max_samples_per_run=1):
+    def __init__(self, output_dir=None, class_names=None, max_queue_size=32, max_samples_per_run=None):
         if max_queue_size < 1:
             raise ValueError("max_queue_size must be at least 1")
         if max_samples_per_run is not None and max_samples_per_run < 1:
@@ -125,82 +102,114 @@ class LostTrackingCollector:
         self.max_samples_per_run = max_samples_per_run
         self.samples_in_current_run = 0
         self._last_detection = None
+        self._lost_episode_saved = False
         self._closed = False
         self._queue = queue.Queue(maxsize=max_queue_size)
         self._thread = threading.Thread(target=self._writer_loop, name="lost-dataset-writer", daemon=True)
         self._thread.start()
 
     def reset_run(self):
-        """Reset run-level counter so a new run can capture up to max_samples_per_run samples."""
+        """Reset collection state at the start/end of a run."""
         self.samples_in_current_run = 0
+        self._last_detection = None
+        self._lost_episode_saved = False
 
     def _remember_detection(self, frame, frame_id, bbox_xyxy, angle, confidence, inference_mode):
+        """Cache the latest successful detection in full-frame coordinates."""
         self._last_detection = None
         if bbox_xyxy is None or angle is None:
             return
+
         coordinates = tuple(float(value) for value in bbox_xyxy)
         angle = float(angle)
         if len(coordinates) != 4 or not all(math.isfinite(value) for value in (*coordinates, angle)):
             return
+
         x_min, y_min, x_max, y_max = coordinates
         frame_height, frame_width = frame.shape[:2]
-        crop_width, start_x, square_size, pad_left, pad_top = _training_geometry(frame.shape)
-        x_min = max(x_min, start_x)
-        x_max = min(x_max, start_x + crop_width)
-        y_min = max(y_min, 0.0)
-        y_max = min(y_max, frame_height)
+        x_min = max(0.0, min(float(frame_width), x_min))
+        x_max = max(0.0, min(float(frame_width), x_max))
+        y_min = max(0.0, min(float(frame_height), y_min))
+        y_max = max(0.0, min(float(frame_height), y_max))
         if x_max <= x_min or y_max <= y_min:
             return
+
         class_id = min(
             self._class_angles,
             key=lambda candidate: abs((angle - self._class_angles[candidate] + 180.0) % 360.0 - 180.0),
         )
-        yolo_bbox = [
-            ((x_min + x_max) / 2.0 - start_x + pad_left) / square_size,
-            ((y_min + y_max) / 2.0 + pad_top) / square_size,
-            (x_max - x_min) / square_size,
-            (y_max - y_min) / square_size,
-        ]
         confidence = float(confidence) if confidence is not None else None
         if confidence is not None and not math.isfinite(confidence):
             confidence = None
+
         self._last_detection = {
             "source_frame_id": int(frame_id),
             "source_frame_size": [frame_width, frame_height],
             "source_inference_mode": inference_mode,
-            "source_bbox_xyxy": list(coordinates),
+            "source_bbox_xyxy": [x_min, y_min, x_max, y_max],
             "source_angle_deg": angle,
             "source_confidence": confidence,
             "class_id": class_id,
             "class_name": self.class_names[class_id],
             "class_angle_deg": self._class_angles[class_id],
-            "bbox_yolo": yolo_bbox,
         }
 
     def update(self, frame, frame_id, detected, bbox_xyxy=None, angle=None,
                confidence=None, inference_mode="FULL", collect_lost=True,
-               best_conf=None):
-        """Cache detections; enqueue lost frames only when collection is enabled."""
+               best_conf=None, roi_rect=None):
+        """Save only the first failed ROI in each lost episode."""
         if confidence is None and best_conf is not None:
             confidence = best_conf
         if self._closed:
             return False
+
         if detected:
             self._remember_detection(frame, frame_id, bbox_xyxy, angle, confidence, inference_mode)
+            self._lost_episode_saved = False
             return False
-        if not collect_lost:
-            self._last_detection = None
+
+        if not collect_lost or inference_mode != "ROI" or roi_rect is None:
             return False
-        if self._last_detection is None:
+        if self._lost_episode_saved:
             self.skipped_count += 1
             return False
-        if self._last_detection["source_frame_size"] != [frame.shape[1], frame.shape[0]]:
-            self._last_detection = None
+        if self._last_detection is None:
             self.skipped_count += 1
             return False
         if self.max_samples_per_run is not None and self.samples_in_current_run >= self.max_samples_per_run:
             self.skipped_count += 1
             return False
+
+        rx, ry, rw, rh = (int(value) for value in roi_rect)
+        if rw <= 0 or rh <= 0 or frame is None or frame.size == 0:
+            self.skipped_count += 1
+            return False
+
+        frame_height, frame_width = frame.shape[:2]
+        if frame_width != rw or frame_height != rh:
+            self.skipped_count += 1
+            LOGGER.warning(
+                "Lost ROI size mismatch: crop=%dx%d, roi_rect=%dx%d",
+                frame_width, frame_height, rw, rh,
+            )
+            return False
+
+        x_min, y_min, x_max, y_max = self._last_detection["source_bbox_xyxy"]
+        roi_x_min = max(0.0, min(float(rw), float(x_min) - rx))
+        roi_y_min = max(0.0, min(float(rh), float(y_min) - ry))
+        roi_x_max = max(0.0, min(float(rw), float(x_max) - rx))
+        roi_y_max = max(0.0, min(float(rh), float(y_max) - ry))
+        if roi_x_max <= roi_x_min or roi_y_max <= roi_y_min:
+            self.skipped_count += 1
+            return False
+
+        bbox_yolo = [
+            ((roi_x_min + roi_x_max) / 2.0) / rw,
+            ((roi_y_min + roi_y_max) / 2.0) / rh,
+            (roi_x_max - roi_x_min) / rw,
+            (roi_y_max - roi_y_min) / rh,
+        ]
+
         sample_number = self._sample_count + 1
         metadata = {
             **self._last_detection,
@@ -210,9 +219,13 @@ class LostTrackingCollector:
             "captured_at": datetime.now().astimezone().isoformat(timespec="milliseconds"),
             "label_source": "last_successful_detection",
             "requires_review": True,
+            "roi_rect_xywh": [rx, ry, rw, rh],
+            "source_roi_size": [frame_width, frame_height],
+            "bbox_roi_xyxy": [roi_x_min, roi_y_min, roi_x_max, roi_y_max],
+            "bbox_yolo": bbox_yolo,
             "image_size": [IMAGE_SIZE, IMAGE_SIZE],
-            "center_crop_ratio": CENTER_CROP_RATIO,
         }
+
         stem = f"lost_{int(frame_id):08d}_{sample_number:06d}"
         try:
             self._queue.put_nowait((stem, frame.copy(), metadata))
@@ -221,12 +234,14 @@ class LostTrackingCollector:
             if self.dropped_count == 1:
                 LOGGER.warning("Lost dataset queue full; dropping samples rather than blocking the camera")
             return False
+
         self._sample_count = sample_number
         self.samples_in_current_run += 1
+        self._lost_episode_saved = True
         return True
 
     def _save_sample(self, stem, frame, metadata):
-        image = prepare_training_image(frame)
+        image = cv2.resize(frame, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_LINEAR)
         success, encoded = cv2.imencode(".png", image)
         if not success:
             raise OSError("Could not encode lost tracking image")

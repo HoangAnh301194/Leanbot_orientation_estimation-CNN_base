@@ -53,7 +53,7 @@ Successful detection
 calculate_roi()
         |
         v
-Raw ROI, ví dụ 224x224
+Raw ROI, ví dụ 200x180 --> 224x224
         |
         +----> resize 160x160
                     |
@@ -84,7 +84,8 @@ Raw ROI, ví dụ 224x224
     python leanbotCameraController.py --source 1 --show --save-lost --ble 654321
   ```
 
-  - Kết quả dataset sau khi thu thập: folder [`lost_tracking_dataset`](lost_tracking_dataset)
+  - Kết quả dataset sau khi thu thập: folder [leanbotCameraController.py](LeanbotTinyRC_AI_PIDControl/leanbotCameraController.py)
+  
     - `images/`: ảnh ROI lost tracking đã resize về 640x640.
     - `labels/`: YOLO label được chuyển sang hệ tọa độ ROI.
     - `metadata/`: thông tin frame, ROI, BBOX, angle, confidence và nguồn label.

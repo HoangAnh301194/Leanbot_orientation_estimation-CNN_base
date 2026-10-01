@@ -355,6 +355,10 @@ class BLEMotorWorker:
         self.leanbot = None
         self.loop = None
         self._action_running = False
+        # Result of the latest autonomous BLE action.  Keep this separate from
+        # is_busy: "not busy" can mean either success or a communication error.
+        self.last_action_ok = None
+        self.last_action_error = None
         self.thread = threading.Thread(target=self._worker_thread, daemon=True)
         self.thread.start()
 
@@ -424,11 +428,71 @@ class BLEMotorWorker:
         except Exception:
             pass
 
+    async def _run_fw_bw_verified(self, speed: int, duration_ms: int):
+        """
+        Send one rfb command without using leanbotTinyRC.run_fw_bw().
+
+        START and END are consumed sequentially by a single waiter.  This avoids
+        the race in the submodule implementation where concurrent START/END
+        waiters can consume each other's serial lines.
+
+        Motion commands are deliberately NOT retried when START is missing:
+        the robot may already be executing the first command even if its START
+        acknowledgement was lost.
+        """
+        command = f"rfb/{int(speed)}/{int(duration_ms)}"
+        start_timeout_s = 0.5
+        # Firmware performs FWD duration + BWD duration. Add margin for stops,
+        # BLE delivery and scheduling jitter.
+        end_timeout_s = max(3.0, 2.0 * float(duration_ms) / 1000.0 + 3.0)
+
+        print(f"[BLE RFB] TX {command}")
+        await self.leanbot.send(f"{command}\n", response=False)
+
+        try:
+            await self.leanbot.waitSerialMessage(
+                f"{command}/START",
+                timeout_s=start_timeout_s,
+            )
+            print(f"[BLE RFB] RX {command}/START")
+        except TimeoutError:
+            # Do not resend the motion command.  It may already be running.
+            # Wait for END once so the worker remains busy until the possible
+            # physical motion has finished and the serial stream is drained.
+            print(
+                f"[WARN] BLE RFB START timeout for {command}; "
+                "not retrying motion command, waiting for END."
+            )
+            try:
+                await self.leanbot.waitSerialMessage(
+                    f"{command}/END",
+                    timeout_s=end_timeout_s,
+                )
+                print(f"[BLE RFB] RX {command}/END after START timeout")
+                return False, "START_TIMEOUT_END_RECEIVED"
+            except TimeoutError:
+                return False, "START_TIMEOUT_END_TIMEOUT"
+
+        try:
+            await self.leanbot.waitSerialMessage(
+                f"{command}/END",
+                timeout_s=end_timeout_s,
+            )
+            print(f"[BLE RFB] RX {command}/END")
+            return True, ""
+        except TimeoutError:
+            return False, "END_TIMEOUT"
+
     def send_run_fw_bw(self, speed: int, duration_ms: int):
-        
         if not self.connected or self.loop is None:
+            self.last_action_ok = False
+            self.last_action_error = "BLE_NOT_CONNECTED"
             return
+
         self._action_running = True
+        self.last_action_ok = None
+        self.last_action_error = None
+
         try:
             while not self.cmd_queue.empty():
                 self.cmd_queue.get_nowait()
@@ -437,8 +501,14 @@ class BLEMotorWorker:
 
         async def _do_rfb():
             try:
-                await leanbotTinyRC.run_fw_bw(self.leanbot, speed, duration_ms)
+                ok, error = await self._run_fw_bw_verified(speed, duration_ms)
+                self.last_action_ok = bool(ok)
+                self.last_action_error = error or None
+                if not ok:
+                    print(f"[WARN] BLE run_fw_bw verification failed: {error}")
             except Exception as e:
+                self.last_action_ok = False
+                self.last_action_error = f"BLE_EXCEPTION:{type(e).__name__}:{e}"
                 print(f"[WARN] BLE run_fw_bw error: {e}")
             finally:
                 self._action_running = False
@@ -788,7 +858,8 @@ def save_heading_raw_trajectory_csv(
             "measurement_id", "sample_index", "elapsed_s", "cx", "cy",
             "segment", "is_start", "is_turn", "is_end",
             "heading_deg", "fit_vx", "fit_vy", "turn_idx",
-            "direction", "steps", "signed_steps", "intervalMs"
+            "direction", "steps", "signed_steps", "intervalMs",
+            "action_status", "action_error"
         ])
         for i, (x, y) in enumerate(zip(traj_x, traj_y)):
             elapsed_s = traj_elapsed_s[i] if i < len(traj_elapsed_s) else ""
@@ -813,6 +884,8 @@ def save_heading_raw_trajectory_csv(
                 meta.get("steps", ""),
                 meta.get("signed_steps", ""),
                 meta.get("intervalMs", ""),
+                meta.get("action_status", ""),
+                meta.get("action_error", ""),
             ])
     return csv_path
 
@@ -898,8 +971,38 @@ def measureHeading(
 
         time.sleep(0.01)
 
-    # 3. Fit trực tiếp đường quỹ đạo 2D XY bằng PCA/TLS, không fit x(t), y(t).
+    # 3. Validate the BLE action before accepting the trajectory.
+    # A failed START/END handshake means the physical FWD/BWD sequence is not
+    # trustworthy enough for heading estimation. Preserve raw points for debug.
+    raw_meta = dict(measurement_meta or {})
+    action_ok = (ble_worker.last_action_ok is True)
+    action_error = ble_worker.last_action_error or ""
+    raw_meta["action_status"] = "OK" if action_ok else "FAILED"
+    raw_meta["action_error"] = action_error
+
     n_pts = len(traj_samples_x)
+    if not action_ok:
+        print(
+            f"[WARN] measureHeading invalid BLE action: {action_error or 'UNKNOWN'} "
+            f"({n_pts} trajectory points)."
+        )
+        raw_path = save_heading_raw_trajectory_csv(
+            raw_csv_dir=raw_csv_dir,
+            measurement_id=measurement_id,
+            traj_x=traj_samples_x,
+            traj_y=traj_samples_y,
+            traj_elapsed_s=traj_samples_elapsed,
+            measured_heading=None,
+            fit_vx=None,
+            fit_vy=None,
+            turn_index=None,
+            measurement_meta=raw_meta,
+        )
+        if raw_path is not None:
+            print(f"[measureHeading XY] Invalid raw trajectory saved: {raw_path}")
+        return None
+
+    # 4. Fit trực tiếp đường quỹ đạo 2D XY bằng PCA/TLS, không fit x(t), y(t).
     measured_heading, fit_vx, fit_vy, turn_index = estimate_heading_from_xy_trajectory(
         traj_samples_x,
         traj_samples_y,
@@ -922,7 +1025,7 @@ def measureHeading(
             fit_vx=fit_vx,
             fit_vy=fit_vy,
             turn_index=turn_index,
-            measurement_meta=measurement_meta,
+            measurement_meta=raw_meta,
         )
         if raw_path is not None:
             print(f"[measureHeading XY] Raw trajectory saved: {raw_path}")
@@ -955,12 +1058,12 @@ def measureHeading(
             fit_vx=None,
             fit_vy=None,
             turn_index=None,
-            measurement_meta=measurement_meta,
+            measurement_meta=raw_meta,
         )
         if raw_path is not None:
             print(f"[measureHeading XY] Raw trajectory saved (fit failed): {raw_path}")
 
-    # 4. return measuredHeading
+    # 5. return measuredHeading
     return measuredHeading
 
 

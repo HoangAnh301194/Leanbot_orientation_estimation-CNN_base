@@ -985,7 +985,7 @@ def main():
     parser.add_argument("--mag-threshold", type=float, default=2.0, help="Minimum vector magnitude to accept a group (default 2.0)")
     parser.add_argument("--debug-imgsz", action="store_true", help="Save debug images of resize/padding steps to benchmark/imgszdebug/")
     parser.add_argument("--lost-dataset-dir", default="", help="Lost-frame dataset root (default: <project>/lost_tracking_dataset, outside benchmark_logs)")
-    parser.add_argument("--save-lost", action="store_true", default=False, help="Enable saving 1 lost tracking frame sample per run into dataset (default: False)")
+    parser.add_argument("--save-lost", action="store_true", default=False, help="Enable saving the first failed ROI from each lost-tracking episode (default: False)")
     parser.add_argument("--fps", type=float, default=30.0, help="Maximum FPS limit (default 30.0)")
     # --- Angle smoothing pipeline parameters ---
     parser.add_argument("--smooth-window", type=int, default=18, help="Sliding window size for smoothing (default 18)")
@@ -1450,8 +1450,8 @@ def main():
         if save_lost_enabled:
             dataset_root = args.lost_dataset_dir or os.path.join(str(parent_dir), "lost_tracking_dataset")
             try:
-                lost_collector = LostTrackingCollector(dataset_root, names, max_samples_per_run=1)
-                print(f"[INFO] Lost tracking dataset: ENABLED (1 sample per run) -> {lost_collector.session_dir}")
+                lost_collector = LostTrackingCollector(dataset_root, names, max_samples_per_run=None)
+                print(f"[INFO] Lost tracking dataset: ENABLED (1 sample per lost episode) -> {lost_collector.session_dir}")
                 print(f"[INFO] Label check images: {lost_collector.check_labels_dir}")
                 print("[INFO] Inherited labels are provisional; review them before training.")
             except (OSError, ValueError) as error:
@@ -1488,6 +1488,7 @@ def main():
             roi_scale_x, roi_scale_y = 1.0, 1.0
             tracking_lost = 0
             lost_roi_input = None
+            lost_roi_rect = None
             roi_w, roi_h = 0, 0
             display_bbox = None
             best_box = None
@@ -1499,6 +1500,7 @@ def main():
                 offset_x, offset_y = rx, ry
                 roi_input = frame[ry:ry+rh, rx:rx+rw]
                 lost_roi_input = roi_input.copy()
+                lost_roi_rect = (rx, ry, rw, rh)
                 inference_input = cv2.resize(roi_input, (160, 160))
                 input_w, input_h = 160, 160
                 roi_scale_x = rw / 160.0
@@ -2009,12 +2011,27 @@ def main():
                 or (post_ph4_active and not post_ph4_done)
             )
             if lost_collector is not None:
-                lost_collector.update(
-                    orig_frame, frame_id, detected,
-                    bbox_xyxy=best_box if detected else None,
-                    angle=angle, confidence=best_conf, inference_mode=inference_mode,
-                    collect_lost=collect_lost,
-                )
+                if detected:
+                    # Cache the latest successful detection in full-frame coordinates.
+                    lost_collector.update(
+                        orig_frame, frame_id, True,
+                        bbox_xyxy=best_box,
+                        angle=angle, confidence=best_conf, inference_mode=inference_mode,
+                        collect_lost=False,
+                    )
+                elif (
+                    collect_lost
+                    and inference_mode == "ROI"
+                    and lost_roi_input is not None
+                    and lost_roi_rect is not None
+                ):
+                    # Save exactly the raw ROI seen by the tracking model at the failure frame.
+                    lost_collector.update(
+                        lost_roi_input, frame_id, False,
+                        inference_mode="ROI",
+                        collect_lost=True,
+                        roi_rect=lost_roi_rect,
+                    )
 
             if recording and writer is not None:
                 rec_pid_mode = pos_state

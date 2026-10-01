@@ -1,77 +1,109 @@
 # Báo cáo công việc ngày 01/10/2026
 
 ## A. Công việc đã làm
-- Chỉnh sửa cơ chế thu thập dataset khi ROI tracking bị mất.
-- Dataset mới lấy trực tiếp ROI raw tại frame ROI tracker bị fail, sau đó resize trực tiếp lên 640x640 để phục vụ train bổ sung.
+- Chỉnh sửa lại cách lưu dataset khi lost tracking.
+- Lấy trực tiếp ROI tại đúng frame bị lost tracking và resize ROI này lên 640x640 để phục vụ train bổ sung.
+### 1. Chỉnh sửa lại cách lưu dataset khi lost tracking
+- Code hiện tại:
+  - Khi tracking thành công Leanbot, hệ thống tính ROI dựa trên BBOX hiện tại bằng hàm `calculate_roi()`.
+  - ROI có kích thước động, dạng hình vuông, cạnh được tính bằng khoảng 2 lần cạnh lớn nhất của BBOX và làm tròn lên bội số 32.
+  - ROI sau khi crop từ ảnh camera được resize về 160x160 để đưa vào tracking model.
+  - Khi tracking bị mất, code trước đó lưu ảnh từ full frame rồi tiếp tục crop, padding và resize về 640x640 để tạo dataset.
 
-### 1. Checklist chỉnh sửa lost-tracking dataset
-- [x] Giữ nguyên cơ chế `calculate_roi()`: ROI có kích thước động, vuông, cạnh bằng khoảng 2 lần cạnh lớn nhất của BBOX và làm tròn lên bội số 32.
-- [x] Giữ lại `lost_roi_input = roi_input.copy()` trước bước resize ROI về 160x160 để inference.
-- [x] Chỉ thu sample khi lỗi xảy ra ở `inference_mode == "ROI"`; không lấy các frame FULL-search thất bại.
-- [x] Lưu `roi_rect = (rx, ry, rw, rh)` của đúng frame bị lost.
-- [x] Khi tracking thành công, cache BBOX/angle/confidence/class gần nhất ở hệ tọa độ full frame.
-- [x] Khi ROI tracking fail, chuyển BBOX đã cache từ full-frame coordinate sang ROI coordinate bằng offset `(rx, ry)`.
-- [x] Clip BBOX vào biên ROI và bỏ sample nếu BBOX sau clip không hợp lệ.
-- [x] Tính lại YOLO normalized label theo kích thước ROI `rw x rh`.
-- [x] Tạo ảnh dataset bằng `cv2.resize(lost_roi_input, (640, 640))`; không dùng chuỗi ROI -> 160 -> 640.
-- [x] Giữ `metadata/` và `check_labels/` để kiểm tra pseudo-label trước khi train.
-- [x] Giữ background writer/queue để không block camera inference.
-- [x] Đổi từ giới hạn 1 sample/run sang 1 sample/lost episode.
-- [x] Lost episode kết thúc khi detect thành công trở lại; episode tiếp theo được phép lưu thêm 1 sample trong cùng run.
-- [x] Giữ `lost_tracking_captures/` tách riêng để debug.
+- **Hướng chỉnh sửa**:
+  - Giữ nguyên cơ chế tạo ROI và tracking model hiện tại.
+  - Tại mỗi frame ROI tracking, giữ lại ROI raw trước khi resize về 160x160.
+  - Khi ROI tracking bị fail, sử dụng chính ROI raw của frame đó làm ảnh dataset.
+  - ROI raw được resize trực tiếp lên 640x640:
+    `dataset_image = cv2.resize(lost_roi_input, (640, 640))`
+  - Chỉ lưu dataset khi lỗi xảy ra trong chế độ ROI tracking, không lưu các frame FULL detection bị fail.
+  - Chuyển BBOX từ hệ tọa độ full frame sang hệ tọa độ ROI trước khi tạo YOLO label.
+  - Giữ lại metadata và ảnh `check_labels` để kiểm tra pseudo-label trước khi sử dụng dataset để train.
 
-### 2. Behavior mong muốn
+- Code chỉnh sửa:
+  - Trong [`leanbotCameraController.py`](leanbotCameraController.py):
+    - Giữ lại ROI bằng:
+      `lost_roi_input = roi_input.copy()`
+    - Lưu thêm vị trí ROI:
+      `lost_roi_rect = (rx, ry, rw, rh)`
+    - Khi tracking thành công, tiếp tục cache BBOX, angle, confidence và class gần nhất.
+    - Khi ROI tracking fail, truyền `lost_roi_input` và `lost_roi_rect` vào `LostTrackingCollector`.
+    - Không thu dataset đối với các frame FULL-search thất bại.
 
+  - Trong `lost_tracking_collector.py`:
+    - Bỏ cơ chế tạo ảnh dataset từ full frame.
+    - Ảnh dataset được tạo trực tiếp từ ROI bị lost:
+      `cv2.resize(frame, (640, 640), interpolation=cv2.INTER_LINEAR)`
+    - Chuyển BBOX từ full-frame coordinate sang ROI coordinate:
+      - `roi_x = full_x - rx`
+      - `roi_y = full_y - ry`
+    - Clip BBOX vào biên ROI.
+    - Tính lại YOLO normalized label theo kích thước ROI.
+    - Thêm các thông tin vào metadata:
+      - `roi_rect_xywh`
+      - `source_roi_size`
+      - `bbox_roi_xyxy`
+      - `bbox_yolo`
+
+- Pipeline dataset sau khi chỉnh sửa:
 ```text
-TRACKING
-TRACKING
-ROI LOST       <- lưu sample #1
-FULL SEARCH
-FULL SEARCH
-FULL DETECT    <- kết thúc lost episode
-ROI TRACKING
-ROI TRACKING
-ROI LOST       <- lưu sample #2
-FULL SEARCH
-```
-
-Mỗi lost episode chỉ lấy frame ROI fail đầu tiên, nhưng một run có thể chứa nhiều lost episode.
-
-### 3. Pipeline dataset mục tiêu
-
-```text
-successful detection
+Successful detection
         |
         v
 calculate_roi()
         |
         v
-raw ROI (ví dụ 224x224)
+Raw ROI, ví dụ 224x224
         |
-        +--> resize 160x160 --> tracking model
-                              |
-                              +--> FAIL
-                                    |
-                                    v
-                           lấy raw ROI 224x224
-                                    |
-                         full bbox -> ROI bbox
-                                    |
-                         YOLO normalize theo ROI
-                                    |
-                         resize raw ROI -> 640x640
-                                    |
-                    images / labels / metadata / check_labels
+        +----> resize 160x160
+                    |
+                    v
+             Tracking model
+                    |
+                   FAIL
+                    |
+                    v
+          Lấy lại raw ROI 224x224
+                    |
+                    v
+          Full BBOX -> ROI BBOX
+                    |
+                    v
+          YOLO normalize theo ROI
+                    |
+                    v
+          Resize raw ROI -> 640x640
+                    |
+                    v
+      images / labels / metadata / check_labels
 ```
 
-- Lệnh chạy dự kiến: dùng `--save-lost` như hiện tại.
-- [ ] Chạy thực nghiệm trên camera/Leanbot và kiểm tra `images/`, `labels/`, `metadata/`, `check_labels/`.
-- Label là pseudo-label kế thừa từ detection thành công gần nhất nên vẫn phải review trước khi đưa vào train.
+- Chạy thực nghiệm:
+  - Lệnh chạy:
+  ```bash
+    python leanbotCameraController.py --source 1 --show --save-lost --ble 654321
+  ```
+
+  - Kết quả dataset sau khi thu thập: folder [`lost_tracking_dataset`](lost_tracking_dataset)
+    - `images/`: ảnh ROI lost tracking đã resize về 640x640.
+    - `labels/`: YOLO label được chuyển sang hệ tọa độ ROI.
+    - `metadata/`: thông tin frame, ROI, BBOX, angle, confidence và nguồn label.
+    - `check_labels/`: ảnh preview để kiểm tra BBOX và class trước khi đưa vào train.
+
+- Ảnh các dataset thu thập ví dụ như sau : 
+
+| Ảnh Dataset (ROI resize 640x640) | Ảnh Check Label (YOLO BBOX) |
+| :---: | :---: |
+| ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/images/lost_00002099_000001.png) | ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/check_labels/lost_00002099_000001.png) |
+| ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/images/lost_00002133_000002.png) | ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/check_labels/lost_00002133_000002.png) |
+| ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/images/lost_00002140_000003.png) | ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/check_labels/lost_00002140_000003.png) |
+| ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/images/lost_00002294_000004.png) | ![](lost_tracking_dataset/session_20261001_095155_949420_3682c78e/check_labels/lost_00002294_000004.png) |
+| ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/images/lost_00000854_000001.png) | ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/check_labels/lost_00000854_000001.png) |
+| ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/images/lost_00000958_000002.png) | ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/check_labels/lost_00000958_000002.png) |
+| ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/images/lost_00000976_000003.png) | ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/check_labels/lost_00000976_000003.png) |
+| ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/images/lost_00001560_000004.png) | ![](lost_tracking_dataset/session_20261001_100748_438285_32d7465b/check_labels/lost_00001560_000004.png) |
 
 ## B. Khó khăn
-- BBOX được cache ở hệ tọa độ full frame trong khi ảnh train mới là ROI; cần transform đúng trước khi serialize YOLO label.
-- Không được lấy ảnh 160x160 đã dùng cho inference rồi phóng lên 640x640 vì sẽ mất thêm thông tin.
-
+- Không 
 ## C. Công việc tiếp theo
-- Chạy thực nghiệm và kiểm tra các ảnh trong `check_labels/`.
-- Sau khi xác nhận bbox/class đúng, ghép các hard samples này vào dataset train bổ sung.
+- Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 

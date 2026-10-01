@@ -1,0 +1,7 @@
+timestamp,log_file,target_heading,ang_err1_deg,spin_steps,spin_speed,ang_err2_deg,improvement_deg
+2026-10-01 09:54:11,log_roi_20261001_095336.csv,56.1 deg,-5.33 deg,100,-50,+0.18 deg,+5.15 deg
+2026-10-01 09:54:46,log_roi_20261001_095415.csv,56.1 deg,-0.58 deg,11,-50,-0.16 deg,+0.43 deg
+2026-10-01 10:08:31,log_roi_20261001_100800.csv,56.1 deg,-5.24 deg,98,-50,+0.63 deg,+4.61 deg
+2026-10-01 10:09:22,log_roi_20261001_100852.csv,90.2 deg,+3.22 deg,61,50,-2.13 deg,+1.09 deg
+2026-10-01 10:10:00,log_roi_20261001_100930.csv,90.2 deg,+1.56 deg,29,50,-1.23 deg,+0.33 deg
+2026-10-01 10:11:01,log_roi_20261001_101025.csv,-178.5 deg,+5.72 deg,108,50,+2.48 deg,+3.24 deg

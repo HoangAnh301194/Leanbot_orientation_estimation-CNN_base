@@ -27,19 +27,32 @@ def main():
                 "duration": float(row["duration"])
             })
 
-    unique_signed_steps = sorted(list(set(r["signed_steps"] for r in records)))
-    summary = []
-    for s_steps in unique_signed_steps:
-        step_items = [r for r in records if r["signed_steps"] == s_steps]
-        rads = np.radians([r["heading"] for r in step_items])
-        avg_heading = float(np.degrees(np.arctan2(np.mean(np.sin(rads)), np.mean(np.cos(rads)))))
-        summary.append({"signed_steps": s_steps, "avg_heading": avg_heading})
+    # Phân tách dữ liệu: đi và về
+    dir_0 = [r for r in records if r["direction"] == 0]
+    dir_1 = [r for r in records if r["direction"] == 1]
+    dir_neg1 = [r for r in records if r["direction"] == -1]
+
+    def get_summary(data):
+        unique_s = sorted(list(set(r["steps"] for r in data)))
+        sum_list = []
+        for s in unique_s:
+            items = [r for r in data if r["steps"] == s]
+            rads = np.radians([r["heading"] for r in items])
+            avg = float(np.degrees(np.arctan2(np.mean(np.sin(rads)), np.mean(np.cos(rads)))))
+            sum_list.append((s, avg))
+        return sum_list
+
+    base_val = get_summary(dir_0)[0][1] if get_summary(dir_0) else 0.0
+    
+    fwd_summary = [(0, base_val)] + get_summary(dir_1)
+    bwd_summary = [(0, base_val)] + get_summary(dir_neg1)
 
     output_dir = csv_path.parent
     base_name = csv_path.stem
 
     # Plot 1
     plt.figure(figsize=(11, 6))
+    unique_signed_steps = sorted(list(set(r["signed_steps"] for r in records)))
     for s in unique_signed_steps:
         s_data = [r for r in records if r["signed_steps"] == s]
         plt.plot([r["intervalMs"] for r in s_data], [r["heading"] for r in s_data], marker='o', label=f"steps={s}")
@@ -53,21 +66,29 @@ def main():
 
     # Plot 2
     plt.figure(figsize=(10, 6))
-    x_steps = np.array([s["signed_steps"] for s in summary])
-    y_headings = np.array([s["avg_heading"] for s in summary])
     
-    # Chỉ tính polyfit nếu có hơn 1 điểm dữ liệu
-    if len(x_steps) > 1:
-        p = np.polyfit(x_steps, y_headings, 1)
-        y_fit = np.polyval(p, x_steps)
-        r2 = 1.0 - np.sum((y_headings - y_fit)**2) / np.sum((y_headings - np.mean(y_headings))**2)
-        fit_label = f"polyFit 1st order: y = {p[0]:.4f}x + {p[1]:.2f} (R² = {r2:.4f})"
-        plt.plot(x_steps, y_fit, color='#d90429', linestyle='--', linewidth=2.0, label=fit_label)
+    fwd_x = np.array([s[0] for s in fwd_summary])
+    fwd_y = np.array([s[1] for s in fwd_summary])
+    bwd_x = np.array([s[0] for s in bwd_summary])
+    bwd_y = np.array([s[1] for s in bwd_summary])
     
-    plt.plot(x_steps, y_headings, marker='s', color='#0055d4', linewidth=1.8, label="Mean measuredHeading (Thuận & Nghịch)")
-    plt.axvline(x=0, color='gray', linestyle=':', alpha=0.7)
-    plt.title("Mean measuredHeading / signed_steps & Fit 1st order")
-    plt.xlabel("Signed steps (Âm=Nghịch, Dương=Thuận)")
+    # Plot Lượt đi (Nét liền)
+    if len(fwd_x) > 1:
+        p = np.polyfit(fwd_x, fwd_y, 1)
+        y_fit = np.polyval(p, fwd_x)
+        r2 = 1.0 - np.sum((fwd_y - y_fit)**2) / np.sum((fwd_y - np.mean(fwd_y))**2)
+        plt.plot(fwd_x, y_fit, color='#d90429', linestyle='-', linewidth=1.5, alpha=0.5, label=f"Fit Đi: y = {p[0]:.4f}x + {p[1]:.2f} (R² = {r2:.4f})")
+    
+    plt.plot(fwd_x, fwd_y, marker='s', color='#0055d4', linewidth=2.0, label="Lượt đi (Quay xa dần tâm)")
+    
+    # Plot Lượt về (Nét đứt)
+    plt.plot(bwd_x, bwd_y, marker='o', color='#ff8c00', linestyle='--', linewidth=2.0, label="Lượt về (Góc khi đã về lại tâm)")
+    
+    # Đường chuẩn (Initial heading)
+    plt.axhline(y=base_val, color='gray', linestyle=':', alpha=0.7, label=f"Góc ban đầu (Base: {base_val:.2f}°)")
+
+    plt.title("Phân tích Heading: Lượt đi (Spin Out) vs Lượt về (Return to Center)")
+    plt.xlabel("Số bước Spin (n steps)")
     plt.ylabel("Mean measuredHeading (degree)")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend()

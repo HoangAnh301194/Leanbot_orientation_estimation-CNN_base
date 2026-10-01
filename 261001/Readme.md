@@ -6,19 +6,19 @@
 
 ### 1. Checklist chỉnh sửa lost-tracking dataset
 - [x] Giữ nguyên cơ chế `calculate_roi()`: ROI có kích thước động, vuông, cạnh bằng khoảng 2 lần cạnh lớn nhất của BBOX và làm tròn lên bội số 32.
-- [ ] Giữ lại `lost_roi_input = roi_input.copy()` trước bước resize ROI về 160x160 để inference.
-- [ ] Chỉ thu sample khi lỗi xảy ra ở `inference_mode == "ROI"`; không lấy các frame FULL-search thất bại.
-- [ ] Lưu `roi_rect = (rx, ry, rw, rh)` của đúng frame bị lost.
-- [ ] Khi tracking thành công, cache BBOX/angle/confidence/class gần nhất ở hệ tọa độ full frame.
-- [ ] Khi ROI tracking fail, chuyển BBOX đã cache từ full-frame coordinate sang ROI coordinate bằng offset `(rx, ry)`.
-- [ ] Clip BBOX vào biên ROI và bỏ sample nếu BBOX sau clip không hợp lệ.
-- [ ] Tính lại YOLO normalized label theo kích thước ROI `rw x rh`.
-- [ ] Tạo ảnh dataset bằng `cv2.resize(lost_roi_input, (640, 640))`; không dùng chuỗi ROI -> 160 -> 640.
-- [ ] Giữ `metadata/` và `check_labels/` để kiểm tra pseudo-label trước khi train.
-- [ ] Giữ background writer/queue để không block camera inference.
-- [ ] Đổi từ giới hạn 1 sample/run sang 1 sample/lost episode.
-- [ ] Lost episode kết thúc khi detect thành công trở lại; episode tiếp theo được phép lưu thêm 1 sample trong cùng run.
-- [ ] Giữ `lost_tracking_captures/` tách riêng để debug.
+- [x] Giữ lại `lost_roi_input = roi_input.copy()` trước bước resize ROI về 160x160 để inference.
+- [x] Chỉ thu sample khi lỗi xảy ra ở `inference_mode == "ROI"`; không lấy các frame FULL-search thất bại.
+- [x] Lưu `roi_rect = (rx, ry, rw, rh)` của đúng frame bị lost.
+- [x] Khi tracking thành công, cache BBOX/angle/confidence/class gần nhất ở hệ tọa độ full frame.
+- [x] Khi ROI tracking fail, chuyển BBOX đã cache từ full-frame coordinate sang ROI coordinate bằng offset `(rx, ry)`.
+- [x] Clip BBOX vào biên ROI và bỏ sample nếu BBOX sau clip không hợp lệ.
+- [x] Tính lại YOLO normalized label theo kích thước ROI `rw x rh`.
+- [x] Tạo ảnh dataset bằng `cv2.resize(lost_roi_input, (640, 640))`; không dùng chuỗi ROI -> 160 -> 640.
+- [x] Giữ `metadata/` và `check_labels/` để kiểm tra pseudo-label trước khi train.
+- [x] Giữ background writer/queue để không block camera inference.
+- [x] Đổi từ giới hạn 1 sample/run sang 1 sample/lost episode.
+- [x] Lost episode kết thúc khi detect thành công trở lại; episode tiếp theo được phép lưu thêm 1 sample trong cùng run.
+- [x] Giữ `lost_tracking_captures/` tách riêng để debug.
 
 ### 2. Behavior mong muốn
 
@@ -65,6 +65,7 @@ raw ROI (ví dụ 224x224)
 ```
 
 - Lệnh chạy dự kiến: dùng `--save-lost` như hiện tại.
+- [ ] Chạy thực nghiệm trên camera/Leanbot và kiểm tra `images/`, `labels/`, `metadata/`, `check_labels/`.
 - Label là pseudo-label kế thừa từ detection thành công gần nhất nên vẫn phải review trước khi đưa vào train.
 
 ## B. Khó khăn

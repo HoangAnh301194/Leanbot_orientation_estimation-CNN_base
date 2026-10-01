@@ -18,12 +18,19 @@ def main():
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # New survey logs keep BLE verification failures in the summary
+            # CSV for traceability. They must not enter heading statistics.
+            status = row.get("status", "OK").strip().upper()
+            heading_text = row.get("heading", "").strip()
+            if status != "OK" or not heading_text:
+                continue
+
             records.append({
                 "direction": int(row["direction"]),
                 "steps": int(row["steps"]),
                 "signed_steps": int(row["signed_steps"]),
                 "intervalMs": int(row["intervalMs"]),
-                "heading": float(row["heading"]),
+                "heading": float(heading_text),
                 "duration": float(row["duration"])
             })
 

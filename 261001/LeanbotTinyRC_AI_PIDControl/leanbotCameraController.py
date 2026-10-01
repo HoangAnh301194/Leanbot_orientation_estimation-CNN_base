@@ -515,10 +515,58 @@ class BLEMotorWorker:
 
         asyncio.run_coroutine_threadsafe(_do_rfb(), self.loop)
 
+    async def _spin_steps_verified(self, speed: int, rotation_steps: int):
+        """Send one spst command with sequential START -> END verification."""
+        command = f"spst/{int(speed)}/{int(rotation_steps)}"
+        start_timeout_s = 0.5
+        # Existing survey timing estimates roughly 0.5 + 0.04 * steps seconds.
+        # Add margin for motor stop/wait and BLE scheduling.
+        end_timeout_s = max(5.0, 0.5 + 0.04 * abs(int(rotation_steps)) + 3.0)
+
+        print(f"[BLE SPIN] TX {command}")
+        await self.leanbot.send(f"{command}\n", response=False)
+
+        try:
+            await self.leanbot.waitSerialMessage(
+                f"{command}/START",
+                timeout_s=start_timeout_s,
+            )
+            print(f"[BLE SPIN] RX {command}/START")
+        except TimeoutError:
+            print(
+                f"[WARN] BLE SPIN START timeout for {command}; "
+                "not retrying motion command, waiting for END."
+            )
+            try:
+                await self.leanbot.waitSerialMessage(
+                    f"{command}/END",
+                    timeout_s=end_timeout_s,
+                )
+                print(f"[BLE SPIN] RX {command}/END after START timeout")
+                return False, "SPIN_START_TIMEOUT_END_RECEIVED"
+            except TimeoutError:
+                return False, "SPIN_START_TIMEOUT_END_TIMEOUT"
+
+        try:
+            await self.leanbot.waitSerialMessage(
+                f"{command}/END",
+                timeout_s=end_timeout_s,
+            )
+            print(f"[BLE SPIN] RX {command}/END")
+            return True, ""
+        except TimeoutError:
+            return False, "SPIN_END_TIMEOUT"
+
     def send_spin_steps(self, speed: int, rotation_steps: int):
         if not self.connected or self.loop is None:
+            self.last_action_ok = False
+            self.last_action_error = "BLE_NOT_CONNECTED"
             return
+
         self._action_running = True
+        self.last_action_ok = None
+        self.last_action_error = None
+
         try:
             while not self.cmd_queue.empty():
                 self.cmd_queue.get_nowait()
@@ -527,8 +575,14 @@ class BLEMotorWorker:
 
         async def _do_spin():
             try:
-                await leanbotTinyRC.spin_steps(self.leanbot, speed, rotation_steps)
+                ok, error = await self._spin_steps_verified(speed, rotation_steps)
+                self.last_action_ok = bool(ok)
+                self.last_action_error = error or None
+                if not ok:
+                    print(f"[WARN] BLE spin_steps verification failed: {error}")
             except Exception as e:
+                self.last_action_ok = False
+                self.last_action_error = f"BLE_EXCEPTION:{type(e).__name__}:{e}"
                 print(f"[WARN] BLE spin_steps error: {e}")
             finally:
                 self._action_running = False

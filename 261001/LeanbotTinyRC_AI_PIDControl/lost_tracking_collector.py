@@ -109,9 +109,8 @@ class LostTrackingCollector:
         self._thread.start()
 
     def reset_run(self):
-        """Reset collection state at the start/end of a run."""
+        """Reset run counters/episode state while preserving the latest valid detection cache."""
         self.samples_in_current_run = 0
-        self._last_detection = None
         self._lost_episode_saved = False
 
     def _remember_detection(self, frame, frame_id, bbox_xyxy, angle, confidence, inference_mode):

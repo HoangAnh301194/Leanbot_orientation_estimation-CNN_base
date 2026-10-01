@@ -53,6 +53,17 @@ def spinSteps(speed: int, steps: int):
                         print("User interrupted survey.")
                         sys.exit(0)
             time.sleep(0.02)
+
+        if ble.last_action_ok is not True:
+            error = ble.last_action_error or "SPIN_ACTION_FAILED"
+            print(
+                f"[FATAL] spinSteps verification failed: speed={speed}, "
+                f"steps={steps}, error={error}. Stopping survey."
+            )
+            if show_ui:
+                cv2.destroyAllWindows()
+            sys.exit(2)
+
         time.sleep(0.2)
 
 

@@ -102,7 +102,6 @@ PID navigation
 > Nếu mất tracking ROI 160x160 thì tự động quay lại bước tìm kiếm qua FULL detection 640.
 
 ## 3.6. Các tham số inference chính
-
 ```text
 --width           1280
 --height          720

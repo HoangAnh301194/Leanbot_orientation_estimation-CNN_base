@@ -58,17 +58,43 @@ def main():
     base_name = csv_path.stem
 
     # Plot 1
-    plt.figure(figsize=(11, 6))
-    unique_signed_steps = sorted(list(set(r["signed_steps"] for r in records)))
-    for s in unique_signed_steps:
-        s_data = [r for r in records if r["signed_steps"] == s]
-        plt.plot([r["intervalMs"] for r in s_data], [r["heading"] for r in s_data], marker='o', label=f"steps={s}")
-    plt.title("measuredHeading theo intervalMs (Thuận & Nghịch)")
+    plt.figure(figsize=(12, 7))
+    import matplotlib.cm as cm
+
+    unique_steps = sorted(list(set(r["steps"] for r in records)))
+    colors = cm.tab10(np.linspace(0, 1, len(unique_steps)))
+
+    for idx, s in enumerate(unique_steps):
+        color = colors[idx]
+
+        # Baseline (direction=0)
+        d0 = sorted([r for r in records if r["steps"] == s and r["direction"] == 0], key=lambda r: r["intervalMs"])
+        if d0:
+            plt.plot([r["intervalMs"] for r in d0], [r["heading"] for r in d0],
+                     marker='D', linestyle=':', color=color, linewidth=2.0, markersize=6,
+                     label=f"steps={s} (baseline)")
+
+        # Spin +X (direction=+1)
+        d1 = sorted([r for r in records if r["steps"] == s and r["direction"] == 1], key=lambda r: r["intervalMs"])
+        if d1:
+            plt.plot([r["intervalMs"] for r in d1], [r["heading"] for r in d1],
+                     marker='o', linestyle='-', color=color, linewidth=2.0, markersize=5,
+                     label=f"steps={s} (spin +{s})")
+
+        # Spin -X (direction=-1)
+        dn = sorted([r for r in records if r["steps"] == s and r["direction"] == -1], key=lambda r: r["intervalMs"])
+        if dn:
+            plt.plot([r["intervalMs"] for r in dn], [r["heading"] for r in dn],
+                     marker='x', linestyle='--', color=color, linewidth=2.0, markersize=5,
+                     label=f"steps={s} (spin -{s})")
+
+    plt.title("measuredHeading theo intervalMs")
     plt.xlabel("intervalMs (ms)")
     plt.ylabel("measuredHeading (độ)")
-    plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', fontsize='small')
+    plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', fontsize='small', ncol=1)
+    plt.grid(True, linestyle='--', alpha=0.4)
     plt.tight_layout()
-    plt.savefig(output_dir / f"{base_name}_plot1_interval.png")
+    plt.savefig(output_dir / f"{base_name}_plot1_interval.png", dpi=150)
     plt.close()
 
     # Plot 2
@@ -84,7 +110,7 @@ def main():
         p = np.polyfit(fwd_x, fwd_y, 1)
         y_fit = np.polyval(p, fwd_x)
         r2 = 1.0 - np.sum((fwd_y - y_fit)**2) / np.sum((fwd_y - np.mean(fwd_y))**2)
-        plt.plot(fwd_x, y_fit, color='#d90429', linestyle='-', linewidth=1.5, alpha=0.5, label=f"Fit Đi: y = {p[0]:.4f}x + {p[1]:.2f} (R² = {r2:.4f})")
+        plt.plot(fwd_x, y_fit, color='#d90429', linestyle='-', linewidth=1.5, alpha=0.5, label=f"Linear fit: y = {p[0]:.4f}x + {p[1]:.2f} (R² = {r2:.4f})")
     
     plt.plot(fwd_x, fwd_y, marker='s', color='#0055d4', linewidth=2.0, label="Lượt đi (Quay xa dần tâm)")
     

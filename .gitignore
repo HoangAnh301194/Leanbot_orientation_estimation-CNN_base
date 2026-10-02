@@ -185,3 +185,13 @@ gmail_mcp/
 260911/datasets_0
 260911/raw_image
 260911/tool1_output
+
+# Allow final dataset archive
+!Leanbot_Camera_AI_Control_FINAL/datasets.zip
+
+# Allow OpenVINO model files in FINAL
+!Leanbot_Camera_AI_Control_FINAL/models/
+!Leanbot_Camera_AI_Control_FINAL/models/**/
+!Leanbot_Camera_AI_Control_FINAL/models/**/*.bin
+!Leanbot_Camera_AI_Control_FINAL/models/**/*.xml
+!Leanbot_Camera_AI_Control_FINAL/models/**/*.yaml

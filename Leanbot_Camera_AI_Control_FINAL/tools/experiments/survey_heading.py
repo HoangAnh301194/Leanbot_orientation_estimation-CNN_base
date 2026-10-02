@@ -9,7 +9,7 @@ import numpy as np
 from datetime import datetime
 
 current_dir = Path(__file__).resolve().parent
-sys.path.insert(0, str(current_dir))
+sys.path.insert(0, str(current_dir.parent.parent / "LeanbotTinyRC_AI_PIDControl"))
 from leanbotCameraController import BLEMotorWorker, LeanbotCameraTracker, measureHeading as _measureHeading
 
 

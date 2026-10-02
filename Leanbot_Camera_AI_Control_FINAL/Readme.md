@@ -6,3 +6,6 @@
 - Chạy inference và các tính năng hiện có. 
 
 ### 1. Thu thập dữ liệu ảnh và build Dataset
+
+
+## B. Công việc 

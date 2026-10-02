@@ -11,7 +11,7 @@ def wrap_to_180(angle_deg):
     return (angle_deg + 180.0) % 360.0 - 180.0
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-logs = sorted(glob.glob(os.path.join(base_dir, "benchmark_logs", "log_roi_*.csv")))
+logs = sorted(glob.glob(os.path.join(base_dir, "..", "..", "LeanbotTinyRC_AI_PIDControl", "benchmark_logs", "log_roi_*.csv")))
 results = []
 
 for log_path in logs:

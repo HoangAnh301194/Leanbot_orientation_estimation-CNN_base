@@ -1,16 +1,13 @@
 # Tổng hợp tài liệu bàn giao công việc
 
 ## A. Các nội dung
-
-Tài liệu bàn giao được chia thành 3 phần chính:
-
 - Thu thập dữ liệu ảnh và Build Dataset.
 - Training và export OpenVINO FP16 model.
 - Chạy inference và các tính năng hiện có.
 
 ### 1. Thu thập dữ liệu ảnh và Build Dataset
 
-Phần này mô tả toàn bộ pipeline dữ liệu từ lúc chụp ảnh tới khi tạo dataset dùng cho training.
+Nội dung toàn bộ pipeline dữ liệu từ lúc chụp ảnh tới khi tạo dataset dùng cho training.
 
 Nội dung chi tiết gồm:
 
@@ -34,7 +31,7 @@ Tài liệu chi tiết:
 
 - [01_DATASET_PIPELINE.md](docs/01_DATASET_PIPELINE.md)
 
-Pipeline tổng quát:
+Pipeline khái quát quy trình của Module thu thập và build dataset:
 
 ```text
 Camera
@@ -63,12 +60,11 @@ merge_lost_tracking_dataset.py
   ↓
 datasets_with_lost_tracking/
   ↓
-Training lại model
+đổi tên thành dataset.zip để phụ vụ module train Model Yolo
 ```
 
 ### 2. Training và export OpenVINO FP16 model
-
-Phần này mô tả quy trình training model YOLO11n với 24 class góc, đánh giá kết quả và export sang OpenVINO FP16.
+Nội dung toàn bộ quy trình training model YOLO11n với 24 class góc, đánh giá kết quả và export sang OpenVINO FP16 để phục vụ Module điều khiển chuyển động thôg qua Camera 
 
 Nội dung chi tiết gồm:
 
@@ -76,16 +72,15 @@ Nội dung chi tiết gồm:
   - [`Leanbot_Train_SoftBCE.ipynb`](tools/Leanbot_Train_SoftBCE.ipynb)
 - Dataset:
   - [`datasets.zip`](datasets.zip)
-- Model nền:
+- Model pretrain để finetuning:
   - `yolo11n.pt`
-- 24 class hướng, mỗi class cách nhau 15 độ.
+- 24 class góc, mỗi class cách nhau 15 độ.
 - Soft Angular BCE để giữ quan hệ tuần hoàn giữa các class góc.
 - Training trên Google Colab GPU.
 - Thông số training chính:
   - 150 epochs.
   - batch size 16.
   - image size 640.
-  - tắt horizontal/vertical flip để bảo toàn hướng.
 - Các metric cần kiểm tra:
   - Precision.
   - Recall.
@@ -102,7 +97,7 @@ Tài liệu chi tiết:
 
 - [02_TRAINING_AND_EXPORT.md](docs/02_TRAINING_AND_EXPORT.md)
 
-Pipeline tổng quát:
+Pipeline toàn bộ quy trình:
 
 ```text
 datasets.zip
@@ -122,7 +117,7 @@ models/yolo11n_latest_version/
 
 ### 3. Chạy inference và các tính năng hiện có
 
-Phần này mô tả runtime camera AI, ước lượng hướng, smoothing và điều khiển Leanbot tới target.
+Nội dung toàn bộ quy trình runtime camera AI, ước lượng hướng, smoothing và điều khiển Leanbot tới target.
 
 Code chính:
 
@@ -139,7 +134,7 @@ Các module runtime:
 
 Các chức năng chính:
 
-- Hybrid inference:
+- Hybrid model Roi tracking inference :  
   - FULL detection bằng model 640x640.
   - ROI tracking bằng model 160x160.
 - Ước lượng hướng bằng score-weighted vector trên 24 class.
@@ -185,7 +180,7 @@ python .\leanbotCameraController.py `
   --ble <BLE_ID>
 ```
 
-## B. Cấu trúc thư mục bàn giao
+## B. Cấu trúc thư mục dự án 
 
 ```text
 Leanbot_Camera_AI_Control_FINAL/
@@ -228,8 +223,7 @@ Leanbot_Camera_AI_Control_FINAL/
 ```
 
 ## C. Cài đặt môi trường
-
-Từ thư mục `Leanbot_Camera_AI_Control_FINAL`:
+- Cài đặt môi trường ảo (nếu là chạy test) và pip install requirement thưu viện: 
 
 ```powershell
 python -m venv venv
@@ -251,20 +245,3 @@ bleak>=0.21.0
 pyyaml>=6.0
 ```
 
-## D. Thứ tự đọc tài liệu
-
-Để tái tạo toàn bộ pipeline từ đầu:
-
-1. [01_DATASET_PIPELINE.md](docs/01_DATASET_PIPELINE.md)
-2. [02_TRAINING_AND_EXPORT.md](docs/02_TRAINING_AND_EXPORT.md)
-3. [03_INFERENCE_AND_CONTROL.md](docs/03_INFERENCE_AND_CONTROL.md)
-
-Ba tài liệu tương ứng với ba giai đoạn:
-
-```text
-Data
-  ↓
-Training / Deployment
-  ↓
-Inference / Control
-```

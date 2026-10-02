@@ -1,6 +1,6 @@
 # 1. Thu thập dữ liệu ảnh và Build Dataset
 
-Tài liệu này mô tả pipeline tạo dữ liệu cho bài toán nhận diện Leanbot và ước lượng hướng theo 24 lớp góc. Pipeline gồm các bước: thu thập ảnh, auto-label, build dataset chuẩn YOLO và bổ sung dữ liệu từ các trường hợp lost tracking.
+Toàn bộ hướng dẫn tái triển khai lại pipeline tạo dữ liệu cho bài toán nhận diện Leanbot và ước lượng hướng theo 24 lớp góc. Pipeline gồm các bước: thu thập ảnh, auto-label, build dataset chuẩn YOLO và bổ sung dữ liệu từ các trường hợp lost tracking.
 
 ## 1.1. Các file sử dụng
 
@@ -50,8 +50,7 @@ Model sử dụng 24 class, mỗi class cách nhau 15 độ:
 Trong đó `p` biểu diễn góc dương và `m` biểu diễn góc âm. Ví dụ `Leanbot_m15` tương ứng -15 độ, tương đương 345 độ trong hệ [0, 360).
 
 ## 1.3. Thu thập dữ liệu ảnh
-
-Chạy từ thư mục `Leanbot_Camera_AI_Control_FINAL`:
+- Lệnh chạy : 
 
 ```powershell
 python .\tools\capture_session.py --source 1 --session_name Leanbot_0_new --class_name Leanbot_0 --class_id 0
@@ -66,8 +65,8 @@ Các tham số:
 
 Trong cửa sổ capture:
 
-- `B`: lưu một ảnh background.
-- `SPACE`: lưu một ảnh có Leanbot.
+- `B`: lưu một ảnh background cho phiên đang thu thập, backgroud này sẽ được dùng chung cho các ảnh trong cùng một session để đánh nhãn tự động. 
+- `SPACE`: Chụp ảnh data Leanbot.
 - `S`: kết thúc và lưu session.
 - `Q`: dừng ngay quá trình capture.
 
@@ -85,14 +84,8 @@ raw_image/
     └── session_metadata.json
 ```
 
-Với pipeline paired, background và raw image cần có cùng chỉ số ở cuối tên file:
 
-```text
-background_000.jpg  <->  deg_0_000.jpg
-background_001.jpg  <->  deg_0_001.jpg
-```
-
-Background phải chứa cùng điều kiện sa bàn, vật cản hoặc vật thể tĩnh như ảnh dữ liệu tương ứng, nhưng không chứa Leanbot cần gán nhãn.
+Background phải chứa cùng điều kiện sa bàn, vật cản hoặc vật thể tĩnh như ảnh dữ liệu tương ứng, nhưng không được chứa Leanbot.
 
 ## 1.4. Auto-label theo cặp background/raw image
 
@@ -200,7 +193,7 @@ Các sample lost tracking thu sau đó chưa được sử dụng để train mo
 
 ## 1.7. Thu thập dữ liệu khi lost tracking
 
-Khi cần lưu thêm các trường hợp ROI tracking thất bại, chạy inference với `--save-lost`:
+Khi cần lưu thêm các trường hợp ROI tracking thất bại khi chạy module Camera AI controll inference thì cần thêm tham số `--save-lost`:
 
 ```powershell
 cd .\LeanbotTinyRC_AI_PIDControl
@@ -209,17 +202,6 @@ python .\leanbotCameraController.py `
   --source 1 `
   --show `
   --save-lost `
-  --ble <BLE_ID>
-```
-
-Có thể chỉ định output riêng:
-
-```powershell
-python .\leanbotCameraController.py `
-  --source 1 `
-  --show `
-  --save-lost `
-  --lost-dataset-dir ..\lost_tracking_dataset `
   --ble <BLE_ID>
 ```
 
@@ -259,7 +241,7 @@ Tool không ghi đè dataset nền. Nó tạo dataset mới, kiểm tra cấu tr
 Expand-Archive -Path .\datasets.zip -DestinationPath .\datasets -Force
 ```
 
-Sau khi giải nén cần có:
+Sau khi giải nén folder datasets sẽ có:
 
 ```text
 datasets/
@@ -277,17 +259,7 @@ lost_tracking_dataset/<session>/check_labels/
 
 Chỉ giữ các sample có bbox và class phù hợp.
 
-### Bước 3: Dry-run
-
-```powershell
-python .\tools\merge_lost_tracking_dataset.py `
-  --base .\datasets `
-  --lost-root .\lost_tracking_dataset `
-  --output .\datasets_with_lost_tracking `
-  --dry-run
-```
-
-### Bước 4: Tạo dataset mới
+### Bước 3: Tạo dataset mới
 
 ```powershell
 python .\tools\merge_lost_tracking_dataset.py `
@@ -315,23 +287,7 @@ datasets_with_lost_tracking/
 └── manifest.json
 ```
 
-Trong manifest:
-
-- `source_type=base_dataset`: sample từ dataset ban đầu.
-- `source_type=lost_tracking`: sample bổ sung từ lost tracking.
-
-Tool kiểm tra cú pháp YOLO, class ID, normalized bbox và kích thước bbox. Tool không thể tự xác nhận pseudo-label đúng về mặt nội dung ảnh; bước kiểm tra `check_labels/` vẫn bắt buộc.
-
-### Bước 5: Tạo file zip để train lại
-
-```powershell
-Compress-Archive `
-  -Path .\datasets_with_lost_tracking\* `
-  -DestinationPath .\datasets_with_lost_tracking.zip `
-  -Force
-```
-
-Upload file zip mới lên Google Colab và cập nhật đường dẫn dataset trong notebook, hoặc đổi tên thành `datasets.zip` để dùng workflow mặc định.
+- Sau khi có datasets_with_lost_tracking thì kiểm tra qua một lần xem ảnh đã được thêm chưa, và đổi tên thành datasets.zip để dùng cho module Training . 
 
 ## 1.9. Pipeline tổng hợp
 

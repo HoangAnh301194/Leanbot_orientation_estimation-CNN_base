@@ -1,6 +1,6 @@
 # 2. Training và Export OpenVINO FP16 Model
 
-Tài liệu này mô tả quy trình huấn luyện model YOLO11n cho 24 class góc Leanbot, đánh giá kết quả và export model sang OpenVINO FP16 để sử dụng trong runtime.
+Toàn bộ quy trình huấn luyện model YOLO11n cho 24 class góc Leanbot, đánh giá kết quả và export model sang OpenVINO FP16 để sử dụng trong runtime.
 
 ## 2.1. Các file sử dụng
 
@@ -12,7 +12,7 @@ Tài liệu này mô tả quy trình huấn luyện model YOLO11n cho 24 class g
 
 ## 2.2. Dataset dùng để training
 
-Model hiện tại được train lại ngày 11/09/2026 với dataset gồm:
+Model hiện tại được train với dataset gần nhất bao gồm:
 
 - 204 ảnh 640x640.
 - 192 ảnh có Leanbot.
@@ -24,16 +24,44 @@ File dataset:
 
 - [`datasets.zip`](../datasets.zip)
 
-Nếu đã bổ sung lost-tracking samples bằng [`merge_lost_tracking_dataset.py`](../tools/merge_lost_tracking_dataset.py), có thể tạo một file zip dataset mới và dùng file đó thay cho `datasets.zip`.
+> Nếu đã bổ sung lost-tracking samples bằng [`merge_lost_tracking_dataset.py`](../tools/merge_lost_tracking_dataset.py), có thể tạo một file zip dataset mới và dùng file đó thay cho `datasets.zip` hiện có trên repo.
 
-## 2.3. Chuẩn bị Google Colab
+## 2.3. Hướng dẫn sử dụng Google Colab để huấn luyện mô hình
 
-Notebook được thiết kế để chạy trên Google Colab với GPU.
+Notebook được thiết kế để chạy trên Google Colab với GPU. Em sử dụng notebook **[`Leanbot_Train_SoftBCE.ipynb`](../tools/Leanbot_Train_SoftBCE.ipynb)** trên Google Colab để huấn luyện và kiểm tra mô hình YOLO11n.
 
-Upload các file sau lên Colab:
+- Tìm Google Colab và mở môi trường làm việc.
 
-- `Leanbot_Train_SoftBCE.ipynb`
-- `datasets.zip`
+  <p align="center">
+    <img src="../../260409/image/colab_search_result.jpg" alt="Tìm kiếm Google Colab"><br>
+    <img src="../../260409/image/colab_training_notebook_overview.jpg" alt="Notebook huấn luyện trên Google Colab">
+  </p>
+
+- Upload notebook huấn luyện lên Colab.
+
+  <p align="center">
+    <img src="../../260409/image/colab_upload_notebook.jpg" alt="Mở hộp thoại upload notebook trên Colab">
+  </p>
+
+- Chọn cấu hình runtime phù hợp để huấn luyện.
+
+  <p align="center">
+    <img src="../../260409/image/colab_runtime_menu.jpg" alt="Mở menu Runtime trên Google Colab"><br>
+    <img src="../../260409/image/colab_change_runtime_t4_gpu.jpg" alt="Chọn Python 3 và T4 GPU">
+  </p>
+
+- Upload file dữ liệu **`datasets.zip`** (đã chuẩn bị ở bước trước) để notebook chuẩn bị dữ liệu đầu vào.
+
+  <p align="center">
+    <img src="../../260409/image/colab_files_panel_before_upload.jpg" alt="Cửa sổ Files trước khi upload dữ liệu"><br>
+    <img src="../../260409/image/colab_datasets_zip_uploaded.jpg" alt="File datasets.zip sau khi được upload">
+  </p>
+
+- Chạy toàn bộ notebook để cài thư viện, giải nén dữ liệu và huấn luyện mô hình.
+
+  <p align="center">
+    <img src="../../260409/image/colab_run_all_notebook.jpg" alt="Nút Run all trên notebook"><br>
+  </p>
 
 Trong notebook, dataset được giải nén và chia thành các tập:
 
@@ -50,172 +78,9 @@ datasets/
     └── labels/
 ```
 
-Notebook chia dữ liệu theo class để hạn chế mất cân bằng giữa các góc.
+- Sau khi chạy hoàn tất thì Notebook tự động tải 1 folder bao gồm cả model best.pt và các file dữ liệu đánh giá quá trình trainning về máy. 
 
-## 2.4. File cấu hình YOLO
-
-Notebook tạo file `leanbot_data.yaml` với 24 class:
-
-```yaml
-path: /content/datasets
-train: train/images
-val: val/images
-test: test/images
-
-nc: 24
-
-names:
-  0: Leanbot_0
-  1: Leanbot_p15
-  2: Leanbot_p30
-  3: Leanbot_p45
-  4: Leanbot_p60
-  5: Leanbot_p75
-  6: Leanbot_p90
-  7: Leanbot_p105
-  8: Leanbot_p120
-  9: Leanbot_p135
-  10: Leanbot_p150
-  11: Leanbot_p165
-  12: Leanbot_p180
-  13: Leanbot_p195
-  14: Leanbot_m150
-  15: Leanbot_m135
-  16: Leanbot_m120
-  17: Leanbot_m105
-  18: Leanbot_m90
-  19: Leanbot_m75
-  20: Leanbot_m60
-  21: Leanbot_m45
-  22: Leanbot_m30
-  23: Leanbot_m15
-```
-
-## 2.5. Model nền và Soft Angular BCE
-
-Model nền:
-
-```python
-model = YOLO("yolo11n.pt")
-```
-
-Bài toán dùng 24 class hướng liên tiếp theo vòng tròn. Vì vậy notebook thay BCE mặc định bằng Soft Angular BCE.
-
-Với class đúng có góc `theta`, target của các class lân cận được làm mềm theo khoảng cách góc vòng tròn:
-
-```text
-d = min(|theta_i - theta_j|, 360 - |theta_i - theta_j|)
-```
-
-Trọng số target được tính theo Gaussian:
-
-```text
-soft = exp(-0.5 * (d / sigma)^2)
-```
-
-Notebook hiện dùng:
-
-```text
-sigma = 15 degrees
-```
-
-Cách này giữ quan hệ tuần hoàn giữa các class, ví dụ:
-
-```text
-0° gần 15°
-0° cũng gần 345°
-```
-
-## 2.6. Thông số training hiện tại
-
-Lệnh training trong notebook:
-
-```python
-!python train.py --epochs 150 --batch 16
-```
-
-Các thông số chính:
-
-```text
-Base model     : yolo11n.pt
-Epochs         : 150
-Batch size     : 16
-Image size     : 640
-Device         : GPU
-Degrees        : 10.0
-Horizontal flip: 0.0
-Vertical flip  : 0.0
-Soft BCE sigma : 15°
-```
-
-Flip bị tắt vì lật ảnh sẽ làm thay đổi ý nghĩa hướng của Leanbot.
-
-## 2.7. Output sau training
-
-Ultralytics lưu kết quả mặc định trong:
-
-```text
-/content/runs/detect/leanbot_colab/
-```
-
-Các file cần lưu lại:
-
-```text
-weights/
-├── best.pt
-└── last.pt
-
-results.csv
-results.png
-confusion_matrix.png
-confusion_matrix_normalized.png
-BoxP_curve.png
-BoxR_curve.png
-BoxF1_curve.png
-BoxPR_curve.png
-```
-
-Model dùng để export là:
-
-```text
-best.pt
-```
-
-## 2.8. Các metric cần kiểm tra
-
-Các chỉ số chính:
-
-- Precision.
-- Recall.
-- mAP50.
-- mAP50-95.
-- Confusion matrix.
-
-Với bài toán góc, confusion matrix cần được kiểm tra thêm theo quan hệ class lân cận. Sai lệch giữa hai class cách nhau 15 độ có ý nghĩa khác với nhầm sang một class cách xa nhiều góc.
-
-Kết quả model train ngày 11/09/2026:
-
-```text
-mAP50     ≈ 0.9398
-mAP50-95  ≈ 0.8061
-Precision ≈ 0.7943
-Recall    ≈ 0.9286
-```
-
-## 2.9. Tải model `best.pt` từ Colab
-
-Notebook có cell tải:
-
-```python
-from google.colab import files
-
-best_model = '/content/runs/detect/leanbot_colab/weights/best.pt'
-files.download(best_model)
-```
-
-Sau khi tải về, đặt `best.pt` ở một thư mục tạm hoặc thư mục model để export.
-
-## 2.10. Export OpenVINO FP16
+## 2.4. Export OpenVINO FP16
 
 Script:
 
@@ -228,7 +93,6 @@ Script hỗ trợ hai kích thước input:
 640
 ```
 
-Runtime hiện dùng model no-NMS, vì phần grouping/NMS được xử lý trong code Python.
 
 ### Export model 640
 
@@ -240,6 +104,8 @@ python .\tools\export_openvino_fp16.py `
   --imgsz 640 `
   --no-nms
 ```
+
+- Phần --model có thể đổi đường dẫn cho phù hợp.
 
 ### Export model 160
 
@@ -257,19 +123,10 @@ best_fp16_no_nms_imgsz640_openvino_model/
 best_fp16_no_nms_imgsz160_openvino_model/
 ```
 
-Mỗi OpenVINO IR cần ít nhất:
 
-```text
-model.xml
-model.bin
-metadata.yaml
-```
+## 2.5. Vị trí model trong project
 
-Không được chỉ copy file `.xml`; `.bin` chứa weights của model.
-
-## 2.11. Vị trí model trong project
-
-Runtime mặc định tìm model ở:
+Runtime hiện tại mặc định tìm model ở:
 
 - [FULL 640](../models/yolo11n_latest_version/best_fp16_no_nms_imgsz640_openvino_model/)
 - [ROI 160](../models/yolo11n_latest_version/best_fp16_no_nms_imgsz160_openvino_model/)
@@ -290,7 +147,7 @@ models/
         └── metadata.yaml
 ```
 
-## 2.12. Vai trò hai model trong runtime
+## 2.6. Vai trò hai model trong runtime
 
 ```text
 Camera frame
@@ -306,7 +163,7 @@ Camera frame
 
 Model 640 ưu tiên phạm vi tìm kiếm toàn ảnh. Model 160 giảm kích thước input để phục vụ tracking ROI với chi phí inference thấp hơn.
 
-## 2.13. Quy trình retrain sau khi bổ sung dữ liệu
+## 2.7. Tổng quan quy trình retrain sau khi bổ sung dữ liệu
 
 ```text
 Dataset gốc

@@ -1,6 +1,6 @@
 # 3. Chạy Inference và các tính năng hiện có
 
-Tài liệu này mô tả cách chạy hệ thống camera AI, pipeline inference, smoothing góc, set target, điều khiển PID tới target, cơ chế đi lùi, lost tracking và các phím điều khiển.
+Tài liệu mô tả toàn bộ cách chạy hệ thống camera AI, pipeline inference, set target, điều khiển PID tới target, cơ chế đi lùi, lost tracking và các phím điều khiển.
 
 ## 3.1. Các file runtime
 
@@ -15,9 +15,7 @@ Tài liệu này mô tả cách chạy hệ thống camera AI, pipeline inferenc
 - [Model 160](../models/yolo11n_latest_version/best_fp16_no_nms_imgsz160_openvino_model/)
 
 ## 3.2. Cài dependency
-
-Từ thư mục `Leanbot_Camera_AI_Control_FINAL`:
-
+- Cài đặt môi trường ảo ( nếu cần) và tải requirement nếu chưa cài trước đó. 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
@@ -46,22 +44,10 @@ Chuyển vào runtime folder:
 cd .\LeanbotTinyRC_AI_PIDControl
 ```
 
-Lệnh cơ bản:
+Lệnh chạy ngắn với các thôgn số mặc định :
 
 ```powershell
 python .\leanbotCameraController.py --source 1 --show --ble <BLE_ID>
-```
-
-Nếu không cần BLE:
-
-```powershell
-python .\leanbotCameraController.py --source 1 --show --ble 0
-```
-
-Nếu chạy từ video:
-
-```powershell
-python .\leanbotCameraController.py --video <path_to_video> --show --ble 0
 ```
 
 ## 3.4. Model mặc định
@@ -76,7 +62,7 @@ models\yolo11n_latest_version\best_fp16_no_nms_imgsz640_openvino_model
 models\yolo11n_latest_version\best_fp16_no_nms_imgsz160_openvino_model
 ```
 
-Có thể override:
+Có thể override model khác để infernce nếu cần :
 
 ```powershell
 python .\leanbotCameraController.py `
@@ -113,8 +99,7 @@ Fused angle
     ↓
 PID navigation
 ```
-
-Khi ROI tracking thất bại, hệ thống chuyển lại FULL search để tìm lại Leanbot.
+> Nếu mất tracking ROI 160x160 thì tự động quay lại bước tìm kiếm qua FULL detection 640.
 
 ## 3.6. Các tham số inference chính
 
@@ -183,7 +168,7 @@ Thông số:
 --target-config     target_config.json
 ```
 
-Lệnh tùy chỉnh:
+Lệnh tùy chỉnh khi chạy inference nếu cần. 
 
 ```powershell
 python .\leanbotCameraController.py `
@@ -195,7 +180,7 @@ python .\leanbotCameraController.py `
 
 ## 3.9. Start navigation
 
-Sau khi set target, nhấn `S`.
+Sau khi set target,đặt Leanbot ra khỏi vị trí set target và  nhấn `S` để chạy naigation về điểm target và góc target.
 
 State machine:
 
@@ -286,7 +271,7 @@ settle_time  = 500 ms
 
 Robot gửi lệnh forward/backward tự động qua firmware.
 
-## 3.10. Cơ chế tự chọn tiến hoặc lùi
+## 3.10. Cơ chế tự chọn chuyển động tiến hoặc lùi về target 
 
 Khi bắt đầu Phase 1:
 
@@ -306,7 +291,7 @@ thì:
 is_reversing = True
 ```
 
-Bearing điều khiển được cộng thêm 180 độ và vận tốc tuyến tính ở Phase 2 được đổi dấu.
+Cơ chế điều khiển được cộng thêm 180 độ và vận tốc tuyến tính ở Phase 2 được đổi dấu.
 
 Gain khi đi lùi:
 
@@ -458,9 +443,8 @@ target_history.csv
 target_history.json
 ```
 
-`benchmark_logs/` chứa dữ liệu debug và capture, không phải dependency của runtime.
-
-## 3.15. Ví dụ lệnh chạy đầy đủ
+`benchmark_logs/` chứa dữ liệu debug và capture
+## 3.15. lệnh chạy đầy đủ với tham số
 
 ```powershell
 python .\leanbotCameraController.py `
@@ -495,7 +479,7 @@ python .\leanbotCameraController.py `
   --ble <BLE_ID>
 ```
 
-## 3.16. Trình tự vận hành đề xuất
+## 3.16. Trình tự vận hành tổng quát.
 
 ```text
 1. Kết nối camera và Leanbot.

@@ -85,7 +85,7 @@ Raw ROI, ví dụ 200x180 --> 224x224
   ```
 
   - Kết quả dataset sau khi thu thập: folder [leanbotCameraController.py](LeanbotTinyRC_AI_PIDControl/leanbotCameraController.py)
-  
+
     - `images/`: ảnh ROI lost tracking đã resize về 640x640.
     - `labels/`: YOLO label được chuyển sang hệ tọa độ ROI.
     - `metadata/`: thông tin frame, ROI, BBOX, angle, confidence và nguồn label.
@@ -108,3 +108,4 @@ Raw ROI, ví dụ 200x180 --> 224x224
 - Không 
 ## C. Công việc tiếp theo
 - Em xin phép nhận hướng đi tiếp theo từ Thầy ạ . 
+
